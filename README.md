@@ -51,4 +51,3 @@ i <- end + 1
 write.csv(out,file = "outputMat.csv",sep = "\t")
 }
 
-```r
