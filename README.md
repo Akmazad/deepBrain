@@ -1,6 +1,6 @@
 # deepC
 sample text
-```R
+```r
 ## datadir = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\tryData2"
 
 
@@ -51,4 +51,4 @@ i <- end + 1
 write.csv(out,file = "outputMat.csv",sep = "\t")
 }
 
-```R
+```r
