@@ -1,4 +1,4 @@
-# deepC
+# deep Brain
 sample text
 ```r
 ## datadir = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\tryData2"
