@@ -41,13 +41,13 @@ out=NULL
 i <- 1
 b <- binSize
 while (i < 243190){
-start <- i
-end <- i + b
-bin <- window(fullCov$chr2,start,end)
-sb <- sapply(bin,sum)
-out <- rbind(out,sb)
-i <- end + 1
-}
+    start <- i
+    end <- i + b
+    bin <- window(fullCov$chr2,start,end)
+    sb <- sapply(bin,sum)
+    out <- rbind(out,sb)
+    i <- end + 1
+  }
 write.csv(out,file = "outputMat.csv",sep = "\t")
 }
 
