@@ -48,6 +48,6 @@ while (i < 243190){
     out <- rbind(out,sb)
     i <- end + 1
   }
-write.csv(out,file = "outputMat.csv",sep = "\t")
+write.csv(out,file = "outputMat.csv")
 }
 
