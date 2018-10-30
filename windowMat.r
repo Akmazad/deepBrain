@@ -31,7 +31,7 @@ windowMat <- function(datadir, chrFile, binSize, outputPath){
     ## first get the bam file paths
     bam_files <- list.files(path = datadir, pattern="*.sorted.bam$", recursive=TRUE, full.names=TRUE)
     ##  then make the bai paths since they are meant to be in the same directory here as the bam file
-    bai_files <- paste(files,".bai",sep="")
+    bai_files <- paste(bam_files, ".bai", sep="")
 
     ## read chromosome length file
     chrInfo <- read.csv(file=chrFile, sep="\t")
