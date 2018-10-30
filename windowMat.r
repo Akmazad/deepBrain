@@ -1,37 +1,49 @@
-## datadir = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\tryData2"
+windowMatForAchr <- function(bam_files, bai_files, datadir, binSize, chrID, chrLength){
+    ## Load libraries
+    library('RCurl')
+    library('derfinder')
+    library('GenomicRanges')
+    
+    ## Load the data from disk -- for choromose 2 for example
+    fullCov = fullCoverage(files = bam_files, bam = bai_files, chrs = chrID)
 
 
-windowMat <- function(datadir, binSize, chromosome){
+    ## summed coverage for each bin for all the samples (bam)
+    out=NULL
+    i <- 1
+    b <- binSize
+    while (i < chrLength){
+        start <- i
+        end <- i + b
+        bin <- window(fullCov$chr2,start,end)
+        sb <- sapply(bin,sum)
+        out <- rbind(out,sb)
+        i <- end + 1
+      }
+}
 
-## GOAL: TRY TO RUN WITHOUT ERROR
+## chrFile = "/Volumes/Seagate/STAR_Output/chromosome_Length.csv"
+## datadir = "/Volumes/Seagate/STAR_Output/"
 
-## Load libraries
-library('RCurl')
-library('derfinder')
-library('GenomicRanges')
+windowMat <- function(datadir, chrFile, binSize, outputPath){
+    ## for all the chromosome initialize the window Matrix
+    mat <- NULL
 
-## Determine the BAM files to use (from local file)
+    ## first get the bam file paths
+    bam_files <- list.files(path = datadir, pattern="*.sorted.bam$", recursive=TRUE, full.names=TRUE)
+    ##  then make the bai paths since they are meant to be in the same directory here as the bam file
+    bai_files <- paste(files,".bai",sep="")
 
-## get the bam file paths
-bam_files <- list.files(path="/Volumes/Seagate/STAR_Output/", pattern="*.bam$|*.bai$", recursive=TRUE, full.names=TRUE)
-##  get the make the bai paths
-bai_files <- paste(files,".bai",sep="")
-
-## Load the data from disk -- for choromose 2 for example
-fullCov = fullCoverage(files = bam_files, bam=bai_files, chrs = chromosome)
-
-
-## summed coverage for each bin for all the samples (bam)
-out=NULL
-i <- 1
-b <- binSize
-while (i < 243190){
-    start <- i
-    end <- i + b
-    bin <- window(fullCov$chr2,start,end)
-    sb <- sapply(bin,sum)
-    out <- rbind(out,sb)
-    i <- end + 1
-  }
-## write.csv(out,file = "outputMat.csv")
+    ## read chromosome length file
+    chrInfo <- read.csv(file=chrFile, sep="\t")
+    
+    chrInd <- 1
+    while(chrInd <=25){
+        chrID <- chrInfo$chrID[chrInd]
+        chrLength <- chrInfo$chr_length[chrInd]
+        tempMat <- windowMatForAchr(bam_files, bai_files, datadir, binSize, chrID, chrLength)
+        mat <- rbind(mat, tempMat)
+        }
+    
+    write.csv(out,file = paste(outputPath, "/outputMatForAll.csv"))
 }
