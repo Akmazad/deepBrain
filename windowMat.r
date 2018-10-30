@@ -34,7 +34,7 @@ windowMat <- function(datadir, chrFile, binSize, outputPath){
     bai_files <- paste(bam_files, ".bai", sep="")
 
     ## read chromosome length file
-    read.csv(file=chrFile, sep="\t", stringsAsFactors = FALSE)
+    chrInfo = read.csv(file=chrFile, sep="\t", stringsAsFactors = FALSE)
     
     ## iterate through each chromosomes and get their coverage info
     chrInd <- 1
