@@ -36,12 +36,14 @@ windowMat <- function(datadir, chrFile, binSize, outputPath){
     ## read chromosome length file
     chrInfo <- read.csv(file=chrFile, sep="\t")
     
+    ## iterate through each chromosomes and get their coverage info
     chrInd <- 1
-    while(chrInd <=25){
+    while(chrInd <=25 ){
         chrID <- chrInfo$chrID[chrInd]
         chrLength <- chrInfo$chr_length[chrInd]
         tempMat <- windowMatForAchr(bam_files, bai_files, datadir, binSize, chrID, chrLength)
         mat <- rbind(mat, tempMat)
+        chrInd <- chrInd + 1
         }
     
     write.csv(out,file = paste(outputPath, "/outputMatForAll.csv"))
