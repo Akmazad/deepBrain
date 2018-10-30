@@ -7,7 +7,6 @@ windowMatForAchr <- function(bam_files, bai_files, datadir, binSize, chrID, chrL
     ## Load the data from disk -- for choromose 2 for example
     fullCov = fullCoverage(files = bam_files, bam = bai_files, chrs = chrID)
 
-
     ## summed coverage for each bin for all the samples (bam)
     out=NULL
     i <- 1
