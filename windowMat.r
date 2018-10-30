@@ -8,12 +8,11 @@ windowMatForAchr <- function(bam_files, bai_files, datadir, binSize, chrID, chrL
     fullCov = fullCoverage(files = bam_files, bam = bai_files, chrs = chrID)
 
     ## summed coverage for each bin for all the samples (bam)
-    out=NULL
-    i <- 1
+    out = NULL
+    start <- 1
     b <- binSize
-    while (i < chrLength){
-        start <- i
-        end <- i + b
+    while (start < chrLength){
+        end <- if(start + b - 1 <= chrLength) (start + b - 1) else chrLength 
         bin <- window(fullCov$chr2,start,end)
         sb <- sapply(bin,sum)
         out <- rbind(out,sb)
