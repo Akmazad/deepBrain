@@ -17,24 +17,23 @@ windowMatForAchr <- function(datadir, binSize){
 
     ## summed coverage for each bin for all the samples (bam)
     out = NULL
-    for(chrID in 1:25){
+    for(chrID in 1:length(allChrs)){
         start <- 1
         b <- binSize
         binID <- 1
         chrLength <- as.numeric(sapply(fullCov[chrID], nrow))
-        print(chrLength)
         message(paste("Chromosome ",allChrs[chrID]," has started","\n"), appendLF=FALSE)
         message(paste("bins done: ",binID,", "), appendLF=FALSE)
         while (start < chrLength){
             end <- if(start + b - 1 <= chrLength) (start + b - 1) else chrLength 
-            bin <- window(fullCov[chrID], start, end)
+            bin <- window(DataFrame(fullCov[chrID]), start, end)
             sb <- sapply(bin,sum)
-            names(sb) <- paste(names(fullCov[chrID]), "_", binID)
+            ##names(sb) <- paste(names(fullCov[chrID]), "_bin_", binID, sep="")
             out <- rbind(out,sb)
             start <- end + 1
             binID <- binID + 1
           }
-          message(paste("Chromosome ",allChrs[chrID]," has been completed","\n"), appendLF=FALSE)
+          message(paste("\n", "Chromosome ",allChrs[chrID]," has been completed","\n"), appendLF=FALSE)
       }
       write.csv(out,file = "outputMatForAll.csv")
 }
