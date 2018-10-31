@@ -1,4 +1,4 @@
-windowMatForAchr <- function(datadir, binSize){
+windowMatForAllchr <- function(datadir, binSize, outputPath){
     ## Load libraries
     library('RCurl')
     library('derfinder')
@@ -10,8 +10,8 @@ windowMatForAchr <- function(datadir, binSize){
     bai_files <- paste(bam_files, ".bai", sep="")
     
     ## Load the data from disk -- for choromose 2 for example
-    ## allChrs = c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT')
-    allChrs = c('1', 'X', 'Y', 'MT')
+    allChrs = c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT')
+    ## allChrs = c('1', 'X', 'Y', 'MT')
     fullCov = fullCoverage(files = bam_files, bam = bai_files, chrs = allChrs)
 
 
@@ -35,6 +35,6 @@ windowMatForAchr <- function(datadir, binSize){
           }
           message(paste("\n", "Chromosome ",allChrs[chrID]," has been completed","\n"), appendLF=FALSE)
       }
-      write.csv(out,file = "outputMatForAll.csv")
+      write.csv(out,file = paste(outputPath, "/outputMatForAll.csv"))
 }
 
