@@ -6,6 +6,8 @@ windowMatForAchr <- function(bam_files, bai_files, datadir, binSize, chrID, chrL
     
     ## Load the data from disk -- for choromose 2 for example
     fullCov = fullCoverage(files = bam_files, bam = bai_files, chrs = chrID)
+    ##print(fullCov)
+    ##print(fullCov$chr1)
 
     ## summed coverage for each bin for all the samples (bam)
     out = NULL
@@ -13,15 +15,19 @@ windowMatForAchr <- function(bam_files, bai_files, datadir, binSize, chrID, chrL
     b <- binSize
     while (start < chrLength){
         end <- if(start + b - 1 <= chrLength) (start + b - 1) else chrLength 
-        bin <- window(fullCov$chr2,start,end)
+        ## message(paste("end position: ", end, "\n"), appendLF=FALSE)
+        bin <- window(fullCov[,1],start,end)
         sb <- sapply(bin,sum)
         out <- rbind(out,sb)
-        i <- end + 1
+        start <- end + 1
       }
 }
 
-## chrFile = "/Volumes/Seagate/STAR_Output/chromosome_Length.csv"
+## chrFile = "/Volumes/Seagate/STAR_Output/chromosome_Length_X_MT.csv"
+## chrFile = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\chromosome_Length_X_MT.csv"
 ## datadir = "/Volumes/Seagate/STAR_Output/"
+## datadir = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\tryData2"
+
 
 windowMat <- function(datadir, chrFile, binSize, outputPath){
     ## for all the chromosome initialize the window Matrix
@@ -38,7 +44,7 @@ windowMat <- function(datadir, chrFile, binSize, outputPath){
     ## iterate through each chromosomes and get their coverage info
     chrInd <- 1
     while(chrInd <=25 ){
-        chrID <- chrInfo$chrID[chrInd]
+        chrID <- toString(chrInfo$chrID[chrInd])
         message(paste(chrID, " started"), appendLF=FALSE)
         chrLength <- chrInfo$chr_length[chrInd]
         tempMat <- windowMatForAchr(bam_files, bai_files, datadir, binSize, chrID, chrLength)
@@ -49,3 +55,5 @@ windowMat <- function(datadir, chrFile, binSize, outputPath){
     
     write.csv(out,file = paste(outputPath, "/outputMatForAll.csv"))
 }
+## to run this code
+## windowMat(datadir=datadir, chrFile=chrFile, binSize=10000, outputPath=datadir)
