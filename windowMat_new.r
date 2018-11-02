@@ -37,4 +37,6 @@ windowMatForAllchr <- function(datadir, binSize, outputPath){
       }
       write.csv(out,file = paste(outputPath, "/outputMatForAll.csv"))
 }
-
+## datadir = "/Volumes/Seagate/STAR_Output/"
+## outputPath = "/home/"
+## windowMatForAllchr(datadir=datadir, binSize=1000, outputPath=outputPath)
