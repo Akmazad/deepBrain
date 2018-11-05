@@ -12,12 +12,13 @@ windowMatForAllchr <- function(datadir, binSize, outputPath){
     ## Load the data from disk -- for choromose 2 for example
     allChrs = c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT')
     ## allChrs = c('1', 'X', 'Y', 'MT')
-    fullCov = fullCoverage(files = bam_files, bam = bai_files, chrs = allChrs)
-
+    
 
     ## summed coverage for each bin for all the samples (bam)
-    out = NULL
     for(chrID in 1:length(allChrs)){
+        out = NULL
+        fullCov = fullCoverage(files = bam_files, bam = bai_files, chrs = allChrs[chrID])
+
         start <- 1
         b <- binSize
         binID <- 1
@@ -33,9 +34,11 @@ windowMatForAllchr <- function(datadir, binSize, outputPath){
             start <- end + 1
             binID <- binID + 1
           }
-          message(paste("\n", "Chromosome ",allChrs[chrID]," has been completed","\n"), appendLF=FALSE)
-      }
-      write.csv(out,file = paste(outputPath, "/outputMatForAll.csv"))
+        message(paste("\n", "Chromosome ",allChrs[chrID]," has been completed","\n"), appendLF=FALSE)
+        ## remove the fullCov data
+        rm(fullCov)
+        write.csv(out,file = paste(outputPath, "/outputMatForChr", "_", chrID, ".csv"))
+      }   
 }
 ## datadir = "/Volumes/Seagate/STAR_Output/"
 ## outputPath = "/home/"
