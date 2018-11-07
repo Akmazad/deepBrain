@@ -18,19 +18,18 @@ windowMatForAllchr <- function(datadir, binSize, outputPath){
     for(chrID in 1:length(allChrs)){
         out = NULL
         fullCov = fullCoverage(files = bam_files, bam = bai_files, chrs = allChrs[chrID])
-
         start <- 1
         b <- binSize
         binID <- 1
         chrLength <- as.numeric(sapply(fullCov[chrID], nrow))
         message(paste("Chromosome ",allChrs[chrID]," has started","\n"), appendLF=FALSE)
-        message(paste("bins done: ",binID,", "), appendLF=FALSE)
         while (start < chrLength){
             end <- if(start + b - 1 <= chrLength) (start + b - 1) else chrLength 
             bin <- window(DataFrame(fullCov[chrID]), start, end)
             sb <- sapply(bin,sum)
             ##names(sb) <- paste(names(fullCov[chrID]), "_bin_", binID, sep="")
             out <- rbind(out,sb)
+            message(paste("bins done: ",binID,", "), appendLF=FALSE)
             start <- end + 1
             binID <- binID + 1
           }
