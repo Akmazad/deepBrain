@@ -7,4 +7,13 @@
 2) "sample_code1.r" contains very basic codes demonstrating "derfinder" mainly
 
 ## Step-2: 
+PBS script for running on HPC
+#!/bin/bash
+#PBS -P yr31
+#PBS -q gpu
+#PBS -l ngpus=2
+#PBS -l ncpus=6
+#PBS -l walltime=0:45:00,mem=8GB
+#PBS -l wd
 
+R rScript.r
