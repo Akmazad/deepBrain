@@ -1,9 +1,16 @@
-ba9_81.filepath <- "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA9_81_April2015_LR.csv"
-ba41_66.filepath <- "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA41_66_Mar2015_LR.csv"
-baVermis_62.filepath <- "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_Vermis_62_Mar2015_LR.csv"
-samplefilePath = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\BrainSampleList.csv"
-chrFile = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\chromosome_Length.csv"
-outputPath = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data"
+# ba9_81.filepath <- "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA9_81_April2015_LR.csv"
+# ba41_66.filepath <- "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA41_66_Mar2015_LR.csv"
+# baVermis_62.filepath <- "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_Vermis_62_Mar2015_LR.csv"
+# samplefilePath = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\BrainSampleList.csv"
+# chrFile = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\chromosome_Length.csv"
+# outputPath = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data"
+
+ba9_81.filepath <- "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA9_81_April2015_LR.csv"
+ba41_66.filepath <- "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA41_66_Mar2015_LR.csv"
+baVermis_62.filepath <- "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_Vermis_62_Mar2015_LR.csv"
+samplefilePath = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\BrainSampleList.csv"
+chrFile = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\chromosome_Length.csv"
+outputPath = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data"
 
 accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filepath, samplefilePath, chrFile, binSize, overlapCutoff, outputPath){
   ### load files
@@ -22,22 +29,23 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
   while(chrInd <=1 ){
     chrID <- toString(chrInfo$chrID[chrInd])
     chrLength <- chrInfo$chr_length[chrInd]
-    wStart <- 1
+    wStart <- 12000
     binID <- 1
-    while (start < chrLength){
+    #while (wStart < chrLength){
+    while (wStart < 1000000){
       wEnd <- if(wStart + binSize - 1 <= chrLength) (wStart + binSize - 1) else chrLength
       ## read data within a window of a particular chromosom       
       dat <- ba9_81.dat
-      rStart <- if ((dat[,2] - dat[,2]*overlapCutoff) >= 0) dat[,2] - dat[,2]*overlapCutoff else 0
-      rEnd <- if ((dat[,3] + dat[,3]*overlapCutoff) <= dat[,3] + dat[,3]*overlapCutoff) else chrLength
-      cond1 <- which((dat[,1]==paste0("chr",chrInd)) && (dat[,2] <= wStart && dat[,3] => wEnd)) ## whole window contained
-      cond2 <- which((dat[,1]==paste0("chr",chrInd)) && (rStart <= wStart && dat[,3] => wEnd))   ## window start is before the chr start
-      cond3 <- which((dat[,1]==paste0("chr",chrInd)) && (dat[,2] <= wStart && rEnd => wEnd))   ## window end is after the chr end
+      rStart <- if ((dat[,2] - dat[,2]*overlapCutoff) >= 0) (dat[,2] - dat[,2]*overlapCutoff) else 0
+      rEnd <- if ((dat[,3] + dat[,3]*overlapCutoff) <= chrLength) (dat[,3] + dat[,3]*overlapCutoff) else chrLength
+      cond1 <- which((dat[,1]==paste0("chr",chrInd)) && (dat[,2] <= wStart && dat[,3] >= wEnd)) ## whole window contained
+      cond2 <- which((dat[,1]==paste0("chr",chrInd)) && (rStart <= wStart && dat[,3] >= wEnd))   ## window start is before the chr start
+      cond3 <- which((dat[,1]==paste0("chr",chrInd)) && (dat[,2] <= wStart && rEnd >= wEnd))   ## window end is after the chr end
       
       temp.ba9_81 <- ba9_81.dat[cond1||cond2 ||cond3,]
-      dat <- ba41_66.dat
+      dat <- ba41_66.dat            ## affects the conditions
       temp.ba41_66 <- ba41_66.dat[cond1|| cond2||cond3,]
-      dat <- baVermis.dat
+      dat <- baVermis.dat           ## affects the conditions
       temp.baVermis <- baVermis.dat[cond1||cond2||cond3,]
       
       names(temp.ba9_81) <- paste0(names(temp.ba9_81),".","ba9")
@@ -58,10 +66,10 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
         val <- if(!is.null(toCheck[[sam]]) && length(toCheck[[sam]]) > 0) toCheck[[sam]] else NA
         aRow <- cbind(aRow, val)
       }
-      message(paste(end, ""), appendLF=FALSE)
+      message(paste(wEnd, ""), appendLF=FALSE)
       ## bind that row
       out <- rbind(out,aRow)
-      start <- end + 1
+      wStart <- wEnd + 1
       binID <- binID + 1
     }
     
