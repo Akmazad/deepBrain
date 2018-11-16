@@ -100,4 +100,4 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
   write.csv(out,file = "outputAccetylation.csv")
 }
 
-accetylationDat(ba9_81.filepath, ba41_66.filepath, ba41_66.filepath, samplefilePath, chrFile, 200, overlapCutoff = 0, outputPath)
+accetylationDat(ba9_81.filepath, ba41_66.filepath, baVermis_62.filepath, samplefilePath, chrFile, 200, overlapCutoff = 0, outputPath)
