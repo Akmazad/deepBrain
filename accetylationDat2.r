@@ -8,19 +8,19 @@
 # chrFile = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\chromosome_Length.csv"
 # outputPath = "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data"
 
-# ba9_81.filepath <- "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA9_81_April2015_LR.csv"
-# ba41_66.filepath <- "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA41_66_Mar2015_LR.csv"
-# baVermis_62.filepath <- "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_Vermis_62_Mar2015_LR.csv"
-# samplefilePath = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\BrainSampleList.csv"
-# chrFile = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\chromosome_Length.csv"
-# outputPath = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data"
+ba9_81.filepath <- "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA9_81_April2015_LR.csv"
+ba41_66.filepath <- "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA41_66_Mar2015_LR.csv"
+baVermis_62.filepath <- "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_Vermis_62_Mar2015_LR.csv"
+samplefilePath = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\BrainSampleList.csv"
+chrFile = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\chromosome_Length.csv"
+outputPath = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data"
 
-ba9_81.filepath <- "/short/yr31/aa7970/azData/DeepBrain/Data/normalized_log2_tags_BA9_81_April2015_LR.csv"
-ba41_66.filepath <- "/short/yr31/aa7970/azData/DeepBrain/Data/normalized_log2_tags_BA41_66_Mar2015_LR.csv"
-baVermis_62.filepath <- "/short/yr31/aa7970/azData/DeepBrain/Data/normalized_log2_tags_Vermis_62_Mar2015_LR.csv"
-samplefilePath = "/short/yr31/aa7970/azData/DeepBrain/Data/BrainSampleList.csv"
-chrFile = "/short/yr31/aa7970/azData/DeepBrain/Data/chromosome_Length.csv"
-outputPath = "/short/yr31/aa7970/azData/DeepBrain/Data/"
+# ba9_81.filepath <- "/short/yr31/aa7970/azData/DeepBrain/Data/normalized_log2_tags_BA9_81_April2015_LR.csv"
+# ba41_66.filepath <- "/short/yr31/aa7970/azData/DeepBrain/Data/normalized_log2_tags_BA41_66_Mar2015_LR.csv"
+# baVermis_62.filepath <- "/short/yr31/aa7970/azData/DeepBrain/Data/normalized_log2_tags_Vermis_62_Mar2015_LR.csv"
+# samplefilePath = "/short/yr31/aa7970/azData/DeepBrain/Data/BrainSampleList.csv"
+# chrFile = "/short/yr31/aa7970/azData/DeepBrain/Data/chromosome_Length.csv"
+# outputPath = "/short/yr31/aa7970/azData/DeepBrain/Data/"
 
 accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filepath, samplefilePath, chrFile, binSize, overlapCutoff, outputPath){
   #library("reproducible")
@@ -38,13 +38,12 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
   while(chrInd <=1 ){
     chrID <- toString(chrInfo$chrID[chrInd])
     chrLength <- chrInfo$chr_length[chrInd]
-    wStart <- 12260
+    wStart <- 12697
     binID <- 1
     #while (wStart < chrLength){  
-    while (wStart < 19110){
+    while (wStart < 15500){
       wEnd <- if(wStart + binSize - 1 <= chrLength) (wStart + binSize - 1) else chrLength
-      chrName <- as.character(lapply(strsplit(dat[,1],"_"), `[[`, 1))
-      
+        
       #######################    FOR "ba9_81" brain region    #######################
       dat <- ba9_81.dat
       chrName <- as.character(lapply(strsplit(dat[,1],"_"), `[[`, 1))
@@ -114,7 +113,8 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       
       allValues <- cbind(temp.ba9_81,temp.ba41_66,temp.baVermis)
       if(!all(allValues == 0)){
-        aRow <- cbind(paste0("chr",chrInd),wStart,wEnd,allValues)
+        chrID <- paste0("chr",chrInd)
+        aRow <- cbind(chrID,wStart,wEnd,allValues)
         out <- rbind(out,aRow)
       }
       
