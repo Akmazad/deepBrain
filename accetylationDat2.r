@@ -110,16 +110,18 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       temp.baVermis <- temp.baVermis[!exc]
       names(temp.baVermis) <- paste0(names(temp.baVermis),".","vermis")
       
+      
       allValues <- cbind(temp.ba9_81,temp.ba41_66,temp.baVermis)
       if(!all(allValues == 0)){
         chrID <- paste0("chr",chrInd)
         aRow <- cbind(chrID,wStart,wEnd,allValues)
         out <- rbind(out,aRow)
       }
-      
+      message(wEnd, appendLF=FALSE)
       wStart <- wEnd + 1
       binID <- binID + 1
     }
+    message(paste0("Chromosome "), chrInd, " has been completed")
     write.csv(out,file = "outputAccetylation.csv", row.names=FALSE)
     chrInd <- chrInd + 1
   }
