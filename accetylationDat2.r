@@ -1,5 +1,7 @@
 ## preconditions: 
-## 1. overlapCutoff value is between [0,1] and applied on the chromosomal region (i.e. [rStart:rEnd])
+## 1. overlapCutoff value is between [0,1] and applied as the percentage of binSize 
+## 2. window (i.e. [wStart,wEnd]) will not completely engulf the chromosomal region (i.e. [rStart,rEnd])
+## 3. Hence, there will not be more than 1 
 
 # ba9_81.filepath <- "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA9_81_April2015_LR.csv"
 # ba41_66.filepath <- "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA41_66_Mar2015_LR.csv"
