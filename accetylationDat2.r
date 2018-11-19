@@ -18,7 +18,7 @@ chrFile = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\D
 outputPath = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data"
 
 accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filepath, samplefilePath, chrFile, binSize, overlapCutoff, outputPath){
-  library("reproducible")
+  #library("reproducible")
   ### load files
   ba9_81.dat <- read.csv(ba9_81.filepath,header = TRUE, stringsAsFactors = FALSE)
   ba41_66.dat <- read.csv(ba41_66.filepath,header = TRUE, stringsAsFactors = FALSE)
@@ -42,6 +42,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       
       #######################    FOR "ba9_81" brain region    #######################
       dat <- ba9_81.dat
+      chrName <- as.character(lapply(strsplit(dat[,1],"_"), `[[`, 1))
       rStart <- dat[,2] - dat[,2]*overlapCutoff
       rEnd <- dat[,3] + dat[,3]*overlapCutoff
       cond1 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, dat[,3] >= wEnd)) ## whole window contained
@@ -65,6 +66,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       
       #######################    FOR "ba41_66" brain region    #######################
       dat <- ba41_66.dat            
+      chrName <- as.character(lapply(strsplit(dat[,1],"_"), `[[`, 1))
       rStart <- dat[,2] - dat[,2]*overlapCutoff
       rEnd <- dat[,3] + dat[,3]*overlapCutoff
       cond1 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, dat[,3] >= wEnd)) ## whole window contained
@@ -87,11 +89,12 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       
       #######################    FOR "baVermis" brain region    #######################
       dat = baVermis.dat            
+      chrName <- as.character(lapply(strsplit(dat[,1],"_"), `[[`, 1))
       rStart <- dat[,2] - dat[,2]*overlapCutoff
       rEnd <- dat[,3] + dat[,3]*overlapCutoff
-      cond1 <- "&"(startsWith(dat[,1],paste0("chr",chrInd)), "&"(dat[,2] <= wStart, dat[,3] >= wEnd)) ## whole window contained
-      cond2 <- "&"(startsWith(dat[,1],paste0("chr",chrInd)), "&"(rStart <= wStart, dat[,3] >= wEnd))   ## window start is before the chr start
-      cond3 <- "&"(startsWith(dat[,1],paste0("chr",chrInd)), "&"(dat[,2] <= wStart, rEnd >= wEnd))   ## window start is before the chr start   ## window end is after the chr end
+      cond1 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, dat[,3] >= wEnd)) ## whole window contained
+      cond2 <- "&"(chrName==paste0("chr",chrInd), "&"(rStart <= wStart, dat[,3] >= wEnd))   ## window start is before the chr start
+      cond3 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, rEnd >= wEnd))   ## window start is before the chr start   ## window end is after the chr end
       cond <- "|"(cond1,cond2)
       cond <- "|"(cond,cond3)      
       temp.baVermis <- baVermis.dat[which(cond),]
@@ -110,11 +113,12 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       ## See Precondition 1 and 2
       if(nrow(temp.ba9_81) > 1 || nrow(temp.ba41_66) > 1 || nrow(temp.baVermis) > 1) message("Should not happen !!")      
       
-      aRow <- cbind(chrInd,wStart,wEnd,temp.ba9_81,temp.ba41_66)
-      aRow <- cbind(aRow,temp.baVermis)
-      
-      if(!all(aRow == 0))
+      allValues <- cbind(temp.ba9_81,temp.ba41_66,temp.baVermis)
+      if(!all(allValues == 0)){
+        aRow <- cbind(chrInd,wStart,wEnd,allValues)
         out <- rbind(out,aRow)
+      }
+      
       wStart <- wEnd + 1
       binID <- binID + 1
     }
@@ -125,4 +129,4 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
   write.csv(out,file = "outputAccetylation.csv", row.names=FALSE)
 }
 
-accetylationDat(ba9_81.filepath, ba41_66.filepath, baVermis_62.filepath, samplefilePath, chrFile, 200, overlapCutoff = 0, outputPath)
+accetylationDat(ba9_81.filepath, ba41_66.filepath, baVermis_62.filepath, samplefilePath, chrFile, 200, overlapCutoff = 0.05, outputPath)
