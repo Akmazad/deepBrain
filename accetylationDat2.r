@@ -107,7 +107,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       
       allValues <- cbind(temp.ba9_81,temp.ba41_66,temp.baVermis)
       if(!all(allValues == 0)){
-        aRow <- cbind(chrInd,wStart,wEnd,allValues)
+        aRow <- cbind(paste0("chr",chrInd),wStart,wEnd,allValues)
         out <- rbind(out,aRow)
       }
       
