@@ -1,7 +1,5 @@
 ## preconditions: 
-## 1. A window (i.e. [wStart:wEnd]) will not completely engulf the chromosome region (i.e. [rStart:rEnd])
-## 2. Hence, there WILL NOT be more than 1 overlap for each windown
-## 3. overlapCutoff value is between [0,1] and applied on the chromosomal region (i.e. [rStart:rEnd])
+## 1. overlapCutoff value is between [0,1] and applied on the chromosomal region (i.e. [rStart:rEnd])
 
 # ba9_81.filepath <- "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA9_81_April2015_LR.csv"
 # ba41_66.filepath <- "C:\\Users\\z3526914\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\Data\\Brain_Prabhakar_H3K27Ac\\normalized_log2_tags_BA41_66_Mar2015_LR.csv"
@@ -106,9 +104,6 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       exc <- names(temp.baVermis) %in% c("chr","start","end")
       temp.baVermis <- temp.baVermis[!exc]
       names(temp.baVermis) <- paste0(names(temp.baVermis),".","vermis")
-      
-      ## See Precondition 1 and 2
-      if(nrow(temp.ba9_81) > 1 || nrow(temp.ba41_66) > 1 || nrow(temp.baVermis) > 1) message("Should not happen !!")      
       
       allValues <- cbind(temp.ba9_81,temp.ba41_66,temp.baVermis)
       if(!all(allValues == 0)){
