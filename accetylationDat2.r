@@ -46,8 +46,8 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       #######################    FOR "ba9_81" brain region    #######################
       dat <- ba9_81.dat
       chrName <- as.character(lapply(strsplit(dat[,1],"_"), `[[`, 1))
-      rStart <- dat[,2] - dat[,2]*overlapCutoff
-      rEnd <- dat[,3] + dat[,3]*overlapCutoff
+      rStart <- dat[,2] - b*overlapCutoff
+      rEnd <- dat[,3] + b*overlapCutoff
       cond1 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, dat[,3] >= wEnd)) ## whole window contained
       cond2 <- "&"(chrName==paste0("chr",chrInd), "&"(rStart <= wStart, dat[,3] >= wEnd))   ## window start is before the chr start
       cond3 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, rEnd >= wEnd))   ## window start is before the chr start   ## window end is after the chr end
@@ -69,8 +69,8 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       #######################    FOR "ba41_66" brain region    #######################
       dat <- ba41_66.dat            
       chrName <- as.character(lapply(strsplit(dat[,1],"_"), `[[`, 1))
-      rStart <- dat[,2] - dat[,2]*overlapCutoff
-      rEnd <- dat[,3] + dat[,3]*overlapCutoff
+      rStart <- dat[,2] - b*overlapCutoff
+      rEnd <- dat[,3] + b*overlapCutoff
       cond1 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, dat[,3] >= wEnd)) ## whole window contained
       cond2 <- "&"(chrName==paste0("chr",chrInd), "&"(rStart <= wStart, dat[,3] >= wEnd))   ## window start is before the chr start
       cond3 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, rEnd >= wEnd))   ## window start is before the chr start   ## window end is after the chr end
@@ -91,8 +91,8 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       #######################    FOR "baVermis" brain region    #######################
       dat = baVermis.dat            
       chrName <- as.character(lapply(strsplit(dat[,1],"_"), `[[`, 1))
-      rStart <- dat[,2] - dat[,2]*overlapCutoff
-      rEnd <- dat[,3] + dat[,3]*overlapCutoff
+      rStart <- dat[,2] - b*overlapCutoff
+      rEnd <- dat[,3] + b*overlapCutoff
       cond1 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, dat[,3] >= wEnd)) ## whole window contained
       cond2 <- "&"(chrName==paste0("chr",chrInd), "&"(rStart <= wStart, dat[,3] >= wEnd))   ## window start is before the chr start
       cond3 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, rEnd >= wEnd))   ## window start is before the chr start   ## window end is after the chr end
