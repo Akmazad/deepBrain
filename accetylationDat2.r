@@ -33,7 +33,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
   while(chrInd <=1 ){
     chrID <- toString(chrInfo$chrID[chrInd])
     chrLength <- chrInfo$chr_length[chrInd]
-    wStart <- 18910
+    wStart <- 12260
     binID <- 1
     #while (wStart < chrLength){  
     while (wStart < 19110){
