@@ -48,8 +48,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       cond1 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, dat[,3] >= wEnd)) ## whole window contained
       cond2 <- "&"(chrName==paste0("chr",chrInd), "&"(rStart <= wStart, dat[,3] >= wEnd))   ## window start is before the chr start
       cond3 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, rEnd >= wEnd))   ## window start is before the chr start   ## window end is after the chr end
-      cond <- "|"(cond1,cond2)
-      cond <- "|"(cond,cond3)
+      cond <- "|"(cond1,"|"(cond2,cond3))
       temp.ba9_81 <- ba9_81.dat[which(cond),]
       
       # if nothing found, make an empty row with zeros
@@ -72,8 +71,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       cond1 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, dat[,3] >= wEnd)) ## whole window contained
       cond2 <- "&"(chrName==paste0("chr",chrInd), "&"(rStart <= wStart, dat[,3] >= wEnd))   ## window start is before the chr start
       cond3 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, rEnd >= wEnd))   ## window start is before the chr start   ## window end is after the chr end
-      cond <- "|"(cond1,cond2)
-      cond <- "|"(cond,cond3)      
+      cond <- "|"(cond1,"|"(cond2,cond3))
       temp.ba41_66 <- ba41_66.dat[which(cond),]
       
       if(nrow(temp.ba41_66) < 1){  # if nothing found, make an empty row with zeros
@@ -95,8 +93,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       cond1 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, dat[,3] >= wEnd)) ## whole window contained
       cond2 <- "&"(chrName==paste0("chr",chrInd), "&"(rStart <= wStart, dat[,3] >= wEnd))   ## window start is before the chr start
       cond3 <- "&"(chrName==paste0("chr",chrInd), "&"(dat[,2] <= wStart, rEnd >= wEnd))   ## window start is before the chr start   ## window end is after the chr end
-      cond <- "|"(cond1,cond2)
-      cond <- "|"(cond,cond3)      
+      cond <- "|"(cond1,"|"(cond2,cond3))  
       temp.baVermis <- baVermis.dat[which(cond),]
       
       if(nrow(temp.baVermis) < 1){  # if nothing found, make an empty row with zeros
