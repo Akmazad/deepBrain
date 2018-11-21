@@ -29,9 +29,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
   ba41_66.dat <- read.csv(ba41_66.filepath,header = TRUE, stringsAsFactors = FALSE)
   baVermis.dat <- read.csv(baVermis_62.filepath,header = TRUE, stringsAsFactors = FALSE)
   sample.dat <- read.csv(samplefilePath,header = TRUE, stringsAsFactors = FALSE)
-  nR.ba9_81.dat <- nrow(ba9_81.dat)
-  nR.ba41_66.dat <- nrow(ba41_66.dat)
-  nR.baVermis.dat <- nrow(baVermis.dat)
+  nIter <- max(c(nrow(ba9_81.dat),nrow(ba41_66.dat),nrow(baVermis.dat)))
   
   ## read chromosome length file
   chrInfo = read.csv(file=chrFile, sep="\t", stringsAsFactors = FALSE)
