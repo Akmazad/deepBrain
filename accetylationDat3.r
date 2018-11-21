@@ -40,9 +40,14 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
     chrLength <- chrInfo$chr_length[chrInd]
     
     ## Step-1: create the output dataframe and initialize with all 0's
-    s <- seq(1, chrLength, binSize)
+    s <- seq(1, chrLength, binSize) ## check it for subsequent windows
     df <- data.frame(matrix(0L, ncol = ncol(ba9_81.dat)+ncol(ba41_66.dat)+ncol(baVermis.dat)-6, nrow = length(s)))
     
+    ## construct column header
+    header <- names(ba9_81.dat)
+    header <- c(header, names(ba41_66.dat)[!names(ba41_66.dat) %in% c("chr","start","end")])
+    header <- c(header, names(baVermis.dat)[!names(baVermis.dat) %in% c("chr","start","end")])
+    names(df) <- header ## getting error
   }
  
 }
