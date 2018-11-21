@@ -23,3 +23,28 @@ outputPath = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain
 # samplefilePath = "/short/yr31/aa7970/azData/DeepBrain/Data/BrainSampleList.csv"
 # chrFile = "/short/yr31/aa7970/azData/DeepBrain/Data/chromosome_Length.csv"
 # outputPath = "/short/yr31/aa7970/azData/DeepBrain/Data/"
+
+accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filepath, samplefilePath, chrFile, binSize, overlapCutoff, outputPath){
+  ba9_81.dat <- read.csv(ba9_81.filepath,header = TRUE, stringsAsFactors = FALSE)
+  ba41_66.dat <- read.csv(ba41_66.filepath,header = TRUE, stringsAsFactors = FALSE)
+  baVermis.dat <- read.csv(baVermis_62.filepath,header = TRUE, stringsAsFactors = FALSE)
+  sample.dat <- read.csv(samplefilePath,header = TRUE, stringsAsFactors = FALSE)
+  nR.ba9_81.dat <- nrow(ba9_81.dat)
+  nR.ba41_66.dat <- nrow(ba41_66.dat)
+  nR.baVermis.dat <- nrow(baVermis.dat)
+  
+  ## read chromosome length file
+  chrInfo = read.csv(file=chrFile, sep="\t", stringsAsFactors = FALSE)
+  chrInd <- 1  
+  while(chrInd <=1 ){
+    out <- NULL
+    chrID <- toString(chrInfo$chrID[chrInd])
+    chrLength <- chrInfo$chr_length[chrInd]
+    
+    ## Step-1: create the output dataframe and initialize with all 0's
+    s <- seq(1, chrLength, binSize)
+    df <- data.frame(matrix(0L, ncol = ncol(ba9_81.dat)+ncol(ba41_66.dat)+ncol(baVermis.dat)-6, nrow = length(s)))
+    
+  }
+ 
+}
