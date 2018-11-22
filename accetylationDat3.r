@@ -33,7 +33,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
   ## read chromosome length file
   chrInfo = read.csv(file=chrFile, sep="\t", stringsAsFactors = FALSE)
   chrInd <- 1  
-  while(chrInd <=1 ){
+  while(chrInd <=25 ){
     #filter the datasets based on the chromosome ID
     chr.ba9_81.dat <- ba9_81.dat[which(ba9_81.dat[,1]==paste0("chr",chrInd)),]
     chr.ba41_66.dat <- ba41_66.dat[which(ba41_66.dat[,1]==paste0("chr",chrInd)),]
@@ -63,7 +63,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
     for(i in 1:nIter){
       ######################        Process ba9
       # get chr region info
-      if(chr.ba9_81.dat[i,]$start != NA){
+      if(!is.na(chr.ba9_81.dat[i,]$start)){
         rStart = chr.ba9_81.dat[i,]$start
         rEnd = chr.ba9_81.dat[i,]$end
         
@@ -81,7 +81,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       }
       ######################        Process ba41
       # get chr region info
-      if(chr.ba41_66.dat[i,]$start != NA){
+      if(!is.na(chr.ba41_66.dat[i,]$start)){
         rStart = chr.ba41_66.dat[i,]$start
         rEnd = chr.ba41_66.dat[i,]$end
         
@@ -99,11 +99,30 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
       }
       
       ######################        Process baVermis
+       # get chr region info
+      if(!is.na(chr.baVermis.dat[i,]$start)){
+        rStart = chr.baVermis.dat[i,]$start
+        rEnd = chr.baVermis.dat[i,]$end
+        
+        q1 <- rStart%/%binSize
+        r1 <- rStart%%binSize
+        q2 <- rEnd%/%binSize
+        r2 <- rEnd%%binSize
+        
+        rowStartPos <- if(r1 <= binSize*overlapCutoff) (r1 + 1) else (r1 + 2)
+        rowEndPos <- if((binSize-r2) <= binSize*overlapCutoff) (r2 + 1) else r2
+        
+        colStartPos <- ncol(ba9_81.dat) + ncol(ba41_66.dat)-3+1
+        colEndPos <- ncol(ba9_81.dat)+ncol(ba41_66.dat)+ncol(baVermis.dat)-6
+        df[rowStartPos:rowEndPos,colStartPos:colEndPos] <- 1  ## 1 indicates that there is a peak, i.e. a non-zero value (could be filled with actual value)
+      }
+      
+      if(i%%100 == 0) message(paste0("Iteration: ",i, " done"))
     }
     ## output the dataframe
-    write.csv(df,file="df.csv",row.names=F)
+    write.csv(df,file=paste0("df",chrInd,".csv"),row.names=F)
+    message(paste0("chromosome ", chrInd, " has been completed!!"))
+    chrInd <- chrInd + 1
   }
-  
-  
- 
 }
+accetylationDat(ba9_81.filepath, ba41_66.filepath, baVermis_62.filepath, samplefilePath, chrFile, 200, overlapCutoff = 0.05, outputPath)
