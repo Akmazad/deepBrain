@@ -29,25 +29,44 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
   ba41_66.dat <- read.csv(ba41_66.filepath,header = TRUE, stringsAsFactors = FALSE)
   baVermis.dat <- read.csv(baVermis_62.filepath,header = TRUE, stringsAsFactors = FALSE)
   sample.dat <- read.csv(samplefilePath,header = TRUE, stringsAsFactors = FALSE)
-  nIter <- max(c(nrow(ba9_81.dat),nrow(ba41_66.dat),nrow(baVermis.dat)))
   
   ## read chromosome length file
   chrInfo = read.csv(file=chrFile, sep="\t", stringsAsFactors = FALSE)
   chrInd <- 1  
   while(chrInd <=1 ){
+    #filter the datasets based on the chromosome ID
+    chr.ba9_81.dat <- ba9_81.dat[which(ba9_81.dat[,1]==paste0("chr",chrInd)),]
+    chr.ba41_66.dat <- ba41_66.dat[which(ba41_66.dat[,1]==paste0("chr",chrInd)),]
+    chr.baVermis.dat <- baVermis.dat[which(baVermis.dat[,1]==paste0("chr",chrInd)),]
+    nIter <- max(c(nrow(chr.ba9_81.dat),nrow(chr.ba41_66.dat),nrow(chr.baVermis.dat)))
+  
     out <- NULL
     chrID <- toString(chrInfo$chrID[chrInd])
     chrLength <- chrInfo$chr_length[chrInd]
     
     ## Step-1: create the output dataframe and initialize with all 0's
-    s <- seq(1, chrLength, binSize) ## check it for subsequent windows
+    s <- seq(1, chrLength, binSize) 
+    e <- s + 199
     df <- data.frame(matrix(0L, ncol = ncol(ba9_81.dat)+ncol(ba41_66.dat)+ncol(baVermis.dat)-6, nrow = length(s)))
     
     ## construct column header
-    header <- names(ba9_81.dat)
-    header <- c(header, names(ba41_66.dat)[!names(ba41_66.dat) %in% c("chr","start","end")])
-    header <- c(header, names(baVermis.dat)[!names(baVermis.dat) %in% c("chr","start","end")])
+    header <- c("chr","start","end", paste0(names(ba9_81.dat)[!names(ba9_81.dat) %in% c("chr","start","end")],".ba9"))
+    header <- c(header, paste0(names(ba41_66.dat)[!names(ba41_66.dat) %in% c("chr","start","end")],".ba41"))
+    header <- c(header, paste0(names(baVermis.dat)[!names(baVermis.dat) %in% c("chr","start","end")],".ba41"))
     names(df) <- header ## getting error
+    
+    ## fill the windows
+    df$chr = paste0("chr",chrInd)
+    df$start = s
+    df$end = e
+    ## iteration
+    for(i in 1:nIter){
+      
+    }
+    ## output the dataframe
+    write.csv(df,file="df.csv",row.names=F)
   }
+  
+  
  
 }
