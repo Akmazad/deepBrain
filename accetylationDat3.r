@@ -52,7 +52,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
     ## construct column header
     header <- c("chr","start","end", paste0(names(ba9_81.dat)[!names(ba9_81.dat) %in% c("chr","start","end")],".ba9"))
     header <- c(header, paste0(names(ba41_66.dat)[!names(ba41_66.dat) %in% c("chr","start","end")],".ba41"))
-    header <- c(header, paste0(names(baVermis.dat)[!names(baVermis.dat) %in% c("chr","start","end")],".ba41"))
+    header <- c(header, paste0(names(baVermis.dat)[!names(baVermis.dat) %in% c("chr","start","end")],".baVermis"))
     names(df) <- header ## getting error
     
     ## fill the windows
@@ -72,11 +72,31 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
         q2 <- rEnd%/%binSize
         r2 <- rEnd%%binSize
         
+        rowStartPos <- if(r1 <= binSize*overlapCutoff) (r1 + 1) else (r1 + 2)
+        rowEndPos <- if((binSize-r2) <= binSize*overlapCutoff) (r2 + 1) else r2
         
+        colStartPos <- 4
+        colEndPos <- ncol(ba9_81.dat)
+        df[rowStartPos:rowEndPos,colStartPos:colEndPos] <- 1  ## 1 indicates that there is a peak, i.e. a non-zero value (could be filled with actual value)
       }
-      
       ######################        Process ba41
-      
+      # get chr region info
+      if(chr.ba41_66.dat[i,]$start != NA){
+        rStart = chr.ba41_66.dat[i,]$start
+        rEnd = chr.ba41_66.dat[i,]$end
+        
+        q1 <- rStart%/%binSize
+        r1 <- rStart%%binSize
+        q2 <- rEnd%/%binSize
+        r2 <- rEnd%%binSize
+        
+        rowStartPos <- if(r1 <= binSize*overlapCutoff) (r1 + 1) else (r1 + 2)
+        rowEndPos <- if((binSize-r2) <= binSize*overlapCutoff) (r2 + 1) else r2
+        
+        colStartPos <- ncol(ba9_81.dat) + 1
+        colEndPos <- ncol(ba9_81.dat) + ncol(ba41_66.dat) - 3
+        df[rowStartPos:rowEndPos,colStartPos:colEndPos] <- 1  ## 1 indicates that there is a peak, i.e. a non-zero value (could be filled with actual value)
+      }
       
       ######################        Process baVermis
     }
