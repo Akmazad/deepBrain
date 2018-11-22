@@ -61,7 +61,24 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
     df$end = e
     ## iteration
     for(i in 1:nIter){
+      ######################        Process ba9
+      # get chr region info
+      if(chr.ba9_81.dat[i,]$start != NA){
+        rStart = chr.ba9_81.dat[i,]$start
+        rEnd = chr.ba9_81.dat[i,]$end
+        
+        q1 <- rStart%/%binSize
+        r1 <- rStart%%binSize
+        q2 <- rEnd%/%binSize
+        r2 <- rEnd%%binSize
+        
+        
+      }
       
+      ######################        Process ba41
+      
+      
+      ######################        Process baVermis
     }
     ## output the dataframe
     write.csv(df,file="df.csv",row.names=F)
