@@ -34,16 +34,16 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
   chrInfo = read.csv(file=chrFile, sep="\t", stringsAsFactors = FALSE)
   chrInd <- 1  
   while(chrInd <=25 ){
-    #filter the datasets based on the chromosome ID
-    chr.ba9_81.dat <- ba9_81.dat[which(ba9_81.dat[,1]==paste0("chr",chrInd)),]
-    chr.ba41_66.dat <- ba41_66.dat[which(ba41_66.dat[,1]==paste0("chr",chrInd)),]
-    chr.baVermis.dat <- baVermis.dat[which(baVermis.dat[,1]==paste0("chr",chrInd)),]
-    nIter <- max(c(nrow(chr.ba9_81.dat),nrow(chr.ba41_66.dat),nrow(chr.baVermis.dat)))
-  
     out <- NULL
     chrID <- toString(chrInfo$chrID[chrInd])
     chrLength <- chrInfo$chr_length[chrInd]
     
+    #filter the datasets based on the chromosome ID
+    chr.ba9_81.dat <- ba9_81.dat[which(ba9_81.dat[,1]==paste0("chr",chrID)),]
+    chr.ba41_66.dat <- ba41_66.dat[which(ba41_66.dat[,1]==paste0("chr",chrID)),]
+    chr.baVermis.dat <- baVermis.dat[which(baVermis.dat[,1]==paste0("chr",chrID)),]
+    nIter <- max(c(nrow(chr.ba9_81.dat),nrow(chr.ba41_66.dat),nrow(chr.baVermis.dat)))
+  
     ## Step-1: create the output dataframe and initialize with all 0's
     s <- seq(1, chrLength, binSize) 
     e <- s + 199
@@ -56,7 +56,7 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
     names(df) <- header ## getting error
     
     ## fill the windows
-    df$chr = paste0("chr",chrInd)
+    df$chr = paste0("chr",chrID)
     df$start = s
     df$end = e
     ## iteration
@@ -90,8 +90,8 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
         q2 <- rEnd%/%binSize
         r2 <- rEnd%%binSize
         
-        rowStartPos <- if(r1 <= binSize*overlapCutoff) (r1 + 1) else (r1 + 2)
-        rowEndPos <- if((binSize-r2) <= binSize*overlapCutoff) (r2 + 1) else r2
+        rowStartPos <- if(r1 <= binSize*overlapCutoff) (q1 + 1) else (q1 + 2)
+        rowEndPos <- if((binSize-r2) <= binSize*overlapCutoff) (q2 + 1) else q2
         
         colStartPos <- ncol(ba9_81.dat) + 1
         colEndPos <- ncol(ba9_81.dat) + ncol(ba41_66.dat) - 3
@@ -109,8 +109,8 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
         q2 <- rEnd%/%binSize
         r2 <- rEnd%%binSize
         
-        rowStartPos <- if(r1 <= binSize*overlapCutoff) (r1 + 1) else (r1 + 2)
-        rowEndPos <- if((binSize-r2) <= binSize*overlapCutoff) (r2 + 1) else r2
+        rowStartPos <- if(r1 <= binSize*overlapCutoff) (q1 + 1) else (q1 + 2)
+        rowEndPos <- if((binSize-r2) <= binSize*overlapCutoff) (q2 + 1) else q2
         
         colStartPos <- ncol(ba9_81.dat) + ncol(ba41_66.dat)-3+1
         colEndPos <- ncol(ba9_81.dat)+ncol(ba41_66.dat)+ncol(baVermis.dat)-6
