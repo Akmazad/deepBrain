@@ -72,8 +72,8 @@ accetylationDat <- function(ba9_81.filepath, ba41_66.filepath, baVermis_62.filep
         q2 <- rEnd%/%binSize
         r2 <- rEnd%%binSize
         
-        rowStartPos <- if(r1 <= binSize*overlapCutoff) (r1 + 1) else (r1 + 2)
-        rowEndPos <- if((binSize-r2) <= binSize*overlapCutoff) (r2 + 1) else r2
+        rowStartPos <- if(r1 <= binSize*overlapCutoff) (q1 + 1) else (q1 + 2)
+        rowEndPos <- if((binSize-r2) <= binSize*overlapCutoff) (q2 + 1) else q2
         
         colStartPos <- 4
         colEndPos <- ncol(ba9_81.dat)
