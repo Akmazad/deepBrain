@@ -1,18 +1,14 @@
 # 1: Preparing RNA-seq data from Brain tissue for Deep learning applications
-## 1.1 Derfinder
-1) "windowMat.r" contains all the functions required to RNA-seq preparation (note: this code should be scaled up for running on raijin, including reading files from remote host()
-2) "sample_code1.r" contains very basic codes demonstrating "derfinder" mainly
+## 1.1 StringTie: a unix-based tool 
 
-## 1.2 StringTie: a unix-based tool 
-
-### Installation:
+### 1.1.1 Installation:
 ```
 git clone https://github.com/gpertea/stringtie
 cd stringtie
 make release 
 ```
 
-### Assemble a batch of sample (BAM) files 
+### 1.1.2 Assemble a batch of sample (BAM) files 
 - To assemble the mapped reads into transcripts from all the sample (BAM) files, create a bash script (see "StringTieAssembly.sh") listing commands for all the samples and the output file paths. An example command for a single BAM file looks like following:
 ```
 stringtie /Volumes/Seagate/STAR_Output/AN00493_ba41_42_22/AN00493_ba41_42_22Aligned.out.sorted.bam -l AN00493_ba41_42_22 -p 8 -G /Users/rna/Homo_sapiens.GRCh38.94.chr.gtf -o /Volumes/Seagate/STAR_Output/stringtieAssembly/AN00493_ba41_42_22.gtf
@@ -24,7 +20,7 @@ stringtie /Volumes/Seagate/STAR_Output/AN00493_ba41_42_22/AN00493_ba41_42_22Alig
 - Then run that script with [```./StringTieAssembly.sh```] to get the assembled files in .gtf format
 - This takes help from the annotation file downloaded from here (```ftp://ftp.ensembl.org/pub/release-94/gtf/homo_sapiens/Homo_sapiens.GRCh38.94.gtf.gz```)
 
-### Merge all transcripts from the different samples
+### 1.1.3 Merge all transcripts from the different samples
 "StringTieMergeList.txt" contains all the output file names (.gtf) files
 ```
 stringtie --merge -p 8 -G Homo_sapiens.GRCh38.94.chr.gtf -o /Volumes/Seagate/STAR_Output/stringtie_merged.gtf /Volumes/Seagate/STAR_Output/StringTieMergeList.txt
@@ -42,7 +38,7 @@ stringtie -e -B -p 8 -G /Volumes/Seagate/STAR_Output/stringtie_merged.gtf -o /Vo
 ```
 - This will create a separate folder for each samples, where each folder will contain: 'i_data.ctab' (intron data), 'e_data.ctab' (exon data), 't_data.ctab' (transcript data), and their corresponding indices.
 
-### Exporting transcript data for all the samples
+### 1.1.4 Exporting transcript data for all the samples
 - Use Rstudio and install 'ballgown' library.
 ```
 if (!requireNamespace("BiocManager", quietly=TRUE))
@@ -53,6 +49,7 @@ BiocManager::install("ballgown")
 - Load all the abundance data (comes with additional handy syntaxes imported from the 'ballgown' vignette)
 ```
 ## ----makebgobj, message=FALSE--------------------------------------------
+library(methods)
 library(ballgown)
 data_directory = "/Volumes/Seagate/STAR_Output/StringTieAbundance/"
 # make the ballgown object:
