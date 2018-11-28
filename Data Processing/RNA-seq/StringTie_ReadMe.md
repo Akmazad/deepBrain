@@ -26,19 +26,19 @@ stringtie /Volumes/Seagate/STAR_Output/AN00493_ba41_42_22/AN00493_ba41_42_22Alig
 stringtie --merge -p 8 -G Homo_sapiens.GRCh38.94.chr.gtf -o /Volumes/Seagate/STAR_Output/stringtie_merged.gtf /Volumes/Seagate/STAR_Output/StringTieMergeList.txt
 ```
 
-### Count how many transcripts?
+### 1.1.4 Count how many transcripts?
 ```
 cat /Volumes/Seagate/STAR_Output/stringtie_merged.gtf | grep -v "^#" | awk '$3=="transcript" {print}' | wc -l
 ```
 
-### Estimate transcript abundance
+### 1.1.5 Estimate transcript abundance
 - Run "StringTieAbundance.sh". An examle line is as follows:
 ```
 stringtie -e -B -p 8 -G /Volumes/Seagate/STAR_Output/stringtie_merged.gtf -o /Volumes/Seagate/STAR_Output/StringTieAbundance/AN00493_ba41_42_22/AN00493_ba41_42_22.gtf /Volumes/Seagate/STAR_Output/AN00493_ba41_42_22/AN00493_ba41_42_22Aligned.out.sorted.bam
 ```
 - This will create a separate folder for each samples, where each folder will contain: 'i_data.ctab' (intron data), 'e_data.ctab' (exon data), 't_data.ctab' (transcript data), and their corresponding indices.
 
-### 1.1.4 Exporting transcript data for all the samples
+### 1.1.6 Exporting transcript data for all the samples
 - Use Rstudio and install 'ballgown' library.
 ```
 if (!requireNamespace("BiocManager", quietly=TRUE))
@@ -71,3 +71,6 @@ transcript_gene_table = indexes(bg)$t2g
 head(transcript_gene_table)
 phenotype_table = pData(bg)
 ```
+### 1.1.7 Bin the transcript abundance data
+
+- "transcript_fpkm" or "transcript_cov" matrices contains transcript-level fpkm or coverage values in all the samples in all the chromosomes. Hence, we can apply "AccetylationDat3.r" (may need slight modification) code for binning these datasets, chromosome-wise files.  
