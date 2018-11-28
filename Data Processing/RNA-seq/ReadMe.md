@@ -17,5 +17,5 @@ make release
 - To help running this scripts, paste this into home directory, for example, and add that location to the PATH variable using this command: [$ export PATH=$PATH":$YourHomeDirectory"]. 
 - Then give execute permission to that script by [$ chmod +x StringTieAssembly.sh], which will enable running StringTie as a command.
 - Then run that script with [./StringTieAssembly.sh] to get the assembled files in .gtf format
-- This takes help from the annotation file:  
+- This takes help from the annotation file downloaded from here (ftp://ftp.ensembl.org/pub/release-94/gtf/homo_sapiens/Homo_sapiens.GRCh38.94.gtf.gz)
 
