@@ -6,9 +6,11 @@
 # 1.2 StringTie: a unix-based tool 
 
 # Installation:
+```
 git clone https://github.com/gpertea/stringtie
 cd stringtie
 make release 
+```
 
 # Run a batch of sample (BAM) files 
 - To assemble the mapped reads into transcripts from all the sample (BAM) files, create a bash script (see "StringTieAssembly.sh") listing commands for all the samples and the output file paths. 
