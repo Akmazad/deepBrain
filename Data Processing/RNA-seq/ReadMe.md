@@ -12,7 +12,7 @@ cd stringtie
 make release 
 ```
 
-# Run a batch of sample (BAM) files 
+# Assemble a batch of sample (BAM) files 
 - To assemble the mapped reads into transcripts from all the sample (BAM) files, create a bash script (see "StringTieAssembly.sh") listing commands for all the samples and the output file paths. 
 - To help running this scripts, paste this into home directory, for example, and add that location to the PATH variable using this command: [$ export PATH=$PATH":$YourHomeDirectory"]. 
 - Then give execute permission to that script by [$ chmod +x StringTieAssembly.sh], which will enable running StringTie as a command.
