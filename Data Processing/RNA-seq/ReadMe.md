@@ -15,7 +15,7 @@ make release
 # Assemble a batch of sample (BAM) files 
 - To assemble the mapped reads into transcripts from all the sample (BAM) files, create a bash script (see "StringTieAssembly.sh") listing commands for all the samples and the output file paths. An example command for a single BAM file looks like following:
 ```
-stringtie	/Volumes/Seagate/STAR_Output/AN00493_ba41_42_22/AN00493_ba41_42_22Aligned.out.sorted.bam	-l	AN00493_ba41_42_22	-p	8	-G	/Users/rna/Homo_sapiens.GRCh38.94.chr.gtf	-o	/Volumes/Seagate/STAR_Output/stringtieAssembly/AN00493_ba41_42_22.gtf
+stringtie /Volumes/Seagate/STAR_Output/AN00493_ba41_42_22/AN00493_ba41_42_22Aligned.out.sorted.bam -l AN00493_ba41_42_22 -p 8 -G /Users/rna/Homo_sapiens.GRCh38.94.chr.gtf -o /Volumes/Seagate/STAR_Output/stringtieAssembly/AN00493_ba41_42_22.gtf
 ```
 
 - To help running this scripts, paste this into home directory, for example, and add that location to the PATH variable using this command: [```$ export PATH=$PATH":$YourHomeDirectory"```]. 
