@@ -36,8 +36,41 @@ cat /Volumes/Seagate/STAR_Output/stringtie_merged.gtf | grep -v "^#" | awk '$3==
 ```
 
 ### Estimate transcript abundance
-Run "StringTieAbundance.sh". An examle line is as follows:
+- Run "StringTieAbundance.sh". An examle line is as follows:
 ```
 stringtie -e -B -p 8 -G /Volumes/Seagate/STAR_Output/stringtie_merged.gtf -o /Volumes/Seagate/STAR_Output/StringTieAbundance/AN00493_ba41_42_22/AN00493_ba41_42_22.gtf /Volumes/Seagate/STAR_Output/AN00493_ba41_42_22/AN00493_ba41_42_22Aligned.out.sorted.bam
 ```
+- This will create a separate folder for each samples, where each folder will contain: 'i_data.ctab' (intron data), 'e_data.ctab' (exon data), 't_data.ctab' (transcript data), and their corresponding indices.
 
+### Exporting transcript data for all the samples
+- Use Rstudio and install 'ballgown' library.
+```
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("ballgown")
+```
+
+- Load all the abundance data (comes with additional handy syntaxes imported from the 'ballgown' vignette)
+```
+## ----makebgobj, message=FALSE--------------------------------------------
+library(ballgown)
+data_directory = "/Volumes/Seagate/STAR_Output/StringTieAbundance/"
+# make the ballgown object:
+bg = ballgown(dataDir=data_directory, meas='all')
+## ----getexpr-------------------------------------------------------------
+transcript_fpkm = texpr(bg, 'FPKM')
+transcript_cov = texpr(bg, 'cov')
+whole_tx_table = texpr(bg, 'all')
+exon_mcov = eexpr(bg, 'mcov')
+junction_rcount = iexpr(bg)
+whole_intron_table = iexpr(bg, 'all')
+gene_expression = gexpr(bg)
+## ----pData---------------------------------------------------------------
+pData(bg) = data.frame(id=sampleNames(bg), group=rep(c(1,0), each=10))
+
+## ----indexex-------------------------------------------------------------
+exon_transcript_table = indexes(bg)$e2t
+transcript_gene_table = indexes(bg)$t2g
+head(transcript_gene_table)
+phenotype_table = pData(bg)
+```
