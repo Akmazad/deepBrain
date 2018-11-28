@@ -23,3 +23,7 @@ stringtie /Volumes/Seagate/STAR_Output/AN00493_ba41_42_22/AN00493_ba41_42_22Alig
 - Then run that script with [```./StringTieAssembly.sh```] to get the assembled files in .gtf format
 - This takes help from the annotation file downloaded from here (```ftp://ftp.ensembl.org/pub/release-94/gtf/homo_sapiens/Homo_sapiens.GRCh38.94.gtf.gz```)
 
+# merge all transcripts from the different samples
+```
+```
+
