@@ -6,4 +6,14 @@
 # 1.2 StringTie: a unix-based tool 
 
 # Installation:
-We downloaded OSX binary package "stringtie-1.3.5.OSX_x86_64.tar.gz" from here (http://ccb.jhu.edu/software/stringtie/dl/stringtie-1.3.5.OSX_x86_64.tar.gz) using following command: 
+git clone https://github.com/gpertea/stringtie
+cd stringtie
+make release 
+
+# Run a batch of sample (BAM) files 
+- To assemble the mapped reads into transcripts from all the sample (BAM) files, create a bash script (see "StringTieAssembly.sh") listing commands for all the samples and the output file paths. 
+- To help running this scripts, paste this into home directory, for example, and add that location to the PATH variable using this command: [$ export PATH=$PATH":$YourHomeDirectory"]. 
+- Then give execute permission to that script by [$ chmod +x StringTieAssembly.sh], which will enable running StringTie as a command.
+- Then run that script with [./StringTieAssembly.sh] to get the assembled files in .gtf format
+- This takes help from the annotation file:  
+
