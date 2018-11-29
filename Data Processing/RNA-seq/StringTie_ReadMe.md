@@ -1,5 +1,6 @@
 # 1: Preparing RNA-seq data from Brain tissue for Deep learning applications
-## 1.1 StringTie: a unix-based tool 
+## 1.1 StringTie 
+A unix-based tool for finding expressed transcriptomic, exonic, and intronic chromosomal regions in the RNA-seq data
 
 ### 1.1.1 Installation:
 ```
