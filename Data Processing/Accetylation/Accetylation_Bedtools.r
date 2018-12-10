@@ -44,5 +44,10 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
     write.table(features_bed,paste0(outDir, feature_file, ".bed") , sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
   }
   
+  ############## Overlap Bins with fetures, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
+  # Step-1: create a shell script namely "AcbedShellScript.sh" (see attached) within the "workingDir"
+  # Step-2: register that script for running with appropriate permission under UNIX using "chmod u+x AcbedShellScript.sh"
+  # Step-3: Put following commands for Bedtools in that shell script which assumes the arguments should be passed from R
+  
   
 }
