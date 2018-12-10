@@ -20,7 +20,7 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   chr_size=chr_size[match(paste0("chr", c(c(1:22), "M", "X", "Y")), chr_size$chr), ]
 
   ################ generate bed file of bins of size b
-  message("Generating bed files for each bins of size b:",appendLF=F)
+  message("Generating bed files for each bins of size b: ",appendLF=F)
   b=binSize
   for (j in c(1:nrow(chr_size))){
     start=seq(from=0, to=chr_size$size[j], by=b)+1
@@ -37,7 +37,7 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   message("Done",appendLF=T)
   
   ################ Generate bed file of features (H3K27Ac: BA9, BA41, vermis)
-  message("Generating bed files for features:",appendLF=F)
+  message("Generating bed files for features: ",appendLF=F)
   inDir=workingDir
   outDir=workingDir
   for (feature_file in c(ba9FileName,ba41FileName,baVermisFileName)){
@@ -65,7 +65,7 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   ## done
   
   # Step-4: use system2 R function to run this script with arguments passed for the shell script
-  message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap"),appendLF=F)
+  message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
   system2("./AceTylation_Bed_ShellScript.sh",
             paste(bedDir, 
             workingDir, 
@@ -78,7 +78,7 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   message("Done",appendLF=T)
     
   ############## Generate the binarised matrix
-  message("Generating the binarised matrix:",appendLF=F)
+  message("Generating the binarised matrix: ",appendLF=F)
   setwd(workingDir)
   #bins=read.table(paste0(binFile,".bed"), sep="\t", header=FALSE)
   #colnames(bins)=c("chr", "start", "end", "id",  "strand")
