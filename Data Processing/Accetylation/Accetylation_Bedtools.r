@@ -1,3 +1,10 @@
+# chrSizeFileName = 
+# AcetylationFileName = 
+# binSize = 
+# overlapCutoff = 
+# bedDir = 
+# workingDir = 
+
 accetylationDat <- function(chrSizeFileName,AcetylationFileName,binSize,overlapCutoff,bedDir,workingDir){
   setwd(workingDir)
   rm(list=ls())
