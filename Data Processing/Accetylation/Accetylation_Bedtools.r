@@ -20,6 +20,7 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   chr_size=chr_size[match(paste0("chr", c(c(1:22), "M", "X", "Y")), chr_size$chr), ]
 
   ################ generate bed file of bins of size b
+  message("Generating bed files for each bins of size b:",appendLF=F)
   b=binSize
   for (j in c(1:nrow(chr_size))){
     start=seq(from=0, to=chr_size$size[j], by=b)+1
@@ -33,9 +34,10 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   bins$strand="."
   binFile=paste0("hg19_bins_", b,"bp")
   write.table(bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
-  message("Generating bed files for each bins of size b: Done",appendLF=F)
+  message("Done",appendLF=T)
   
   ################ Generate bed file of features (H3K27Ac: BA9, BA41, vermis)
+  message("Generating bed files for features:",appendLF=F)
   inDir=workingDir
   outDir=workingDir
   for (feature_file in c(ba9FileName,ba41FileName,baVermisFileName)){
@@ -44,7 +46,7 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
     features_bed=cbind(features[, c(1:3)], paste(features[,1], features[,2], features[,3], sep="_"), ".")
     write.table(features_bed,paste0(outDir, feature_file, ".bed") , sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
   }
-  message("Generating bed files for features: Done",appendLF=F)
+  message("Done",appendLF=T)
   
   ############## Overlap Bins with fetures, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
   # Step-1: create a shell script namely "AceTylation_Bed_ShellScript.sh" (see attached) within the "workingDir"
@@ -63,8 +65,9 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   ## done
   
   # Step-4: use system2 R function to run this script with arguments passed for the shell script
+  message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap"),appendLF=F)
   system2("./AceTylation_Bed_ShellScript.sh",
-            paste0(bedDir, 
+            paste(bedDir, 
             workingDir, 
             binFile, 
             overlapCutoff, 
@@ -72,9 +75,10 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
             ba41FileName,
             baVermisFileName,sep=" "))
   # this will create Three overlap bed files
-  message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: Done"),appendLF=F)
-  
+  message("Done",appendLF=T)
+    
   ############## Generate the binarised matrix
+  message("Generating the binarised matrix:",appendLF=F)
   setwd(workingDir)
   #bins=read.table(paste0(binFile,".bed"), sep="\t", header=FALSE)
   #colnames(bins)=c("chr", "start", "end", "id",  "strand")
@@ -93,7 +97,7 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
     rm(binData)
   }
   save(bins, file=paste0(outputFileName,".rda"))
-  message("Generating the binarised matrix: Done",appendLF=F)
+  message("Done",appendLF=T)
   
 }
 
