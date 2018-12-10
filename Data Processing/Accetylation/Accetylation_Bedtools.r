@@ -5,7 +5,7 @@ baVermisFileName = "normalized_log2_tags_Vermis_62_Mar2015_LR"
 binSize = 200
 overlapCutoff = 0.05
 bedDir = "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
-workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test"
+workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 outputFileName = "H3K27ac_binary"
 
 accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName){
@@ -26,7 +26,6 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
     end=seq(from=b, to=chr_size$size[j], by=b)
     chr_bins=cbind(as.character(chr_size$chr[j]),start[1:length(end)],end)
     if (j==1) bins=chr_bins else bins=rbind(bins, chr_bins) 
-    print(j)
   }
   bins=as.data.frame(bins)
   colnames(bins)=c("chr", "start", "end")
@@ -34,7 +33,8 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   bins$strand="."
   binFile=paste0("hg19_bins_", b,"bp")
   write.table(bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
-
+  message("Generating bed files for each bins of size b: Done",appendLF=F)
+  
   ################ Generate bed file of features (H3K27Ac: BA9, BA41, vermis)
   inDir=workingDir
   outDir=workingDir
@@ -44,6 +44,7 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
     features_bed=cbind(features[, c(1:3)], paste(features[,1], features[,2], features[,3], sep="_"), ".")
     write.table(features_bed,paste0(outDir, feature_file, ".bed") , sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
   }
+  message("Generating bed files for features: Done",appendLF=F)
   
   ############## Overlap Bins with fetures, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
   # Step-1: create a shell script namely "AceTylation_Bed_ShellScript.sh" (see attached) within the "workingDir"
@@ -63,17 +64,17 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   
   # Step-4: use system2 R function to run this script with arguments passed for the shell script
   system2("./AceTylation_Bed_ShellScript.sh",
-            "bedDir 
-            workingDir 
-            binFile 
-            overlapCutoff 
-            ba9FileName
-            ba41FileName
-            baVermisFileName")
+            paste0(bedDir, 
+            workingDir, 
+            binFile, 
+            overlapCutoff, 
+            ba9FileName,
+            ba41FileName,
+            baVermisFileName,sep=" "))
   # this will create Three overlap bed files
+  message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: Done"),appendLF=F)
   
   ############## Generate the binarised matrix
-  rm(list=ls())
   setwd(workingDir)
   #bins=read.table(paste0(binFile,".bed"), sep="\t", header=FALSE)
   #colnames(bins)=c("chr", "start", "end", "id",  "strand")
@@ -92,4 +93,8 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
     rm(binData)
   }
   save(bins, file=paste0(outputFileName,".rda"))
+  message("Generating the binarised matrix: Done",appendLF=F)
+  
 }
+
+accetylationDat(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName)
