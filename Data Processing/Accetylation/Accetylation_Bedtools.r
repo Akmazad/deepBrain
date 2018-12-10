@@ -80,8 +80,8 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   ############## Generate the binarised matrix
   message("Generating the binarised matrix: ",appendLF=F)
   setwd(workingDir)
-  #bins=read.table(paste0(binFile,".bed"), sep="\t", header=FALSE)
-  #colnames(bins)=c("chr", "start", "end", "id",  "strand")
+  bins=read.table(paste0(binFile,".bed"), sep="\t", header=FALSE)
+  colnames(bins)=c("chr", "start", "end", "id",  "strand")
   feature_files= c(ba9FileName, ba41FileName,baVermisFileName)
   for ( j in c(1:length(feature_files))){
     features=read.csv(paste0(feature_files[j], ".csv"))
