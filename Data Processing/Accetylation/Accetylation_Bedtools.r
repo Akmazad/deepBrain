@@ -1,13 +1,14 @@
-# chrSizeFileName = 
-# ba9FileName = 
-# ba41FileName = 
-# baVermisFileName = 
-# binSize = 
-# overlapCutoff = 
-# bedDir = 
-# workingDir = 
+chrSizeFileName = "hg19.chrom.sizes.txt"
+ba9FileName = "normalized_log2_tags_BA9_81_April2015_LR"
+ba41FileName = "normalized_log2_tags_BA41_66_Mar2015_LR"
+baVermisFileName = "normalized_log2_tags_Vermis_62_Mar2015_LR"
+binSize = 200
+overlapCutoff = 0.05
+bedDir = "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
+workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test"
+outputFileName = "H3K27ac_binary"
 
-accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir){
+accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName){
   setwd(workingDir)
   rm(list=ls())
   
@@ -31,8 +32,8 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   colnames(bins)=c("chr", "start", "end")
   bins$id=paste(bins$chr, bins$start, bins$end, sep="_")
   bins$strand="."
-  binFile=paste0("hg19_bins_", b,"bp.bed")
-  write.table(bins, binFile, sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  binFile=paste0("hg19_bins_", b,"bp")
+  write.table(bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 
   ################ Generate bed file of features (H3K27Ac: BA9, BA41, vermis)
   inDir=workingDir
@@ -62,17 +63,33 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   
   # Step-4: use system2 R function to run this script with arguments passed for the shell script
   system2("./AceTylation_Bed_ShellScript.sh",
-          "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin 
-              /Volumes/Data1/PROJECTS/DeepLearning/Test 
-              hg19_bins_200bp 
-              0.05 
-              normalized_log2_tags_BA9_81_April2015_LR 
-              normalized_log2_tags_BA41_66_Mar2015_LR 
-              normalized_log2_tags_Vermis_62_Mar2015_LR")
+            "bedDir 
+            workingDir 
+            binFile 
+            overlapCutoff 
+            ba9FileName
+            ba41FileName
+            baVermisFileName")
   # this will create Three overlap bed files
   
-  
-  
-  
-  
+  ############## Generate the binarised matrix
+  rm(list=ls())
+  setwd(workingDir)
+  #bins=read.table(paste0(binFile,".bed"), sep="\t", header=FALSE)
+  #colnames(bins)=c("chr", "start", "end", "id",  "strand")
+  feature_files= c(ba9FileName, ba41FileName,baVermisFileName)
+  for ( j in c(1:length(feature_files))){
+    features=read.csv(paste0(feature_files[j], ".csv"))
+    names=colnames(features); rm(features)
+    names=names[-c(1:3)]
+    overlaps=read.table(paste0(feature_files[j], ".bed"))
+    colnames(overlaps)=c("chr", "start", "end", "id",  "strand")
+    ov=which(bins$id%in%overlaps$id); rm(overlaps)
+    binData=matrix(0, nrow=nrow(bins), ncol=length(names))
+    colnames(binData)=names
+    binData[ov,]=1
+    bins=cbind(bins, binData)
+    rm(binData)
+  }
+  save(bins, file=paste0(outputFileName,".rda"))
 }
