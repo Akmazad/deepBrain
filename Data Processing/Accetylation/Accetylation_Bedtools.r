@@ -96,7 +96,7 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
     bins=cbind(bins, binData)
     rm(binData)
   }
-  save(bins, file=paste0(outputFileName,".rda"))
+  write.csv(bins, file=paste0(outputFileName,".csv"), row.names=F)
   message("Done",appendLF=T)
   
 }
