@@ -2,15 +2,13 @@ chrSizeFileName = "hg19.chrom.sizes.txt"
 ba9FileName = "normalized_log2_tags_BA9_81_April2015_LR"
 ba41FileName = "normalized_log2_tags_BA41_66_Mar2015_LR"
 baVermisFileName = "normalized_log2_tags_Vermis_62_Mar2015_LR"
-binSize = 200
-overlapCutoff = 0.05
 bedDir = "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
 workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 outputFileName = "H3K27ac_binary"
 
 accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName){
   setwd(workingDir)
-  rm(list=ls())
+  #rm(list=ls())
   
   # read in chromosome sizes
   chr_size=read.table(chrSizeFileName, sep="\t")
@@ -76,4 +74,23 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
             baVermisFileName,sep=" "))
   # this will create Three overlap bed files
   message("Done",appendLF=T)
+  
+  message("Generating the binarised matrix: ",appendLF=F)
+  setwd(workingDir)
+  bins=read.table(paste0(binFile,".bed"), sep="\t", header=FALSE)
+  colnames(bins)=c("chr", "start", "end", "id",  "strand")
+  feature_files= c(ba9FileName, ba41FileName,baVermisFileName)
+  for (j in c(1:length(feature_files))){
+    overlaps=read.table(paste0(feature_files[j], ".bed"))
+    max <- if(nrow(overlaps) > max) nrow(overlaps) else max
+  }
+  return(c(max/nrow(bins), 1.0-max/nrow(bins)))
 }  
+
+## iterate over varying overlapCutoff or binSize
+binSize = 200
+for(overlapCutoff in seq(0,1,0.1)){
+  val <- accetylationDat(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName)
+  dat <- rbind(dat,cbind(overlapCutoff,val))
+}
+write.csv(dat,file=paste0(workingDir,"plot_cutoff.csv"))
