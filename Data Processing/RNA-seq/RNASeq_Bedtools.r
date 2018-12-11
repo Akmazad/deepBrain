@@ -1,0 +1,9 @@
+chrSizeFileName = "hg19.chrom.sizes.txt"
+ba9FileName = "normalized_log2_tags_BA9_81_April2015_LR"
+ba41FileName = "normalized_log2_tags_BA41_66_Mar2015_LR"
+baVermisFileName = "normalized_log2_tags_Vermis_62_Mar2015_LR"
+binSize = 200
+overlapCutoff = 0.05
+bedDir = "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
+workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test/"
+outputFileName = "H3K27ac_binary"
