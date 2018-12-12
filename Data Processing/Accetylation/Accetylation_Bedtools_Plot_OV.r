@@ -1,6 +1,7 @@
 
 
 accetylationDat <- function(binFile,nBins,chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName){
+  setwd("/Volumes/Data1/PROJECTS/DeepLearning/Test/")
   message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
   system2("./AceTylation_Bed_ShellScript.sh",
             paste(bedDir, 
@@ -24,7 +25,9 @@ accetylationDat <- function(binFile,nBins,chrSizeFileName,ba9FileName,ba41FileNa
       max <- val
   }
   message("Done",appendLF=T)
-  return(c(max/nBins, 1.0-max/nBins))
+  retVal <- cbind(max/nBins, 1.0-max/nBins)
+  colnames(retVal) <- c("ones","zeros")
+  return(retVal)
 }  
 
 ########################## ONE OFF #################################
@@ -45,7 +48,23 @@ colnames(chr_size)=c("chr", "size")
 chr_size=chr_size[-grep("_", chr_size$chr, fixed=TRUE),]
 chr_size=chr_size[match(paste0("chr", c(c(1:22), "M", "X", "Y")), chr_size$chr), ]
 
+################ Generate bed file of features (H3K27Ac: BA9, BA41, vermis)
+message("Generating bed files for features: ",appendLF=F)
+inDir=workingDir
+outDir=workingDir
+for (feature_file in c(ba9FileName,ba41FileName,baVermisFileName)){
+  features=read.csv(paste0(inDir, feature_file, ".csv"))
+  #apply(features[,-c(1:3)],2,min)
+  features_bed=cbind(features[, c(1:3)], paste(features[,1], features[,2], features[,3], sep="_"), ".")
+  write.table(features_bed,paste0(outDir, feature_file, ".bed") , sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+}
+message("Done",appendLF=T)
+
 ################ generate bed file of bins of size b
+binSize = 200
+workingDir = paste0("/Volumes/Data1/PROJECTS/DeepLearning/Test/",binSize,"bp/")
+setwd(workingDir)
+
 message("Generating bed files for each bins of size b: ",appendLF=F)
 b=binSize
 for (j in c(1:nrow(chr_size))){
@@ -62,17 +81,7 @@ binFile=paste0("hg19_bins_", b,"bp")
 write.table(bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 nBins=nrow(bins)
 message("Done",appendLF=T)
-################ Generate bed file of features (H3K27Ac: BA9, BA41, vermis)
-message("Generating bed files for features: ",appendLF=F)
-inDir=workingDir
-outDir=workingDir
-for (feature_file in c(ba9FileName,ba41FileName,baVermisFileName)){
-  features=read.csv(paste0(inDir, feature_file, ".csv"))
-  #apply(features[,-c(1:3)],2,min)
-  features_bed=cbind(features[, c(1:3)], paste(features[,1], features[,2], features[,3], sep="_"), ".")
-  write.table(features_bed,paste0(outDir, feature_file, ".bed") , sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
-}
-message("Done",appendLF=T)
+
   
 ## iterate over varying overlapCutoff or binSize
 dat<-NULL
@@ -80,4 +89,4 @@ for(overlapCutoff in seq(0.001,1,0.1)){
   val <- accetylationDat(binFile,nBins,chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName)
   dat <- rbind(dat,cbind(overlapCutoff,val))
 }
-write.csv(dat,file=paste0(workingDir,"plot_cutoff.csv"),row.names=F)
+write.csv(dat,file=paste0(workingDir,"plot_cutoff_",binSize,"bp.csv"),row.names=F)
