@@ -80,4 +80,4 @@ for(overlapCutoff in seq(0.001,1,0.1)){
   val <- accetylationDat(binFile,nBins,chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName)
   dat <- rbind(dat,cbind(overlapCutoff,val))
 }
-write.csv(dat,file=paste0(workingDir,"plot_cutoff.csv"))
+write.csv(dat,file=paste0(workingDir,"plot_cutoff.csv"),row.names=F)
