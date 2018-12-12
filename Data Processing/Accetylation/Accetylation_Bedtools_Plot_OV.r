@@ -1,24 +1,6 @@
 
 
-accetylationDat <- function(binFile,chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName){
-  
-  ############## Overlap Bins with fetures, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
-  # Step-1: create a shell script namely "AceTylation_Bed_ShellScript.sh" (see attached) within the "workingDir"
-  # Step-2: register that script for running with appropriate permission under UNIX using "chmod u+x AceTylation_Bed_ShellScript.sh"
-  # Step-3: Put following commands for Bedtools in that shell script which assumes the arguments should be passed from R
-  
-  ##### "AceTylation_Bed_ShellScript.sh" ########
-  ## #!/bin/bash
-  ## bedDir=$1	#first argument which is the Bedtools bin directory
-  ## cd $2	#second argument which is the working directory
-  ## bins=$3	#third argument which is the chromosomal bed file name
-  ## overlapCutof=$(echo $4| bc)	#fourth argument which is overlap cut-off
-  ## for features in $5 $6 $7	#fifth, sixth, and seventh arguments are b19, b41, and baVermis bedfiles
-  ## do
-  ## 	  $bedDir/intersectBed -u -f $overlapCutof -a $bins.bed -b $features.bed > $features.overlaps.bed
-  ## done
-  
-  # Step-4: use system2 R function to run this script with arguments passed for the shell script
+accetylationDat <- function(binFile,nBins,chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName){
   message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
   system2("./AceTylation_Bed_ShellScript.sh",
             paste(bedDir, 
@@ -29,22 +11,22 @@ accetylationDat <- function(binFile,chrSizeFileName,ba9FileName,ba41FileName,baV
             ba41FileName,
             baVermisFileName,sep=" "))
   # this will create Three overlap bed files
-  message("Done",appendLF=T)
+  #message("Done",appendLF=T)
   
-  message("Generating the binarised matrix: ",appendLF=F)
+  #message("Calculating counts: ",appendLF=F)
   setwd(workingDir)
-  bins=read.table(paste0(binFile,".bed"), sep="\t", header=FALSE)
-  colnames(bins)=c("chr", "start", "end", "id",  "strand")
   feature_files= c(ba9FileName, ba41FileName,baVermisFileName)
   max <- -9999
   for (j in c(1:length(feature_files))){
-    overlaps=read.table(paste0(feature_files[j], ".bed"))
-    va <- nrow(overlaps)
+    overlaps=read.table(paste0(feature_files[j], ".overlaps.bed"))
+    val <- nrow(overlaps)
     if(val > max) 
       max <- val
   }
-  return(c(max/nrow(bins), 1.0-max/nrow(bins)))
+  message("Done",appendLF=T)
+  return(c(max/nBins, 1.0-max/nBins))
 }  
+
 ########################## ONE OFF #################################
 chrSizeFileName = "hg19.chrom.sizes.txt"
 ba9FileName = "normalized_log2_tags_BA9_81_April2015_LR"
@@ -78,6 +60,7 @@ bins$id=paste(bins$chr, bins$start, bins$end, sep="_")
 bins$strand="."
 binFile=paste0("hg19_bins_", b,"bp")
 write.table(bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+nBins=nrow(bins)
 message("Done",appendLF=T)
 ################ Generate bed file of features (H3K27Ac: BA9, BA41, vermis)
 message("Generating bed files for features: ",appendLF=F)
@@ -92,8 +75,9 @@ for (feature_file in c(ba9FileName,ba41FileName,baVermisFileName)){
 message("Done",appendLF=T)
   
 ## iterate over varying overlapCutoff or binSize
-for(overlapCutoff in seq(0,1,0.1)){
-  val <- accetylationDat(binFile,chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName)
+dat<-NULL
+for(overlapCutoff in seq(0.001,1,0.1)){
+  val <- accetylationDat(binFile,nBins,chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName)
   dat <- rbind(dat,cbind(overlapCutoff,val))
 }
 write.csv(dat,file=paste0(workingDir,"plot_cutoff.csv"))
