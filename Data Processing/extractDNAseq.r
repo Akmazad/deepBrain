@@ -1,12 +1,10 @@
 chrSizeFileName = "hg19.chrom.sizes.txt"
 workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test/"
+library("BSgenome.Hsapiens.UCSC.hg19")
+hg <- BSgenome.Hsapiens.UCSC.hg19
+setwd(workingDir)
 
-extractDNAseq <- function(chrSizeFileName,binSize,workingDir){
-  #rm(list=ls())
-  setwd(workingDir)
-  library("BSgenome.Hsapiens.UCSC.hg19")
-  hg <- BSgenome.Hsapiens.UCSC.hg19
-  
+extractDNAseq <- function(hg,chrSizeFileName,binSize,workingDir){
   # read in chromosome sizes
   chr_size=read.table(chrSizeFileName, sep="\t")
   colnames(chr_size)=c("chr", "size")
@@ -15,7 +13,7 @@ extractDNAseq <- function(chrSizeFileName,binSize,workingDir){
   chr_size=chr_size[match(paste0("chr", c(c(1:22), "M", "X", "Y")), chr_size$chr), ]
 
   ################ generate bed file of bins of size b
-  message("Generating bed files for each bins of size b: ",appendLF=F)
+  message(paste0("Generating bed files for each bins of size b: ",binSize),appendLF=F)
   b=binSize
   for (j in c(1:nrow(chr_size))){
     start=seq(from=0, to=chr_size$size[j]-b, by=b)+1
@@ -36,8 +34,10 @@ extractDNAseq <- function(chrSizeFileName,binSize,workingDir){
   message("Done",appendLF=T)
 }
 
-binSize = 200
-extractDNAseq(chrSizeFileName,binSize,workingDir)
+## run this code for a set of bins
+for(binSize in seq(200,6400,by=200)){
+  extractDNAseq(hg,chrSizeFileName,binSize,workingDir)
+}
 ## for try
 #binSize = 200
 #j=1
