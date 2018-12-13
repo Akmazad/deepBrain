@@ -1,1 +1,56 @@
-library("BSgenome.Hsapiens.UCSC.hg19")
+chrSizeFileName = "hg19.chrom.sizes.txt"
+workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test/"
+
+extractDNAseq <- function(chrSizeFileName,binSize,workingDir){
+  #rm(list=ls())
+  setwd(workingDir)
+  library("BSgenome.Hsapiens.UCSC.hg19")
+  hg <- BSgenome.Hsapiens.UCSC.hg19
+  
+  # read in chromosome sizes
+  chr_size=read.table(chrSizeFileName, sep="\t")
+  colnames(chr_size)=c("chr", "size")
+  # remove chromosome patches and sort by chr number
+  chr_size=chr_size[-grep("_", chr_size$chr, fixed=TRUE),]
+  chr_size=chr_size[match(paste0("chr", c(c(1:22), "M", "X", "Y")), chr_size$chr), ]
+
+  ################ generate bed file of bins of size b
+  message("Generating bed files for each bins of size b: ",appendLF=F)
+  b=binSize
+  for (j in c(1:nrow(chr_size))){
+    start=seq(from=0, to=chr_size$size[j]-b, by=b)+1
+    end=seq(from=b, to=chr_size$size[j], by=b)
+    chrName=as.character(chr_size$chr[j])
+    fasta.seq=getSeq(hg,chrName,start=start,end=end)
+    tempFasta = as.character(as.data.frame(fasta.seq)[[1]])
+    chr_bins=cbind(chrName,start[1:length(end)],end)
+    chr_bins=cbind(chr_bins,tempFasta)
+    if (j==1) bins=chr_bins else bins=rbind(bins, chr_bins) 
+  }
+  bins=as.data.frame(bins)
+  colnames(bins)=c("chr", "start", "end","FastaSeq")
+  bins$id=paste(bins$chr, bins$start, bins$end, sep="_")
+  bins$strand="."
+  binFile=paste0("hg19.binwise.fasta.", b,"bp")
+  write.table(bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  message("Done",appendLF=T)
+}
+
+binSize = 200
+extractDNAseq(chrSizeFileName,binSize,workingDir)
+## for try
+#binSize = 200
+#j=1
+#b=binSize
+#start=seq(from=0, to=chr_size$size[j]-b, by=b)+1
+#end=seq(from=b, to=chr_size$size[j], by=b)
+#chrName=as.character(chr_size$chr[j])
+#fasta.seq=getSeq(hg,chrName,start=start,end=end)
+#tempFasta = as.character(as.data.frame(fasta.seq)[[1]])
+#chr_bins=cbind(chrName,start[1:length(end)],end)
+#chr_bins=cbind(chr_bins,tempFasta)
+#colnames(chr_bins)=c("chr", "start", "end","FastaSeq")
+#bins=as.data.frame(bins)
+#colnames(bins)=c("chr", "start", "end","FastaSeq")
+#binFile=paste0("hg19.binwise.fasta.", b,"bp")
+#write.table(bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
