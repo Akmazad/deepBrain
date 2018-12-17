@@ -4,7 +4,7 @@ library("BSgenome.Hsapiens.UCSC.hg19")
 hg <- BSgenome.Hsapiens.UCSC.hg19
 setwd(workingDir)
 
-extractDNAseq <- function(hg,chrSizeFileName,binSize,workingDir){
+extractDNAseq <- function(hg,chrSizeFileName,binSize,flankingLength,workingDir){
   # read in chromosome sizes
   chr_size=read.table(chrSizeFileName, sep="\t")
   colnames(chr_size)=c("chr", "size")
@@ -16,8 +16,8 @@ extractDNAseq <- function(hg,chrSizeFileName,binSize,workingDir){
   message(paste0("Generating bed files for each bins of size b: ",binSize),appendLF=F)
   b=binSize
   for (j in c(1:nrow(chr_size))){
-    start=seq(from=0, to=chr_size$size[j]-b, by=b)+1
-    end=seq(from=b, to=chr_size$size[j], by=b)
+    start=seq(from=0, to=chr_size$size[j]-b, by=b)+1 - flankingLength
+    end=seq(from=b, to=chr_size$size[j], by=b) + flankingLength
     chrName=as.character(chr_size$chr[j])
     fasta.seq=getSeq(hg,chrName,start=start,end=end)
     tempFasta = as.character(as.data.frame(fasta.seq)[[1]])
@@ -35,10 +35,12 @@ extractDNAseq <- function(hg,chrSizeFileName,binSize,workingDir){
 }
 
 ## run this code for a set of bins
+flakingLength=1000
 for(binSize in seq(200,6400,by=200)){
-  extractDNAseq(hg,chrSizeFileName,binSize,workingDir)
+  extractDNAseq(hg,chrSizeFileName,binSize,flakingLength,workingDir)
 }
 ## for try
+#flakingLength=1000
 #binSize = 200
 #j=1
 #b=binSize
