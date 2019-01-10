@@ -7,8 +7,13 @@ overlapCutoff = 0.05
 bedDir = "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
 workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 outputFileName = "H3K27ac_binary"
+flakingLength=400
 
-accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName){
+accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName){
+  # get the total human genome
+  library("BSgenome.Hsapiens.UCSC.hg19")
+  hg <- BSgenome.Hsapiens.UCSC.hg19
+  
   setwd(workingDir)
   rm(list=ls())
   
@@ -23,13 +28,22 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   message("Generating bed files for each bins of size b: ",appendLF=F)
   b=binSize
   for (j in c(1:nrow(chr_size))){
-    start=seq(from=0, to=chr_size$size[j], by=b)+1
-    end=seq(from=b, to=chr_size$size[j], by=b)
+    start=seq(from=flankingLength, to=chr_size$size[j], by=b)+1 
+    end=seq(from=b, to=chr_size$size[j], by=b) 
+    
+    ## retrieve dna subsequence (with flanking) from hg
+    chrName=as.character(chr_size$chr[j])
+    dnaSeq.start=start-flankingLength
+    dnaSeq.end=end+flankingLength
+    fasta.seq=getSeq(hg,chrName,start=start,end=end)
+    tempFasta = as.character(as.data.frame(fasta.seq)[[1]])
+    
     chr_bins=cbind(as.character(chr_size$chr[j]),start[1:length(end)],end)
+    chr_bins=cbind(chr_bins,tempFasta)
     if (j==1) bins=chr_bins else bins=rbind(bins, chr_bins) 
   }
   bins=as.data.frame(bins)
-  colnames(bins)=c("chr", "start", "end")
+  colnames(bins)=c("chr", "start", "end", "dna.seq")
   bins$id=paste(bins$chr, bins$start, bins$end, sep="_")
   bins$strand="."
   binFile=paste0("hg19_bins_", b,"bp")
@@ -87,10 +101,11 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
     features=read.csv(paste0(feature_files[j], ".csv"))
     names=colnames(features); rm(features)
     names=names[-c(1:3)]
-    overlaps=read.table(paste0(feature_files[j], ".bed"))
+    overlaps=read.table(paste0(feature_files[j], ".overlaps.bed"))
     colnames(overlaps)=c("chr", "start", "end", "id",  "strand")
     ov=which(bins$id%in%overlaps$id); rm(overlaps)
-    binData=matrix(0, nrow=nrow(bins), ncol=length(names))
+    #binData=matrix(0, nrow=nrow(bins), ncol=length(names))
+    binData=matrix(0, nrow=nrow(bins), ncol=2) ## for 2 brain regions (one for ba9 and ba41 (identical), and other for baVermis)
     colnames(binData)=names
     binData[ov,]=1
     bins=cbind(bins, binData)
