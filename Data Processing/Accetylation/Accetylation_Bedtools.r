@@ -87,7 +87,7 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
     features=read.csv(paste0(feature_files[j], ".csv"))
     names=colnames(features); rm(features)
     names=names[-c(1:3)]
-    overlaps=read.table(paste0(feature_files[j], ".bed"))
+    overlaps=read.table(paste0(feature_files[j], ".overlaps.bed"))
     colnames(overlaps)=c("chr", "start", "end", "id",  "strand")
     ov=which(bins$id%in%overlaps$id); rm(overlaps)
     binData=matrix(0, nrow=nrow(bins), ncol=length(names))
