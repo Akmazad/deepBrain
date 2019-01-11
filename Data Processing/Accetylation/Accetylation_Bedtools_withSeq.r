@@ -12,6 +12,7 @@ flankingLength=400
 accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName){
   rm(list=ls())
   # get the total human genome
+  library("data.table")
   library("BSgenome.Hsapiens.UCSC.hg19")
   hg <- BSgenome.Hsapiens.UCSC.hg19
   
@@ -30,7 +31,7 @@ accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVe
   for (j in c(1:nrow(chr_size))){
     start=seq(from=flankingLength, to=chr_size$size[j]-flankingLength-b, by=b)+1 
     end=seq(from=flankingLength+b, to=chr_size$size[j]-flankingLength, by=b) 
-    print(j)
+    
     ## retrieve dna subsequence (with flanking) from hg
     chrName=as.character(chr_size$chr[j])
     dnaSeq.start=start-flankingLength
@@ -47,7 +48,7 @@ accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVe
   bins$id=paste(bins$chr, bins$start, bins$end, sep="_")
   bins$strand="."
   binFile=paste0("hg19_bins_", b,"bp")
-  write.table(bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  fwrite(bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
   message("Done",appendLF=T)
   
   ################ Generate bed file of features (H3K27Ac: BA9, BA41, vermis)
@@ -58,7 +59,7 @@ accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVe
     features=read.csv(paste0(inDir, feature_file, ".csv"))
     #apply(features[,-c(1:3)],2,min)
     features_bed=cbind(features[, c(1:3)], paste(features[,1], features[,2], features[,3], sep="_"), ".")
-    write.table(features_bed,paste0(outDir, feature_file, ".bed") , sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+   fwrite(features_bed,paste0(outDir, feature_file, ".bed") , sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
   }
   message("Done",appendLF=T)
   
@@ -94,26 +95,28 @@ accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVe
   ############## Generate the binarised matrix
   message("Generating the binarised matrix: ",appendLF=F)
   setwd(workingDir)
-  bins=read.table(paste0(binFile,".bed"), sep="\t", header=FALSE)
+  bins=fread(paste0(binFile,".bed"), sep="\t", header=FALSE)
   colnames(bins)=c("chr", "start", "end", "dna.seq", "id",  "strand")
   feature_files= c(ba9FileName, ba41FileName,baVermisFileName)
   for ( j in c(1:length(feature_files))){
-    features=read.csv(paste0(feature_files[j], ".csv"))
+    features=fread(paste0(feature_files[j], ".csv"))
     names=colnames(features); rm(features)
     names=names[-c(1:3)]
-    overlaps=read.table(paste0(feature_files[j], ".overlaps.bed"))
+    overlaps=fread(paste0(feature_files[j], ".overlaps.bed"))
     colnames(overlaps)=c("chr", "start", "end", "dna.seq", "id",  "strand")
     ov=which(bins$id%in%overlaps$id); rm(overlaps)
     #binData=matrix(0, nrow=nrow(bins), ncol=length(names))
-    binData=matrix(0, nrow=nrow(bins), ncol=2) ## for 2 brain regions (one for ba9 and ba41 (identical), and other for baVermis)
-    colnames(binData)=names
+    #colnames(binData)=names
+    binData=matrix(0, nrow=nrow(bins), ncol=1) ## 1 for each brain region (collapsing all the samples since it's binarized
+    colnames(binData)=c(feature_files[j])
     binData[ov,]=1
     bins=cbind(bins, binData)
     rm(binData)
   }
-  write.csv(bins, file=paste0(outputFileName,".csv"), row.names=F)
+  #write.csv(bins, file=paste0(outputFileName,".csv"), row.names=F)
+  fwrite(bins, file=paste0(outputFileName,".csv"), row.names=F, quote=F)
   message("Done",appendLF=T)
-  
+
 }
 
 accetylationDatWithSeq(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName)
