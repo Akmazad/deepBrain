@@ -116,4 +116,4 @@ accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVe
   
 }
 
-accetylationDatWithSeq(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName)
+accetylationDatWithSeq(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName)
