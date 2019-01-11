@@ -9,7 +9,7 @@ workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 outputFileName = "H3K27ac_binary"
 flakingLength=400
 
-accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName){
+accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName){
   # get the total human genome
   library("BSgenome.Hsapiens.UCSC.hg19")
   hg <- BSgenome.Hsapiens.UCSC.hg19
@@ -35,10 +35,10 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
     chrName=as.character(chr_size$chr[j])
     dnaSeq.start=start-flankingLength
     dnaSeq.end=end+flankingLength
-    fasta.seq=getSeq(hg,chrName,start=start,end=end)
+    fasta.seq=getSeq(hg,chrName,start=dnaSeq.start,end=dnaSeq.end)
     tempFasta = as.character(as.data.frame(fasta.seq)[[1]])
     
-    chr_bins=cbind(as.character(chr_size$chr[j]),start[1:length(end)],end)
+    chr_bins=cbind(chrName,start[1:length(end)],end)
     chr_bins=cbind(chr_bins,tempFasta)
     if (j==1) bins=chr_bins else bins=rbind(bins, chr_bins) 
   }
@@ -95,14 +95,14 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   message("Generating the binarised matrix: ",appendLF=F)
   setwd(workingDir)
   bins=read.table(paste0(binFile,".bed"), sep="\t", header=FALSE)
-  colnames(bins)=c("chr", "start", "end", "id",  "strand")
+  colnames(bins)=c("chr", "start", "end", "dna.seq", "id",  "strand")
   feature_files= c(ba9FileName, ba41FileName,baVermisFileName)
   for ( j in c(1:length(feature_files))){
     features=read.csv(paste0(feature_files[j], ".csv"))
     names=colnames(features); rm(features)
     names=names[-c(1:3)]
     overlaps=read.table(paste0(feature_files[j], ".overlaps.bed"))
-    colnames(overlaps)=c("chr", "start", "end", "id",  "strand")
+    colnames(overlaps)=c("chr", "start", "end", "dna.seq", "id",  "strand")
     ov=which(bins$id%in%overlaps$id); rm(overlaps)
     #binData=matrix(0, nrow=nrow(bins), ncol=length(names))
     binData=matrix(0, nrow=nrow(bins), ncol=2) ## for 2 brain regions (one for ba9 and ba41 (identical), and other for baVermis)
@@ -116,4 +116,4 @@ accetylationDat <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFil
   
 }
 
-accetylationDat(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName)
+accetylationDatWithSeq(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName)
