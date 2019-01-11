@@ -7,15 +7,15 @@ overlapCutoff = 0.05
 bedDir = "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
 workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 outputFileName = "H3K27ac_binary"
-flakingLength=400
+flankingLength=400
 
 accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName){
+  rm(list=ls())
   # get the total human genome
   library("BSgenome.Hsapiens.UCSC.hg19")
   hg <- BSgenome.Hsapiens.UCSC.hg19
   
   setwd(workingDir)
-  rm(list=ls())
   
   # read in chromosome sizes
   chr_size=read.table(chrSizeFileName, sep="\t")
@@ -28,9 +28,9 @@ accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVe
   message("Generating bed files for each bins of size b: ",appendLF=F)
   b=binSize
   for (j in c(1:nrow(chr_size))){
-    start=seq(from=flankingLength, to=chr_size$size[j], by=b)+1 
-    end=seq(from=b, to=chr_size$size[j], by=b) 
-    
+    start=seq(from=flankingLength, to=chr_size$size[j]-flankingLength-b, by=b)+1 
+    end=seq(from=flankingLength+b, to=chr_size$size[j]-flankingLength, by=b) 
+    print(j)
     ## retrieve dna subsequence (with flanking) from hg
     chrName=as.character(chr_size$chr[j])
     dnaSeq.start=start-flankingLength
