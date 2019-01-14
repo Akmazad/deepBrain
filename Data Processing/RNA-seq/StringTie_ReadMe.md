@@ -75,4 +75,4 @@ phenotype_table = pData(bg)
 ### 1.1.7 Bin the transcript abundance data
 
 - "transcript_fpkm" or "transcript_cov" matrices contains transcript-level fpkm or coverage values in all the samples in all the chromosomes. Hence, we can apply "AccetylationDat3.r" (may need slight modification) code for binning these datasets into chromosome-wise files.  
-- [update: 14/01/2019]: Use "transcript_fpkm" metrices, and convert it into a BED file for processing with the code "Accetylation_Bedtools.r"
+- [update: 14/01/2019]: Use "transcript_fpkm" metrix, and convert it into a BED file for processing with the code "Accetylation_Bedtools.r"
