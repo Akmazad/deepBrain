@@ -6,7 +6,7 @@ bedDir = "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
 workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/StringTie/Files/"
 outputFileName = "rnaSeq_binary"
 
-accetylationDat <- function(chrSizeFileName,rnaSeqFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName){
+RNASeqDat <- function(chrSizeFileName,rnaSeqFileName,binSize,overlapCutoff,bedDir,workingDir,outputFileName){
   setwd(workingDir)
   #rm(list=ls())
   
