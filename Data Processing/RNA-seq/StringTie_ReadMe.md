@@ -54,7 +54,7 @@ library(methods)
 library(ballgown)
 data_directory = "/Volumes/Seagate/STAR_Output/StringTieAbundance/"
 # make the ballgown object:
-bg = ballgown(dataDir=data_directory, meas='all')
+bg = ballgown(dataDir=data_directory, meas='all', samplePattern="")
 ## ----getexpr-------------------------------------------------------------
 transcript_fpkm = texpr(bg, 'FPKM')
 transcript_cov = texpr(bg, 'cov')
