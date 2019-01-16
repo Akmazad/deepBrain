@@ -47,30 +47,26 @@ if (!requireNamespace("BiocManager", quietly=TRUE))
 BiocManager::install("ballgown")
 ```
 
-- Load all the abundance data (comes with additional handy syntaxes imported from the 'ballgown' vignette)
+- Load all the abundance data (for more additional handy syntaxes see the 'ballgown' vignette)
 ```
 ## ----makebgobj, message=FALSE--------------------------------------------
 library(methods)
 library(ballgown)
+library("data.table")
 data_directory = "/Volumes/Seagate/STAR_Output/StringTieAbundance/"
 # make the ballgown object:
 bg = ballgown(dataDir=data_directory, meas='all', samplePattern="")
-## ----getexpr-------------------------------------------------------------
+## ----get transcript spike-in (FPKM is the value we are interested in) ---
 transcript_fpkm = texpr(bg, 'FPKM')
-transcript_cov = texpr(bg, 'cov')
 whole_tx_table = texpr(bg, 'all')
-exon_mcov = eexpr(bg, 'mcov')
-junction_rcount = iexpr(bg)
-whole_intron_table = iexpr(bg, 'all')
-gene_expression = gexpr(bg)
-## ----pData---------------------------------------------------------------
-pData(bg) = data.frame(id=sampleNames(bg), group=rep(c(1,0), each=10))
-
-## ----indexex-------------------------------------------------------------
-exon_transcript_table = indexes(bg)$e2t
-transcript_gene_table = indexes(bg)$t2g
-head(transcript_gene_table)
-phenotype_table = pData(bg)
+## get the transcript info, and output it
+pref = whole_tx_table[,c(2,4,5)]
+pref[,1]=c("chr",pref[,1])
+newPref = cbind(pref,paste(pref[,1],pref[,2],pref[,3], sep="_"),".")
+fwrite(newPref,paste0(data_directory,"stringTie.Transcript.SpikeIns.bed"),col.names=F,quote=F,row.names=F)
+## print the new StringTie SpikeIn (feature) values
+newMat = cbind(pref,transcript_fpkm)
+fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),quote=F,row.names=F)
 ```
 ### 1.1.7 Bin the transcript abundance data
 
