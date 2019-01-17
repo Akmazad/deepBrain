@@ -99,9 +99,9 @@ accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVe
   colnames(bins)=c("chr", "start", "end", "dna.seq", "id",  "strand")
   feature_files= c(ba9FileName, ba41FileName,baVermisFileName)
   for ( j in c(1:length(feature_files))){
-    features=fread(paste0(feature_files[j], ".csv"))
-    names=colnames(features); rm(features)
-    names=names[-c(1:3)]
+    #features=fread(paste0(feature_files[j], ".csv"))
+    #names=colnames(features); rm(features)
+    #names=names[-c(1:3)]
     overlaps=fread(paste0(feature_files[j], ".overlaps.bed"))
     colnames(overlaps)=c("chr", "start", "end", "dna.seq", "id",  "strand")
     ov=which(bins$id%in%overlaps$id); rm(overlaps)
