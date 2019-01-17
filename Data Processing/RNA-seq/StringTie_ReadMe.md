@@ -66,7 +66,7 @@ newPref = cbind(pref,paste(pref[,1],pref[,2],pref[,3], sep="_"),".")
 fwrite(newPref,paste0(data_directory,"stringTie.Transcript.SpikeIns.bed"),col.names=F,quote=F,row.names=F)
 ## print the new StringTie SpikeIn (feature) values
 newMat = cbind(pref,transcript_fpkm)
-fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),quote=F,row.names=F)
+fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),sep="\t",quote=F,row.names=F)
 ```
 ### 1.1.7 Bin the transcript abundance data
 
