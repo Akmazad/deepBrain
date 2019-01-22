@@ -84,38 +84,39 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   
   # Step-4: use system2 R function to run this script with arguments passed for the shell script
   message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
-  system2("./AceTylation_Bed_ShellScript.sh",
+  system2("./Ac_RNAseq_Bed_ShellScript.sh",
             paste(bedDir, 
             workingDir, 
             binFile, 
             overlapCutoff, 
             ba9FileName,
             ba41FileName,
-            baVermisFileName,sep=" "))
+            baVermisFileName,
+            rnaSeqFileName,sep=" "))
   # this will create Three overlap bed files
   message("Done",appendLF=T)
     
   ############## Generate the binarised matrix
+  ##### for Accetylation data
   message("Generating the binarised matrix: ",appendLF=F)
   setwd(workingDir)
   bins=fread(paste0(binFile,".bed"), sep="\t", header=FALSE)
   colnames(bins)=c("chr", "start", "end", "dna.seq", "id",  "strand")
-  feature_files= c(ba9FileName, ba41FileName,baVermisFileName)
+  feature_files= c(ba9FileName,baVermisFileName) ## since, ba9 and ba41 are identical
   for ( j in c(1:length(feature_files))){
-    #features=fread(paste0(feature_files[j], ".csv"))
-    #names=colnames(features); rm(features)
-    #names=names[-c(1:3)]
     overlaps=fread(paste0(feature_files[j], ".overlaps.bed"))
     colnames(overlaps)=c("chr", "start", "end", "dna.seq", "id",  "strand")
     ov=which(bins$id%in%overlaps$id); rm(overlaps)
-    #binData=matrix(0, nrow=nrow(bins), ncol=length(names))
-    #colnames(binData)=names
     binData=matrix(0, nrow=nrow(bins), ncol=1) ## 1 for each brain region (collapsing all the samples since it's binarized
     colnames(binData)=c(feature_files[j])
     binData[ov,]=1
     bins=cbind(bins, binData)
     rm(binData)
   }
+  ##### for RNA-seq data
+  overlaps=fread(paste0(rnaSeqFileName, ".overlaps.bed"))
+  
+  
   #write.csv(bins, file=paste0(outputFileName,".csv"), row.names=F)
   fwrite(bins, file=paste0(outputFileName,".csv"), row.names=F, quote=F)
   message("Done",appendLF=T)
