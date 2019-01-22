@@ -114,7 +114,10 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
     rm(binData)
   }
   ##### for RNA-seq data
-  overlaps=fread(paste0(rnaSeqFileName, ".overlaps.bed"))
+  rnaSeq.features=fread(paste0(rnaSeqFileName, ".csv"),header=T)
+  rnaSeq.feature.ids=paste(rnaSeq.features$chr,rnaSeq.features$start,rnaSeq.features$end,sep="_")
+  rnaSeq.features=cbind(rnaSeq.feature.ids,rnaSeq.features[,-c(1:3)])
+  overlaps=fread(paste0(rnaSeqFileName, ".wab.overlaps.bed"))
   colnames(overlaps)=c("chr", "start", "end", "dna.seq", "bin.id",  "strand", "feature.chr", "feature.start", "feature.end", "feature.id", "feature.strand")
   
   #ov=which(bins$id%in%overlaps$bin.id); rm(overlaps)
