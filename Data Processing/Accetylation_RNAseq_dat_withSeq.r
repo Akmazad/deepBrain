@@ -65,11 +65,11 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   message("Done",appendLF=T)
   
   ############## Overlap Bins with fetures, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
-  # Step-1: create a shell script namely "AceTylation_Bed_ShellScript.sh" (see attached) within the "workingDir"
+  # Step-1: create a shell script namely "Ac_RNAseq_Bed_ShellScript.sh" (see attached) within the "workingDir"
   # Step-2: register that script for running with appropriate permission under UNIX using "chmod u+x AceTylation_Bed_ShellScript.sh"
   # Step-3: Put following commands for Bedtools in that shell script which assumes the arguments should be passed from R
   
-  ##### "AceTylation_Bed_ShellScript.sh" ########
+  ##### "Ac_RNAseq_Bed_ShellScript.sh" ########
   ## #!/bin/bash
   ## bedDir=$1	#first argument which is the Bedtools bin directory
   ## cd $2	#second argument which is the working directory
@@ -79,6 +79,8 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   ## do
   ## 	  $bedDir/intersectBed -u -f $overlapCutof -a $bins.bed -b $features.bed > $features.overlaps.bed
   ## done
+  ## $bedDir/intersectBed -wa -wb -f $overlapCutof -a $bins.bed -b $8.bed > $8.overlaps.bed
+
   
   # Step-4: use system2 R function to run this script with arguments passed for the shell script
   message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
