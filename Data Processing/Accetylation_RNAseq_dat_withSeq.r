@@ -2,6 +2,7 @@ chrSizeFileName = "hg19.chrom.sizes.txt"
 ba9FileName = "normalized_log2_tags_BA9_81_April2015_LR"
 ba41FileName = "normalized_log2_tags_BA41_66_Mar2015_LR"
 baVermisFileName = "normalized_log2_tags_Vermis_62_Mar2015_LR"
+rnaSeqFileName = "stringTie.Transcript.SpikeIns"
 binSize = 200
 overlapCutoff = 0.05
 bedDir = "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
@@ -9,7 +10,7 @@ workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 outputFileName = "H3K27ac_binary"
 flankingLength=400
 
-accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName){
+Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,rnaSeqFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName){
   rm(list=ls())
   # get the total human genome
   library("data.table")
@@ -119,4 +120,4 @@ accetylationDatWithSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVe
 
 }
 
-accetylationDatWithSeq(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName)
+accetylationDatWithSeq(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,rnaSeqFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName)
