@@ -134,7 +134,7 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   
   ## find overlap bins
   ov=which(bins$id%in%overlaps$bin.id); rm(overlaps)
-    
+  
   ## binarize
   
   ## rbind with the main output 
