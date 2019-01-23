@@ -63,6 +63,7 @@ whole_tx_table = texpr(bg, 'all')
 pref = whole_tx_table[,c(2,4,5)]
 pref[,1]=paste0("chr",pref[,1])
 newPref = cbind(pref,paste(pref[,1],pref[,2],pref[,3], sep="_"),".")
+colnames(newPref) = c("chr","start","end","feature.id","strand")
 fwrite(newPref,paste0(data_directory,"stringTie.Transcript.SpikeIns.bed"),col.names=F,quote=F,row.names=F)
 ## print the new StringTie SpikeIn (feature) values
 newMat = cbind(pref,transcript_fpkm)
