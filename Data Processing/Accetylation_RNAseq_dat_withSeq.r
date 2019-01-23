@@ -13,6 +13,7 @@ flankingLength=400
 Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,rnaSeqFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName){
   rm(list=ls())
   # get the total human genome
+  library(dplyr)
   library("data.table")
   library("BSgenome.Hsapiens.UCSC.hg19")
   hg <- BSgenome.Hsapiens.UCSC.hg19
@@ -115,10 +116,28 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   }
   ##### for RNA-seq data
   rnaSeq.features=fread(paste0(rnaSeqFileName, ".csv"),header=T)
-  rnaSeq.feature.ids=paste(rnaSeq.features$chr,rnaSeq.features$start,rnaSeq.features$end,sep="_")
-  rnaSeq.features=cbind(rnaSeq.feature.ids,rnaSeq.features[,-c(1:3)])
+  feature.id=paste(rnaSeq.features$chr,rnaSeq.features$start,rnaSeq.features$end,sep="_")
+  rnaSeq.features=cbind(feature.id,rnaSeq.features[,-c(1:3)])
   overlaps=fread(paste0(rnaSeqFileName, ".wab.overlaps.bed"))
   colnames(overlaps)=c("chr", "start", "end", "dna.seq", "bin.id",  "strand", "feature.chr", "feature.start", "feature.end", "feature.id", "feature.strand")
+  overlaps=cbind(overlaps[,overlaps$bin.id],overlaps[,overlaps$feature.id]) ## shortening the overlaps data
+  colnames(overlaps)=c("bin.id","feature.id")
+  overlaps=as.data.frame(overlaps)
+  
+  ## Do left-outer join to get 
+  combined <- sort(union(levels(overlaps$feature.id), levels(rnaSeq.features$feature.id)))
+  mx=mutate(overlaps, feature.id=factor(feature.id, levels=combined))
+  my=mutate(rnaSeq.features, feature.id=factor(feature.id, levels=combined))
+  overlaps=left_join(mx,my); rm(combined); rm(mx); rm(my)
+  overlaps=overlaps[,-2] ## get rid of the feature.id, keeping only the bin.id and the sample values
+  ## union of similar row
+  
+  ## find overlap bins
+  ov=which(bins$id%in%overlaps$bin.id); rm(overlaps)
+    
+  ## binarize
+  
+  ## rbind with the main output 
   
   #ov=which(bins$id%in%overlaps$bin.id); rm(overlaps)
   #binData=matrix(0, nrow=nrow(bins), ncol=1)
