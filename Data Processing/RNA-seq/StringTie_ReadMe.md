@@ -48,7 +48,7 @@ BiocManager::install("ballgown")
 ```
 
 - Load all the abundance data (for more additional handy syntaxes see the 'ballgown' vignette)
-```
+```r
 ## ----makebgobj, message=FALSE--------------------------------------------
 fpkm_th=1.0
 library(methods)
