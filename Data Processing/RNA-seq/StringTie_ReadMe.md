@@ -41,7 +41,7 @@ stringtie -e -B -p 8 -G /Volumes/Seagate/STAR_Output/stringtie_merged.gtf -o /Vo
 
 ### 1.1.6 Exporting transcript data for all the samples
 - Use Rstudio and install 'ballgown' library.
-```
+```r
 if (!requireNamespace("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
 BiocManager::install("ballgown")
