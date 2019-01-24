@@ -73,8 +73,8 @@ fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),sep="\t
 
 - "transcript_fpkm" or "transcript_cov" matrices contains transcript-level fpkm or coverage values in all the samples in all the chromosomes. Hence, we can apply "AccetylationDat3.r" (may need slight modification) code for binning these datasets into chromosome-wise files.  
 - definition:
-~cov: The average per-base coverage for the transcript or exon.
-~FPKM: Fragments per kilobase of transcript per million read pairs. This is the number of pairs of reads aligning to this feature, normalized by the total number of fragments sequenced (in millions) and the length of the transcript (in kilobases).
-~TPM: Transcripts per million. This is the number of transcripts from this particular gene normalized first by gene length, and then by sequencing depth (in millions) in the sample. A detailed explanation and a comparison of TPM and FPKM can be found here, and TPM was defined by B. Li and C. Dewey here.
+    - cov: The average per-base coverage for the transcript or exon.
+    - FPKM: Fragments per kilobase of transcript per million read pairs. This is the number of pairs of reads aligning to this feature, normalized by the total number of fragments sequenced (in millions) and the length of the transcript (in kilobases).
+    - TPM: Transcripts per million. This is the number of transcripts from this particular gene normalized first by gene length, and then by sequencing depth (in millions) in the sample. A detailed explanation and a comparison of TPM and FPKM can be found here, and TPM was defined by B. Li and C. Dewey here.
 
 - [update: 14/01/2019]: Use "transcript_fpkm" metrix, and convert it into a BED file for processing with the code "Accetylation_Bedtools.r"
