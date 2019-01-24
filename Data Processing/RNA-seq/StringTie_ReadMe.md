@@ -50,6 +50,7 @@ BiocManager::install("ballgown")
 - Load all the abundance data (for more additional handy syntaxes see the 'ballgown' vignette)
 ```
 ## ----makebgobj, message=FALSE--------------------------------------------
+fpkm_th=1.0
 library(methods)
 library(ballgown)
 library("data.table")
@@ -58,16 +59,22 @@ data_directory = "/Volumes/Seagate/STAR_Output/StringTieAbundance/"
 bg = ballgown(dataDir=data_directory, meas='all', samplePattern="")
 ## ----get transcript spike-in (FPKM is the value we are interested in) ---
 transcript_fpkm = texpr(bg, 'FPKM')
+binarized_transcript_fpkm = ifelse(transcript_fpkm > fpkm_th, 1,0) ## binarize this based on a threshold: fpkm_th
 whole_tx_table = texpr(bg, 'all')
 ## get the transcript info, and output it
 pref = whole_tx_table[,c(2,4,5)]
 pref[,1]=paste0("chr",pref[,1])
-newPref = cbind(pref,paste(pref[,1],pref[,2],pref[,3], sep="_"),".")
-colnames(newPref) = c("chr","start","end","feature.id","strand")
-fwrite(newPref,paste0(data_directory,"stringTie.Transcript.SpikeIns.bed"),col.names=F,quote=F,row.names=F)
+pref = cbind(pref,"+")
+colnames(pref) = c("chr","start","end","strand")
+newMat = cbind(pref,binarized_transcript_fpkm)
+fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarized.bed"),sep="\t",quote=F,row.names=F)
+
+#newPref = cbind(pref,paste(pref[,1],pref[,2],pref[,3], sep="_"),".")
+#colnames(newPref) = c("chr","start","end","feature.id","strand")
+#fwrite(newPref,paste0(data_directory,"stringTie.Transcript.SpikeIns.bed"),col.names=F,quote=F,row.names=F)
 ## print the new StringTie SpikeIn (feature) values
-newMat = cbind(pref,transcript_fpkm)
-fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),sep="\t",quote=F,row.names=F)
+#newMat = cbind(pref,binarized_transcript_fpkm)
+#fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),sep="\t",quote=F,row.names=F)
 ```
 ### 1.1.7 Bin the transcript abundance data
 
