@@ -2,7 +2,7 @@ chrSizeFileName = "hg19.chrom.sizes.txt"
 ba9FileName = "normalized_log2_tags_BA9_81_April2015_LR"
 ba41FileName = "normalized_log2_tags_BA41_66_Mar2015_LR"
 baVermisFileName = "normalized_log2_tags_Vermis_62_Mar2015_LR"
-rnaSeqFileName = "stringTie.Transcript.SpikeIns_full"
+rnaSeqFileName = "stringTie.Transcript.SpikeIns_full_binarized"
 binSize = 200
 overlapCutoff = 0.05
 bedDir = "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
@@ -48,10 +48,12 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   bins=as.data.frame(bins)
   colnames(bins)=c("chr", "start", "end", "dna.seq")
   bins$id=paste(bins$chr, bins$start, bins$end, sep="_")
-  bins$strand="."
+  bins$strand="+" ## by default the strand is "+"
   binFile=paste0("hg19_bins_", b,"bp")
-  fwrite(bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
-  message("Done",appendLF=T)
+  temp_bins=bins[,-4] ## remove the sequence part from Binfile (to save the memory space)
+  fwrite(temp_bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
+  rm(temp_bins); message("Done",appendLF=T)
+  
   
   ################ Generate bed file of features (H3K27Ac: BA9, BA41, vermis)
   message("Generating bed files for features: ",appendLF=F)
@@ -101,12 +103,12 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   ##### for Accetylation data
   message("Generating the binarised matrix: ",appendLF=F)
   setwd(workingDir)
-  bins=fread(paste0(binFile,".bed"), sep="\t", header=FALSE)
-  colnames(bins)=c("chr", "start", "end", "dna.seq", "id",  "strand")
+  #bins=fread(paste0(binFile,".bed"), sep="\t", header=FALSE) ## it is already in the memory
+  #colnames(bins)=c("chr", "start", "end", "dna.seq", "id",  "strand")
   feature_files= c(ba9FileName,baVermisFileName) ## since, ba9 and ba41 are identical
   for ( j in c(1:length(feature_files))){
     overlaps=fread(paste0(feature_files[j], ".overlaps.bed"))
-    colnames(overlaps)=c("chr", "start", "end", "dna.seq", "id",  "strand")
+    colnames(overlaps)=c("chr", "start", "end", "id",  "strand")
     ov=which(bins$id%in%overlaps$id); rm(overlaps)
     binData=matrix(0, nrow=nrow(bins), ncol=1) ## 1 for each brain region (collapsing all the samples since it's binarized
     colnames(binData)=c(feature_files[j])
