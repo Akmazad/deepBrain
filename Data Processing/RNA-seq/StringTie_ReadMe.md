@@ -63,15 +63,16 @@ bg = ballgown(dataDir=data_directory, meas='all', samplePattern="")
 transcript_fpkm = texpr(bg, 'FPKM')
 
 ## filter transcripts which has at least fpkm_perc_th number of samples have fpkm > fpkm_val_th
-transcript_fpkm=transcript_fpkm[rowMeans(transcript_fpkm >= fpkm_val_th) >= fpkm_perc_th,]
+filtered.row=which(rowMeans(transcript_fpkm >= fpkm_val_th) >= fpkm_perc_th)
+transcript_fpkm=transcript_fpkm[filtered.row,]
 
 whole_tx_table = texpr(bg, 'all')
 ## get the transcript info, and output it
-pref = whole_tx_table[,c(2,4,5)]
+pref = whole_tx_table[filtered.row,c(2,4,5)]
 pref[,1]=paste0("chr",pref[,1])
-pref = cbind(pref,"+")
-colnames(pref) = c("chr","start","end","strand")
-newMat = cbind(pref,binarized_transcript_fpkm)
+pref = cbind(pref, whole_tx_table[filtered.row,c(3,10)])
+colnames(pref) = c("chr","start","end","strand","gene_name")
+newMat = cbind(pref,transcript_fpkm)
 
 
 fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarized.bed"),sep="\t",quote=F,row.names=F)
