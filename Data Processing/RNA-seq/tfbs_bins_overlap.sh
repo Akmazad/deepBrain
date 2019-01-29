@@ -1,4 +1,4 @@
-```bash
+```sh
 #!/bin/bash
 bedDir=$1
 fileDir=$2
