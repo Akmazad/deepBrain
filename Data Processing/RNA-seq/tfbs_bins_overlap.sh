@@ -1,3 +1,4 @@
+```bash
 #!/bin/bash
 bedDir=$1
 fileDir=$2
@@ -12,3 +13,4 @@ do
   filename="${tfFile##*/}"
   echo "$filename: [DONE]"
 done
+```
