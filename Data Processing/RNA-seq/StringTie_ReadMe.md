@@ -73,8 +73,16 @@ pref[,1]=paste0("chr",pref[,1])
 pref = cbind(pref, whole_tx_table[filtered.row,c(3,10)])
 colnames(pref) = c("chr","start","end","strand","gene_name")
 newMat = cbind(pref,transcript_fpkm)
+```
+### 1.1.6a use UCSC TF profile to find TF genes that are expressed in the RNA-seq data
+```r
+## download Transcription Factor ChIP-seq Uniform Peaks from ENCODE/Analysis (source UCSC: http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeAwgTfbsUniform)
+tf.dat <- read.csv("/Volumes/Data1/PROJECTS/DeepLearning/Test/UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv", header=F)
+tf_genes <- unique(tf.dat[,2]) ## second column contains the gene-symbol
+tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
+```
 
-
+```r
 fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarized.bed"),sep="\t",quote=F,row.names=F)
 
 #newPref = cbind(pref,paste(pref[,1],pref[,2],pref[,3], sep="_"),".")
