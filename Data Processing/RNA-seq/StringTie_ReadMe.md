@@ -39,7 +39,7 @@ stringtie -e -B -p 8 -G /Volumes/Seagate/STAR_Output/stringtie_merged.gtf -o /Vo
 ```
 - This will create a separate folder for each samples, where each folder will contain: 'i_data.ctab' (intron data), 'e_data.ctab' (exon data), 't_data.ctab' (transcript data), and their corresponding indices.
 
-### 1.1.6 Exporting transcript data for all the samples
+### 1.1.6a Exporting transcript data for all the samples
 - Use Rstudio and install 'ballgown' library.
 ```r
 if (!requireNamespace("BiocManager", quietly=TRUE))
@@ -50,7 +50,9 @@ BiocManager::install("ballgown")
 - Load all the abundance data (for more additional handy syntaxes see the 'ballgown' vignette)
 ```r
 ## ----makebgobj, message=FALSE--------------------------------------------
-fpkm_th=1.0
+fpkm_val_th=1.0
+fpkm_perc_th=0.5
+
 library(methods)
 library(ballgown)
 library("data.table")
@@ -59,7 +61,10 @@ data_directory = "/Volumes/Seagate/STAR_Output/StringTieAbundance/"
 bg = ballgown(dataDir=data_directory, meas='all', samplePattern="")
 ## ----get transcript spike-in (FPKM is the value we are interested in) ---
 transcript_fpkm = texpr(bg, 'FPKM')
-binarized_transcript_fpkm = ifelse(transcript_fpkm > fpkm_th, 1,0) ## binarize this based on a threshold: fpkm_th
+
+## filter transcripts which has at least fpkm_perc_th number of samples have fpkm > fpkm_val_th
+transcript_fpkm=transcript_fpkm[rowMeans(transcript_fpkm >= fpkm_val_th) >= fpkm_perc_th,]
+
 whole_tx_table = texpr(bg, 'all')
 ## get the transcript info, and output it
 pref = whole_tx_table[,c(2,4,5)]
@@ -67,6 +72,8 @@ pref[,1]=paste0("chr",pref[,1])
 pref = cbind(pref,"+")
 colnames(pref) = c("chr","start","end","strand")
 newMat = cbind(pref,binarized_transcript_fpkm)
+
+
 fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarized.bed"),sep="\t",quote=F,row.names=F)
 
 #newPref = cbind(pref,paste(pref[,1],pref[,2],pref[,3], sep="_"),".")
@@ -76,7 +83,7 @@ fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarize
 #newMat = cbind(pref,binarized_transcript_fpkm)
 #fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),sep="\t",quote=F,row.names=F)
 ```
-### 1.1.6b [test analysis] intersect with Enhancer locations (PsychEncode)
+### 1.1.6b [test analysis] intersect with Enhancer locations (PsychEncode) [IGNORED]
 ```r
 ############## Overlap StringTie features with Enhancer locations, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
   # Step-1: create a shell script namely "rnaSeqEnhancer_Bed_ShellScript.sh" (see attached) within the "workingDir"
