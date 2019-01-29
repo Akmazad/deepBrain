@@ -78,32 +78,35 @@ fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarize
 ```
 ### 1.1.6b [test analysis] intersect with Enhancer locations (PsychEncode)
 ```r
-############## Overlap Bins with fetures, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
-  # Step-1: create a shell script namely "AceTylation_Bed_ShellScript.sh" (see attached) within the "workingDir"
-  # Step-2: register that script for running with appropriate permission under UNIX using "chmod u+x AceTylation_Bed_ShellScript.sh"
+############## Overlap StringTie features with Enhancer locations, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
+  # Step-1: create a shell script namely "rnaSeqEnhancer_Bed_ShellScript.sh" (see attached) within the "workingDir"
+  # Step-2: register that script for running with appropriate permission under UNIX using "chmod u+x rnaSeqEnhancer_Bed_ShellScript.sh"
   # Step-3: Put following commands for Bedtools in that shell script which assumes the arguments should be passed from R
   
-  ##### "AceTylation_Bed_ShellScript.sh" ########
+  ##### "rnaSeqEnhancer_Bed_ShellScript.sh" ########
   ## #!/bin/bash
   ## bedDir=$1	#first argument which is the Bedtools bin directory
   ## cd $2	#second argument which is the working directory
-  ## bins=$3	#third argument which is the chromosomal bed file name
+  ## rnaSeqBed=$3	#third argument which is the rnaSeq bed file name
   ## overlapCutof=$(echo $4| bc)	#fourth argument which is overlap cut-off
-  ## for features in $5 $6 $7	#fifth, sixth, and seventh arguments are b19, b41, and baVermis bedfiles
-  ## do
-  ## 	  $bedDir/intersectBed -u -f $overlapCutof -a $bins.bed -b $features.bed > $features.overlaps.bed
+  ## enhancerBed=$5                 #fifth argument which is enhancerFileName
+  ## $bedDir/intersectBed -u -f $overlapCutof -a $rnaSeqBed.bed -b $enhancerBed.bed > $rnaSeqEnhancer.overlaps.bed
   ## done
   
   # Step-4: use system2 R function to run this script with arguments passed for the shell script
-  message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
-  system2("./AceTylation_Bed_ShellScript.sh",
+  bedDir="/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
+  workingDir="/Volumes/Data1/PROJECTS/DeepLearning/Test"
+  strintTieBedFile="stringTie.Transcript.SpikeIns_full_binarized"
+  overlapCutoff=0.05
+  enhancerBedFile="DER-03_hg19_PEC_enhancers"
+  message(paste0("Overlapping rnaSeq locations with enhancers locations, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
+  system2("./rnaSeqEnhancer_Bed_ShellScript.sh",
             paste(bedDir, 
             workingDir, 
-            binFile, 
+            strintTieBedFile, 
             overlapCutoff, 
-            ba9FileName,
-            ba41FileName,
-            baVermisFileName,sep=" "))
+            enhancerBedFile,
+            sep=" "))
   # this will create Three overlap bed files
  
  message("Done",appendLF=T)
