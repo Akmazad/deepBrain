@@ -76,6 +76,39 @@ fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarize
 #newMat = cbind(pref,binarized_transcript_fpkm)
 #fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),sep="\t",quote=F,row.names=F)
 ```
+### 1.1.6b [test analysis] intersect with Enhancer locations (PsychEncode)
+```r
+############## Overlap Bins with fetures, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
+  # Step-1: create a shell script namely "AceTylation_Bed_ShellScript.sh" (see attached) within the "workingDir"
+  # Step-2: register that script for running with appropriate permission under UNIX using "chmod u+x AceTylation_Bed_ShellScript.sh"
+  # Step-3: Put following commands for Bedtools in that shell script which assumes the arguments should be passed from R
+  
+  ##### "AceTylation_Bed_ShellScript.sh" ########
+  ## #!/bin/bash
+  ## bedDir=$1	#first argument which is the Bedtools bin directory
+  ## cd $2	#second argument which is the working directory
+  ## bins=$3	#third argument which is the chromosomal bed file name
+  ## overlapCutof=$(echo $4| bc)	#fourth argument which is overlap cut-off
+  ## for features in $5 $6 $7	#fifth, sixth, and seventh arguments are b19, b41, and baVermis bedfiles
+  ## do
+  ## 	  $bedDir/intersectBed -u -f $overlapCutof -a $bins.bed -b $features.bed > $features.overlaps.bed
+  ## done
+  
+  # Step-4: use system2 R function to run this script with arguments passed for the shell script
+  message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
+  system2("./AceTylation_Bed_ShellScript.sh",
+            paste(bedDir, 
+            workingDir, 
+            binFile, 
+            overlapCutoff, 
+            ba9FileName,
+            ba41FileName,
+            baVermisFileName,sep=" "))
+  # this will create Three overlap bed files
+ 
+ message("Done",appendLF=T)
+```
+
 ### 1.1.7 Bin the transcript abundance data
 
 - "transcript_fpkm" or "transcript_cov" matrices contains transcript-level fpkm or coverage values in all the samples in all the chromosomes. Hence, we can apply "AccetylationDat3.r" (may need slight modification) code for binning these datasets into chromosome-wise files.  
