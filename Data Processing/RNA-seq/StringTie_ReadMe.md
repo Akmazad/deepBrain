@@ -80,6 +80,7 @@ newMat = cbind(pref,transcript_fpkm)
 tf.dat <- read.csv("/Volumes/Data1/PROJECTS/DeepLearning/Test/UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv", header=F)
 tf_genes <- unique(tf.dat[,2]) ## second column contains the gene-symbol
 tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
+tf_genes.dat.ucscAcc = tf.dat[which(tf.dat$Factor %in% tf_genes.rnaSeq$gene_name),3]    # third column holds the UCSC accession number
 ```
 
 ```r
