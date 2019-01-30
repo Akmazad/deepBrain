@@ -89,6 +89,11 @@ pdf("rplot.pdf")
 plot(plot_dat$fpkm_perc_th,plot_dat$nTFs))
 dev.off() 
 ```
+<object data="https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/rplot_perc_vs_nTFs.pdf" type="application/pdf" width="700px" height="700px">
+    <embed src="https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/rplot_perc_vs_nTFs.pdf">
+        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="http://yoursite.com/the.pdf">Download PDF</a>.</p>
+    </embed>
+</object>
 ### 1.1.6.4 Filter the transcription matrix
 ```r
 fpkm_val_th=0.0
