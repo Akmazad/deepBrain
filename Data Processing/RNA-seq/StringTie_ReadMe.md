@@ -39,7 +39,7 @@ stringtie -e -B -p 8 -G /Volumes/Seagate/STAR_Output/stringtie_merged.gtf -o /Vo
 ```
 - This will create a separate folder for each samples, where each folder will contain: 'i_data.ctab' (intron data), 'e_data.ctab' (exon data), 't_data.ctab' (transcript data), and their corresponding indices.
 
-### 1.1.6a Exporting transcript data for all the samples
+### 1.1.6.1 Exporting transcript data for all the samples
 - Use Rstudio and install 'ballgown' library.
 ```r
 if (!requireNamespace("BiocManager", quietly=TRUE))
@@ -50,9 +50,6 @@ BiocManager::install("ballgown")
 - Load all the abundance data (for more additional handy syntaxes see the 'ballgown' vignette)
 ```r
 ## ----makebgobj, message=FALSE--------------------------------------------
-fpkm_val_th=1.0
-fpkm_perc_th=0.5
-
 library(methods)
 library(ballgown)
 library("data.table")
@@ -62,10 +59,43 @@ bg = ballgown(dataDir=data_directory, meas='all', samplePattern="")
 ## ----get transcript spike-in (FPKM is the value we are interested in) ---
 transcript_fpkm = texpr(bg, 'FPKM')
 
-## filter transcripts which has at least fpkm_perc_th number of samples have fpkm > fpkm_val_th
-filtered.row=which(rowMeans(transcript_fpkm >= fpkm_val_th) >= fpkm_perc_th)
-transcript_fpkm=transcript_fpkm[filtered.row,]
 
+```
+### 1.1.6.2 Load UCSC TF profile find TF genes that are expressed in the RNA-seq data
+```r
+## download Transcription Factor ChIP-seq Uniform Peaks from ENCODE/Analysis (source UCSC: http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeAwgTfbsUniform)
+tf.dat <- read.csv("/Volumes/Data1/PROJECTS/DeepLearning/Test/UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv", header=F)
+tf_genes <- unique(tf.dat[,2]) ## second column contains the gene-symbol
+```
+### 1.1.6.3 Determine a threshold for the percentage of samples with non-zero RNA-seq samples
+```r
+transcript_fpkm = texpr(bg, 'FPKM')
+whole_tx_table = texpr(bg, 'all')
+plot_dat<-NULL
+fpkm_val_th=0.0 ## basicaly to ignore this parameter and reuse the existing filtering-code
+for(fpkm_perc_th in seq(0.1,1,0.05)){
+    filtered.row=which(rowMeans(transcript_fpkm > fpkm_val_th) >= fpkm_perc_th)
+    print(length(filtered.row))
+    pref = whole_tx_table[filtered.row,c(2,4,5)]
+    pref[,1]=paste0("chr",pref[,1])
+    pref = cbind(pref, whole_tx_table[filtered.row,c(3,10)])
+    gene_names=pref$gene_name
+    nCommonGenes = length(intersect(tf_genes,gene_names))
+    plot_dat = rbind(plot_dat,cbind(fpkm_perc_th,nCommonGenes))
+}
+colnames(plot_dat)=c("fpkm_perc_th","nTFs")
+plot_dat=as.data.frame(plot_dat)
+pdf("rplot.pdf") 
+plot(plot_dat$fpkm_perc_th,plot_dat$nTFs))
+dev.off() 
+```
+### 1.1.6.4 Filter the transcription matrix
+```r
+fpkm_val_th=0.0
+fpkm_perc_th=0.2
+
+filtered.row=which(rowMeans(transcript_fpkm > fpkm_val_th) >= fpkm_perc_th)
+transcript_fpkm=transcript_fpkm[filtered.row,]
 whole_tx_table = texpr(bg, 'all')
 ## get the transcript info, and output it
 pref = whole_tx_table[filtered.row,c(2,4,5)]
@@ -73,25 +103,22 @@ pref[,1]=paste0("chr",pref[,1])
 pref = cbind(pref, whole_tx_table[filtered.row,c(3,10)])
 colnames(pref) = c("chr","start","end","strand","gene_name")
 newMat = cbind(pref,transcript_fpkm)
-```
-### 1.1.6a use UCSC TF profile to find TF genes that are expressed in the RNA-seq data
-```r
-## download Transcription Factor ChIP-seq Uniform Peaks from ENCODE/Analysis (source UCSC: http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeAwgTfbsUniform)
-tf.dat <- read.csv("/Volumes/Data1/PROJECTS/DeepLearning/Test/UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv", header=F)
-tf_genes <- unique(tf.dat[,2]) ## second column contains the gene-symbol
-tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
-tf_genes.dat.ucscAcc = tf.dat[which(tf.dat$Factor %in% tf_genes.rnaSeq$gene_name),3]    # third column holds the UCSC accession number
-```
 
-```r
-fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarized.bed"),sep="\t",quote=F,row.names=F)
-
+#fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarized.bed"),sep="\t",quote=F,row.names=F)
 #newPref = cbind(pref,paste(pref[,1],pref[,2],pref[,3], sep="_"),".")
 #colnames(newPref) = c("chr","start","end","feature.id","strand")
 #fwrite(newPref,paste0(data_directory,"stringTie.Transcript.SpikeIns.bed"),col.names=F,quote=F,row.names=F)
 ## print the new StringTie SpikeIn (feature) values
 #newMat = cbind(pref,binarized_transcript_fpkm)
 #fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),sep="\t",quote=F,row.names=F)
+```
+### 1.1.6.5 Filter expression matrix for only TFs that are expressed 
+```r
+tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
+tf_genes.dat.ucscAcc = tf.dat[which(tf.dat$Factor %in% tf_genes.rnaSeq$gene_name),3]    # third column holds the UCSC accession number
+```
+### 1.1.6.6 get the TF profiles from the UCSC DCC portal for each 
+```r
 ```
 ### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
 ```r
