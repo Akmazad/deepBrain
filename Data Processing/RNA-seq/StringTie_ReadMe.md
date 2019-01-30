@@ -58,8 +58,6 @@ data_directory = "/Volumes/Seagate/STAR_Output/StringTieAbundance/"
 bg = ballgown(dataDir=data_directory, meas='all', samplePattern="")
 ## ----get transcript spike-in (FPKM is the value we are interested in) ---
 transcript_fpkm = texpr(bg, 'FPKM')
-
-
 ```
 ### 1.1.6.2 Load UCSC TF profile find TF genes that are expressed in the RNA-seq data
 ```r
@@ -89,7 +87,6 @@ pdf("rplot.pdf")
 plot(plot_dat$fpkm_perc_th,plot_dat$nTFs))
 dev.off() 
 ```
-[embed] https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/rplot_perc_vs_nTFs.pdf [/embed]
 ### 1.1.6.4 Filter the transcription matrix
 ```r
 fpkm_val_th=0.0
