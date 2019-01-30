@@ -93,6 +93,47 @@ fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarize
 #newMat = cbind(pref,binarized_transcript_fpkm)
 #fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),sep="\t",quote=F,row.names=F)
 ```
+### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
+```r
+############## Overlap Bins with TFB locations, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
+  # Step-1: create a shell script namely "tfbs_bins_overlap.sh" (see attached) within the "workingDir"
+  # Step-2: register that script for running with appropriate permission under UNIX using "chmod u+x tfbs_bins_overlap.sh"
+  # Step-3: Put following commands for Bedtools in that shell script which assumes the arguments should be passed from R
+  
+  ##### "tfbs_bins_overlap.sh" ########
+  ## #!/bin/bash
+  ## bedDir=$1
+  ## fileDir=$2
+  ## bins=$3/$4
+  ## overlapCutof=$(echo $5| bc)
+  ## for tfFile in "$fileDir"/*.narrowPeak
+  ## do
+    ## $bedDir/intersectBed -u -f $overlapCutof -a $bins.bed -b $tfFile > $tfFile.overlaps.bed
+    ## filename="${tfFile##*/}"
+    ## echo "$filename: [DONE]"
+  ## done
+
+  
+  # Step-4: use system2 R function to run this script with arguments passed for the shell script
+  bedDir="/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
+  fileDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/UCSC_Encode_DCC"
+  binFileDir="/Volumes/Data1/PROJECTS/DeepLearning/Test"
+  binFile="hg19_bins_200bp"
+  overlapCutoff=0.05
+  
+  message(paste0("Overlapping tf locations with Bin locations, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
+  system2("./tfbs_bins_overlap.sh",
+            paste(bedDir, 
+            fileDir, 
+            binFileDir, 
+            binFile, 
+            overlapCutoff,
+            sep=" "))
+  # this will create Three overlap bed files
+ 
+ message("Done",appendLF=T)
+
+```
 ### 1.1.6b [test analysis] intersect with Enhancer locations (PsychEncode) [IGNORED]
 ```r
 ############## Overlap StringTie features with Enhancer locations, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
