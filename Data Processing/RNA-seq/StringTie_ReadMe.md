@@ -115,7 +115,7 @@ newMat = cbind(pref,transcript_fpkm)
 tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
 tf_genes.dat.ucscAcc = tf.dat[which(tf.dat$Factor %in% tf_genes.rnaSeq$gene_name),3]    # third column holds the UCSC accession number
 ```
-### 1.1.6.6 get the TF profiles from the UCSC DCC portal for each 
+### 1.1.6.6 Download and extract all the TF profiles from the UCSC DCC portal
 ```r
 ```
 ### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
