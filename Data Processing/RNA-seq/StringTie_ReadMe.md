@@ -133,6 +133,14 @@ tf_genes.dat.ucscAcc = tf.dat[which(tf.dat$Factor %in% tf_genes.rnaSeq$gene_name
 ```
 ### 1.1.6.6 Download and extract all the TF profiles from the UCSC DCC portal
 ```r
+library(RCurl)
+library(XML)
+url <- "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeAwgTfbsUniform/"
+doc <- htmlParse(url)
+links <- as.data.frame(xpathSApply(doc, "//a/@href"))
+links <- as.data.frame(links[-c(1:7),]) ## removing initial junk links
+
+
 ```
 ### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
 ```r
