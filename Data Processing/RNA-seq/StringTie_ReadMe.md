@@ -109,16 +109,23 @@ hist(transcript_fpkm)
 dev.off() 
 ```
 ### 1.1.6.5 Overlap the filtered transctipts with the Bins
+```r
+bedDir="/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
+fileDir="/Volumes/Data1/PROJECTS/DeepLearning/Test"
+binFile="hg19_bins_200bp"
+overlapCutoff=0.05
+transctiptFile="stringTie.Transcript.SpikeIns_filtered"
 message(paste0("Overlapping filtered transctipts with Bin locations, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
-system2("./tfbs_bins_overlap.sh",
+system2("./filteredTrascript_bins_overlap.sh",
             paste(bedDir, 
             fileDir, 
-            binFileDir, 
             binFile, 
             overlapCutoff,
+            transctiptFile,
             sep=" "))
 message("Done",appendLF=T)
-
+## the output of this overlap is named as "stringTie.Transcript.SpikeIns_filtered.overlaps.bed", located in the "fileDir"
+```
 ### 1.1.6.5 Further expression matrix (filtered) for only TFs that are expressed 
 ```r
 tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
