@@ -87,10 +87,10 @@ pdf("rplot.pdf")
 plot(plot_dat$fpkm_perc_th,plot_dat$nTFs))
 dev.off() 
 ```
-### 1.1.6.4 Filter the transcription matrix
+### 1.1.6.4 Filter the transcription matrix (percentage threshold only)
 ```r
 fpkm_val_th=0.0
-fpkm_perc_th=0.2
+fpkm_perc_th=0.5
 
 filtered.row=which(rowMeans(transcript_fpkm > fpkm_val_th) >= fpkm_perc_th)
 transcript_fpkm=transcript_fpkm[filtered.row,]
@@ -101,16 +101,25 @@ pref[,1]=paste0("chr",pref[,1])
 pref = cbind(pref, whole_tx_table[filtered.row,c(3,10)])
 colnames(pref) = c("chr","start","end","strand","gene_name")
 newMat = cbind(pref,transcript_fpkm)
-
-#fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns_full_binarized.bed"),sep="\t",quote=F,row.names=F)
-#newPref = cbind(pref,paste(pref[,1],pref[,2],pref[,3], sep="_"),".")
-#colnames(newPref) = c("chr","start","end","feature.id","strand")
-#fwrite(newPref,paste0(data_directory,"stringTie.Transcript.SpikeIns.bed"),col.names=F,quote=F,row.names=F)
-## print the new StringTie SpikeIn (feature) values
-#newMat = cbind(pref,binarized_transcript_fpkm)
-#fwrite(newMat,paste0(data_directory,"stringTie.Transcript.SpikeIns.csv"),sep="\t",quote=F,row.names=F)
+output_directory="/Volumes/Data1/PROJECTS/DeepLearning/Test"
+fwrite(pref,paste0(output_directory,"stringTie.Transcript.SpikeIns_filtered.bed"),sep="\t",quote=F,row.names=F)
+# Draw the frequency distribution of the filtered expression matrix
+pdf("FD_filtered_transcript_matrix.pdf") 
+hist(transcript_fpkm)
+dev.off() 
 ```
-### 1.1.6.5 Filter expression matrix for only TFs that are expressed 
+### 1.1.6.5 Overlap the filtered transctipts with the Bins
+message(paste0("Overlapping filtered transctipts with Bin locations, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
+system2("./tfbs_bins_overlap.sh",
+            paste(bedDir, 
+            fileDir, 
+            binFileDir, 
+            binFile, 
+            overlapCutoff,
+            sep=" "))
+message("Done",appendLF=T)
+
+### 1.1.6.5 Further expression matrix (filtered) for only TFs that are expressed 
 ```r
 tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
 tf_genes.dat.ucscAcc = tf.dat[which(tf.dat$Factor %in% tf_genes.rnaSeq$gene_name),3]    # third column holds the UCSC accession number
