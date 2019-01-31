@@ -2,12 +2,12 @@ chrSizeFileName = "hg19.chrom.sizes.txt"
 ba9FileName = "normalized_log2_tags_BA9_81_April2015_LR"
 ba41FileName = "normalized_log2_tags_BA41_66_Mar2015_LR"
 baVermisFileName = "normalized_log2_tags_Vermis_62_Mar2015_LR"
-rnaSeqFileName = "stringTie.Transcript.SpikeIns_full_binarized"
+rnaSeqFileName = "stringTie.Transcript.SpikeIns_filtered"
 binSize = 200
 overlapCutoff = 0.05
 bedDir = "/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
 workingDir = "/Volumes/Data1/PROJECTS/DeepLearning/Test/"
-outputFileName = "H3K27ac_binary"
+outputFileName = "H3K27ac_rnaSeq"
 flankingLength=400
 
 Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,rnaSeqFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName){
@@ -31,6 +31,7 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   message("Generating bed files for each bins of size b: ",appendLF=F)
   b=binSize
   for (j in c(1:nrow(chr_size))){
+    ### these start and end positions doesn't consider initial few bins that don't flanking sequence
     start=seq(from=flankingLength, to=chr_size$size[j]-flankingLength-b, by=b)+1 
     end=seq(from=flankingLength+b, to=chr_size$size[j]-flankingLength, by=b) 
     
@@ -105,7 +106,7 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   setwd(workingDir)
   #bins=fread(paste0(binFile,".bed"), sep="\t", header=FALSE) ## it is already in the memory
   #colnames(bins)=c("chr", "start", "end", "dna.seq", "id",  "strand")
-  feature_files= c(ba9FileName,baVermisFileName) ## since, ba9 and ba41 are identical
+  feature_files= c(ba9FileName,baVermisFileName,rnaSeqFileName) ## since, ba9 and ba41 are identical
   for ( j in c(1:length(feature_files))){
     overlaps=fread(paste0(feature_files[j], ".overlaps.bed"))
     colnames(overlaps)=c("chr", "start", "end", "id",  "strand")
