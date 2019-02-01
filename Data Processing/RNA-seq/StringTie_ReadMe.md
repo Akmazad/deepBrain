@@ -162,6 +162,8 @@ apply(as.array(allFilePaths), MARGIN = 1, FUN = function(x) download.Save.file(u
 lookupDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 ucsc.tf.profileName=read.csv(paste0(lookupDir,"UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"),header=T)
 expr.ucsc.tf.profileName=ucsc.tf.profileName[ucsc.tf.profileName$Factor %in% tf.genes.expr,]$fileTitle
+expr.ucsc.tf.profileName=paste0(expr.ucsc.tf.profileName,".narrowPeak.bed")
+write.csv(expr.ucsc.tf.profileName,paste0(lookupDir,"expr.ucsc.tf.profileName.csv"),row.names=F,quote=F)
 
 #library(stringr)
 #expr.ucsc.tf.profileName=apply(as.array(tf.genes.expr),MARGIN = 1, FUN = function(x) str_detect(ucsc.tf.profileName,str_to_title(x)))
