@@ -140,13 +140,13 @@ library(RCurl)
 library(XML)
 url <- "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeAwgTfbsUniform/"
 doc <- htmlParse(url)
-links <- as.data.frame(xpathSApply(doc, "//a/@href"))
-links <- as.data.frame(links[-c(1:7),]) ## removing initial junk links
-colnames(links)="filenames"
-allFilePaths=paste0(url,links$filenames)
+ucsc.tf.profileName <- as.data.frame(xpathSApply(doc, "//a/@href"))
+ucsc.tf.profileName <- as.data.frame(ucsc.tf.profileName[-c(1:7),]) ## removing initial junk links
+colnames(ucsc.tf.profileName)="filenames"
+allFilePaths=paste0(url,ucsc.tf.profileName$filenames)
 encodeFileOutDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCFiles/"
 
-##iterate for all, using 'apply' function
+## download files : iterate for all, using 'apply' function
 download.Save.file <- function(url,f) {
     tmp <- tempfile()
     download.file(f,tmp)
@@ -156,7 +156,13 @@ download.Save.file <- function(url,f) {
     unlink(tmp)
 }
 apply(as.array(allFilePaths), MARGIN = 1, FUN = function(x) download.Save.file(url,x))
-
+```
+### 1.1.6.5.3 Pick the TF (expressed) profiles 
+```r
+lookupDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCFiles/"
+ucsc.tf.profileName=list.files(path = lookupDir, pattern = NULL, all.files = FALSE, full.names = FALSE, recursive = FALSE, ignore.case =                                    FALSE, include.dirs = FALSE)
+library(stringr)
+expr.ucsc.tf.profileName=apply(as.array(tf.genes.expr),MARGIN = 1, FUN = function(x) str_detect(ucsc.tf.profileName,str_to_title(x)))
 ```
 ### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
 ```r
