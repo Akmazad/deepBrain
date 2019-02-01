@@ -143,14 +143,16 @@ colnames(links)="filenames"
 allFilePaths=paste0(url,links$filenames)
 encodeFileOutDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCFiles/"
 
-##iterate for all, 'apply' function
-tmp <- tempfile()
-download.file(allFilePaths[1],tmp)
-data <- read.table(gzfile(tmp), sep="\t", header=TRUE, stringsAsFactors=FALSE)
-fName <- paste0(substr(allFilePaths[1], nchar(url)+1, nchar(allFilePaths[1])-2),"bed")
-write.table(data,paste0(encodeFileOutDir,fName), quote = F, row.names = F, sep = "\t")
-unlink(temp)
-
+##iterate for all, using 'apply' function
+download.Save.file <- function(url,f) {
+    tmp <- tempfile()
+    download.file(f,tmp)
+    data <- read.table(gzfile(tmp), sep="\t", header=TRUE, stringsAsFactors=FALSE)
+    fName <- paste0(substr(f, nchar(url)+1, nchar(f)-2),"bed")
+    write.table(data,paste0(encodeFileOutDir,fName), quote = F, row.names = F, sep = "\t")
+    unlink(tmp)
+}
+apply(as.array(allFilePaths), MARGIN = 1, FUN = function(x) download.Save.file(url,x))
 ```
 ### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
 ```r
