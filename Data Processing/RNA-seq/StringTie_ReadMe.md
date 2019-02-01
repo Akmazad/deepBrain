@@ -107,6 +107,8 @@ fwrite(pref,paste0(output_directory,"stringTie.Transcript.SpikeIns_filtered.bed"
 pdf("FD_filtered_transcript_matrix.pdf") 
 hist(transcript_fpkm)
 dev.off() 
+#save the TF_genes in the expression data
+tf.genes.expr = intersect(tf_genes,pref$gene_name)
 ```
 ### 1.1.6.5 Overlap the filtered transctipts with the Bins
 ```r
@@ -126,12 +128,13 @@ system2("./filteredTrascript_bins_overlap.sh",
 message("Done",appendLF=T)
 ## the output of this overlap is named as "stringTie.Transcript.SpikeIns_filtered.overlaps.bed", located in the "fileDir"
 ```
-### 1.1.6.5 Further expression matrix (filtered) for only TFs that are expressed 
+### 1.1.6.5.1 Further expression matrix (filtered) for only TFs that are expressed 
 ```r
 tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
 tf_genes.dat.ucscAcc = tf.dat[which(tf.dat$Factor %in% tf_genes.rnaSeq$gene_name),3]    # third column holds the UCSC accession number
+
 ```
-### 1.1.6.6 Download and extract all the TF profiles from the UCSC DCC portal
+### 1.1.6.5.2 Download and extract all the TF profiles from the UCSC DCC portal
 ```r
 library(RCurl)
 library(XML)
@@ -153,6 +156,7 @@ download.Save.file <- function(url,f) {
     unlink(tmp)
 }
 apply(as.array(allFilePaths), MARGIN = 1, FUN = function(x) download.Save.file(url,x))
+
 ```
 ### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
 ```r
