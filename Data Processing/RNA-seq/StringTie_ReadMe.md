@@ -61,7 +61,7 @@ transcript_fpkm = texpr(bg, 'FPKM')
 ```
 ### 1.1.6.2 Load UCSC TF profile find TF genes that are expressed in the RNA-seq data
 ```r
-## download Transcription Factor ChIP-seq Uniform Peaks from ENCODE/Analysis (source UCSC: http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeAwgTfbsUniform)
+## download Transcription Factor (161 distinct TF) ChIP-seq Uniform Peaks from ENCODE/Analysis (source UCSC: http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeAwgTfbsUniform)
 tf.dat <- read.csv("/Volumes/Data1/PROJECTS/DeepLearning/Test/UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv", header=F)
 tf_genes <- unique(tf.dat[,2]) ## second column contains the gene-symbol
 ```
@@ -159,10 +159,12 @@ apply(as.array(allFilePaths), MARGIN = 1, FUN = function(x) download.Save.file(u
 ```
 ### 1.1.6.5.3 Pick the TF (expressed) profiles 
 ```r
-lookupDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCFiles/"
-ucsc.tf.profileName=list.files(path = lookupDir, pattern = NULL, all.files = FALSE, full.names = FALSE, recursive = FALSE, ignore.case =                                    FALSE, include.dirs = FALSE)
-library(stringr)
-expr.ucsc.tf.profileName=apply(as.array(tf.genes.expr),MARGIN = 1, FUN = function(x) str_detect(ucsc.tf.profileName,str_to_title(x)))
+lookupDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/"
+ucsc.tf.profileName=read.csv(paste0(lookupDir,"UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"),header=T)
+expr.ucsc.tf.profileName=ucsc.tf.profileName[ucsc.tf.profileName$Factor %in% tf.genes.expr,]$fileTitle
+
+#library(stringr)
+#expr.ucsc.tf.profileName=apply(as.array(tf.genes.expr),MARGIN = 1, FUN = function(x) str_detect(ucsc.tf.profileName,str_to_title(x)))
 ```
 ### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
 ```r
