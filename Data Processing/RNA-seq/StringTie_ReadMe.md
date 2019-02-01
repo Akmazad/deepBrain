@@ -139,7 +139,17 @@ url <- "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeAwgTfbs
 doc <- htmlParse(url)
 links <- as.data.frame(xpathSApply(doc, "//a/@href"))
 links <- as.data.frame(links[-c(1:7),]) ## removing initial junk links
+colnames(links)="filenames"
+allFilePaths=paste0(url,links$filenames)
+encodeFileOutDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCFiles/"
 
+##iterate for all, 'apply' function
+tmp <- tempfile()
+download.file(allFilePaths[1],tmp)
+data <- read.table(gzfile(tmp), sep="\t", header=TRUE, stringsAsFactors=FALSE)
+fName <- paste0(substr(allFilePaths[1], nchar(url)+1, nchar(allFilePaths[1])-2),"bed")
+write.table(data,paste0(encodeFileOutDir,fName), quote = F, row.names = F, sep = "\t")
+unlink(temp)
 
 ```
 ### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
