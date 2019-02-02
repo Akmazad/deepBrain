@@ -165,8 +165,8 @@ expr.ucsc.tf.profileName=ucsc.tf.profileName[ucsc.tf.profileName$Factor %in% tf.
 expr.ucsc.tf.profileName=paste0(expr.ucsc.tf.profileName,".narrowPeak.bed")
 #write.csv(expr.ucsc.tf.profileName,paste0(lookupDir,"expr.ucsc.tf.profileName.csv"),row.names=F,quote=F)
 processAfiles <- function(aFile,lookupDir){
-    tfProfile=read.csv(paste0(lookupDir,"EncodeDCCFiles/",aFile),header=T,sep="\t")
-    write.csv(tfProfile,paste0(lookupDir,"EncodeDCCExprMatchFiles/",aFile),quote=F,row.names=F,sep="\t")
+    tfProfile=read.table(paste0(lookupDir,"EncodeDCCFiles/",aFile),header=T,sep="\t")
+    write.table(tfProfile,paste0(lookupDir,"EncodeDCCExprMatchFiles/",aFile),quote=F,row.names=F,sep="\t")
 }
 apply(as.array(expr.ucsc.tf.profileName), MARGIN = 1, FUN = function(x) processAfiles(x,lookupDir))
 #library(stringr)
