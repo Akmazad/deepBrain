@@ -164,14 +164,19 @@ lookupDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 ucsc.tf.profileName=read.csv(paste0(lookupDir,"UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"),header=T)
 expr.ucsc.tf.profileName=ucsc.tf.profileName[ucsc.tf.profileName$Factor %in% tf.genes.expr,]$fileTitle
 expr.ucsc.tf.profileName=paste0(expr.ucsc.tf.profileName,".narrowPeak")
-#write.csv(expr.ucsc.tf.profileName,paste0(lookupDir,"expr.ucsc.tf.profileName.csv"),row.names=F,quote=F)
-processAfiles <- function(aFile,lookupDir){
-    tfProfile=read.table(paste0(lookupDir,"EncodeDCCFiles/",aFile),header=T,sep="\t")
-    write.table(tfProfile,paste0(lookupDir,"EncodeDCCExprMatchFiles/",aFile),quote=F,row.names=F,sep="\t")
-}
-apply(as.array(expr.ucsc.tf.profileName), MARGIN = 1, FUN = function(x) processAfiles(x,lookupDir))
-#library(stringr)
-#expr.ucsc.tf.profileName=apply(as.array(tf.genes.expr),MARGIN = 1, FUN = function(x) str_detect(ucsc.tf.profileName,str_to_title(x)))
+oldDir=paste0(lookupDir,"EncodeDCCFiles/")
+newDir=paste0(lookupDir,"EncodeDCCExprMatchFiles/")
+# copy the files to the new folder
+file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
+
+##write.csv(expr.ucsc.tf.profileName,paste0(lookupDir,"expr.ucsc.tf.profileName.csv"),row.names=F,quote=F)
+#processAfiles <- function(aFile,lookupDir){
+#    tfProfile=read.table(paste0(lookupDir,"EncodeDCCFiles/",aFile),header=T,sep="\t")
+#    write.table(tfProfile,paste0(lookupDir,"EncodeDCCExprMatchFiles/",aFile),quote=F,row.names=F,sep="\t")
+#}
+#apply(as.array(expr.ucsc.tf.profileName), MARGIN = 1, FUN = function(x) processAfiles(x,lookupDir))
+##library(stringr)
+##expr.ucsc.tf.profileName=apply(as.array(tf.genes.expr),MARGIN = 1, FUN = function(x) str_detect(ucsc.tf.profileName,str_to_title(x)))
 ```
 ### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
 ```r
