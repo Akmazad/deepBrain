@@ -117,8 +117,8 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
     bins=cbind(bins, binData)
     rm(binData)
   }
-  ##### for RNA-seq data
   
+  ##### for RNA-seq data
   lookupDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/"
   overlapFileDir=paste0(lookupDir,"EncodeDCCExprMatchFiles/")
   ucsc.tf.profileName=read.csv(paste0(lookupDir,"UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"),header=T)
