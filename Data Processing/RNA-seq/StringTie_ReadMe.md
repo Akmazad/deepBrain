@@ -150,9 +150,10 @@ encodeFileOutDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCFiles/"
 download.Save.file <- function(url,f) {
     tmp <- tempfile()
     download.file(f,tmp)
-    data <- read.table(gzfile(tmp), sep="\t", header=TRUE, stringsAsFactors=FALSE)
-    fName <- paste0(substr(f, nchar(url)+1, nchar(f)-2),"bed")
-    write.table(data,paste0(encodeFileOutDir,fName), quote = F, row.names = F, sep = "\t")
+    data <- read.table(gzfile(tmp), sep="\t", header=F, stringsAsFactors=FALSE)
+    #fName <- paste0(substr(f, nchar(url)+1, nchar(f)-2),"bed")
+    fName <- substr(f, nchar(url)+1, nchar(f)-3)
+    write.table(data,paste0(encodeFileOutDir,fName), quote = F, row.names = F, col.names = F, sep = "\t")
     unlink(tmp)
 }
 apply(as.array(allFilePaths), MARGIN = 1, FUN = function(x) download.Save.file(url,x))
@@ -162,7 +163,7 @@ apply(as.array(allFilePaths), MARGIN = 1, FUN = function(x) download.Save.file(u
 lookupDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 ucsc.tf.profileName=read.csv(paste0(lookupDir,"UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"),header=T)
 expr.ucsc.tf.profileName=ucsc.tf.profileName[ucsc.tf.profileName$Factor %in% tf.genes.expr,]$fileTitle
-expr.ucsc.tf.profileName=paste0(expr.ucsc.tf.profileName,".narrowPeak.bed")
+expr.ucsc.tf.profileName=paste0(expr.ucsc.tf.profileName,".narrowPeak")
 #write.csv(expr.ucsc.tf.profileName,paste0(lookupDir,"expr.ucsc.tf.profileName.csv"),row.names=F,quote=F)
 processAfiles <- function(aFile,lookupDir){
     tfProfile=read.table(paste0(lookupDir,"EncodeDCCFiles/",aFile),header=T,sep="\t")
