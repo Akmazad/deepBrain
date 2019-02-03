@@ -119,6 +119,23 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   }
   ##### for RNA-seq data
   
+  lookupDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/"
+  overlapFileDir=paste0(lookupDir,"EncodeDCCExprMatchFiles/")
+  ucsc.tf.profileName=read.csv(paste0(lookupDir,"UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"),header=T)
+  expr.ucsc.tf.profileName=ucsc.tf.profileName[ucsc.tf.profileName$Factor %in% tf.genes.expr,]$fileTitle
+  feature_files=paste0(expr.ucsc.tf.profileName,".narrowPeak")
+  for ( j in c(1:length(feature_files))){
+     overlaps=fread(paste0(overlapFileDir,feature_files[j], ".overlaps.bed"))
+     colnames(overlaps)=c("chr", "start", "end", "id",  "strand")
+     ov=which(bins$id%in%overlaps$id); rm(overlaps)
+     binData=matrix(0, nrow=nrow(bins), ncol=1) ## 1 for each brain region (collapsing all the samples since it's binarized
+     colnames(binData)=c(feature_files[j])
+     binData[ov,]=1
+     bins=cbind(bins, binData)
+     rm(binData)
+  }
+
+  
   #rnaSeq.features=fread(paste0(rnaSeqFileName, ".csv"),header=T)
   #feature.id=paste(rnaSeq.features$chr,rnaSeq.features$start,rnaSeq.features$end,sep="_")
   #rnaSeq.features=cbind(feature.id,rnaSeq.features[,-c(1:3)])
@@ -135,12 +152,12 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   #overlaps=left_join(mx,my); rm(combined); rm(mx); rm(my)
   #overlaps=overlaps[,-2] ## get rid of the feature.id, keeping only the bin.id and the sample values
   
-  rnaSeq.features=fread(paste0(rnaSeqFileName, ".overlaps.bed"),header=F)
-  rnaSeq.features=rnaSeq.features[,-c(4:11)]
+  #rnaSeq.features=fread(paste0(rnaSeqFileName, ".overlaps.bed"),header=F)
+  #rnaSeq.features=rnaSeq.features[,-c(4:11)]
   ## union of similar row
   
   ## find overlap bins
-  ov=which(bins$id%in%overlaps$bin.id); rm(overlaps)
+  #ov=which(bins$id%in%overlaps$bin.id); rm(overlaps)
   
   ## binarize
   
