@@ -13,12 +13,14 @@ flankingLength=400
 Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,rnaSeqFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName){
   rm(list=ls())
   # get the total human genome
-  library(dplyr)
+  library("dplyr")
   library("data.table")
   library("BSgenome.Hsapiens.UCSC.hg19")
   hg <- BSgenome.Hsapiens.UCSC.hg19
   
   setwd(workingDir)
+  b=binSize
+  binFile=paste0("hg19_bins_", b,"bp")
   
   # read in chromosome sizes
   chr_size=read.table(chrSizeFileName, sep="\t")
@@ -29,7 +31,6 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
 
   ################ generate bed file of bins of size b
   message("Generating bed files for each bins of size b: ",appendLF=F)
-  b=binSize
   for (j in c(1:nrow(chr_size))){
     ### these start and end positions doesn't consider initial few bins that don't flanking sequence
     start=seq(from=flankingLength, to=chr_size$size[j]-flankingLength-b, by=b)+1 
@@ -50,7 +51,6 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   colnames(bins)=c("chr", "start", "end", "dna.seq")
   bins$id=paste(bins$chr, bins$start, bins$end, sep="_")
   bins$strand="+" ## by default the strand is "+"
-  binFile=paste0("hg19_bins_", b,"bp")
   temp_bins=bins[,-4] ## remove the sequence part from Binfile (to save the memory space)
   fwrite(temp_bins, paste0(binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
   rm(temp_bins); message("Done",appendLF=T)
@@ -87,8 +87,8 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
 
   
   # Step-4: use system2 R function to run this script with arguments passed for the shell script
-  message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
-  system2("./Ac_RNAseq_Bed_ShellScript.sh",
+   message(paste0("Overlapping bins with fetures, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
+  system2("./AceTylation_Bed_ShellScript.sh",
             paste(bedDir, 
             workingDir, 
             binFile, 
@@ -96,7 +96,7 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
             ba9FileName,
             ba41FileName,
             baVermisFileName,
-            rnaSeqFileName,sep=" "))
+            sep=" "))
   # this will create Three overlap bed files
   message("Done",appendLF=T)
     
@@ -104,7 +104,7 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   ##### for Accetylation data
   message("Generating the binarised matrix: ",appendLF=F)
   setwd(workingDir)
-  #bins=fread(paste0(binFile,".bed"), sep="\t", header=FALSE) ## it is already in the memory
+  bins=fread(paste0(binFile,".bed"), sep="\t", header=FALSE) ## it is already in the memory
   #colnames(bins)=c("chr", "start", "end", "dna.seq", "id",  "strand")
   feature_files= c(ba9FileName,baVermisFileName,rnaSeqFileName) ## since, ba9 and ba41 are identical
   for ( j in c(1:length(feature_files))){
@@ -119,13 +119,10 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
   }
   
   ##### for RNA-seq data
-  lookupDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/"
-  overlapFileDir=paste0(lookupDir,"EncodeDCCExprMatchFiles/")
-  ucsc.tf.profileName=read.csv(paste0(lookupDir,"UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"),header=T)
-  expr.ucsc.tf.profileName=ucsc.tf.profileName[ucsc.tf.profileName$Factor %in% tf.genes.expr,]$fileTitle
-  feature_files=paste0(expr.ucsc.tf.profileName,".narrowPeak")
+  dir="/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCExprMatchFiles/"
+  feature_files=list.files(dir,pattern="*.narrowPeak$")
   for ( j in c(1:length(feature_files))){
-     overlaps=fread(paste0(overlapFileDir,feature_files[j], ".overlaps.bed"))
+     overlaps=fread(paste0(dir,feature_files[j], ".overlaps.bed"))
      colnames(overlaps)=c("chr", "start", "end", "id",  "strand")
      ov=which(bins$id%in%overlaps$id); rm(overlaps)
      binData=matrix(0, nrow=nrow(bins), ncol=1) ## 1 for each brain region (collapsing all the samples since it's binarized
@@ -133,6 +130,7 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
      binData[ov,]=1
      bins=cbind(bins, binData)
      rm(binData)
+     print(j)
   }
 
   
@@ -172,4 +170,4 @@ Accetylation_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41File
 
 }
 
-accetylationDatWithSeq(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,rnaSeqFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName)
+Accetylation_RNAseq_dat_withSeq(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,rnaSeqFileName,binSize,overlapCutoff,flankingLength,bedDir,workingDir,outputFileName)
