@@ -16,7 +16,7 @@ flankingLength=400
 workingDir = "/short/yr31/aa7970/azData/DeepBrain/Data/"
 Pos.OutputFileName = "H3K27ac_rnaSeq.Pos.dat"
 Neg.OutputFileName = "H3K27ac_rnaSeq.Neg.dat"
-Comb.OutputFileName= "H3K27ac_rnaSeq.pos.neg.dat"
+Comb.OutputFileName= "H3K27ac_rnaSeq.Pos.Neg.dat"
 
 
 Prep_Acc_RNAseq_dat_withSeq <- function(chrSizeFileName,ba9FileName,ba41FileName,baVermisFileName,rnaSeqFileName,binSize,overlapCutoff,flankingLength,workingDir,outputFileName){
