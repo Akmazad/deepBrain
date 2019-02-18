@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import sys
 
 def makeMemmap(setType):
     df = pd.read_csv(setType + ".dat")#,
@@ -74,7 +75,9 @@ def makeMemmap(setType):
     # del labelMemmap
 
 def main():
-    makeMemmap("H3K27ac_rnaSeq.Pos.Neg.tfSpecific")
+    inputFileName=sys.argv[0]
+    #makeMemmap("H3K27ac_rnaSeq.Pos.Neg.tfSpecific")
+    makeMemmap(inputFileName)
 
 if __name__ == '__main__':
     main()
