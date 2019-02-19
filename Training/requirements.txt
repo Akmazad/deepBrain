@@ -1,0 +1,6 @@
+torch
+torchvision
+graphviz
+numpy
+tensorboard
+tensorboardx
