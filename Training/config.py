@@ -25,7 +25,9 @@ class SearchConfig(BaseConfig):
     def build_parser(self):
         parser = argparse.ArgumentParser("Search config")
         parser.add_argument('--name', required=True)
-        parser.add_argument('--dataset', required=True, help='CIFAR10 / MNIST / FashionMNIST')
+        parser.add_argument('--datapath', required=True)
+        parser.add_argument('--train_data', required=True)
+        parser.add_argument('--train_label', required=True)
         parser.add_argument('--batch_size', type=int, default=64)
         parser.add_argument('--w_lr', type=float, default=0.025, help='lr for weights')
         parser.add_argument('--w_lr_min', type=float, default=0.001, help='minimum lr for weights')
@@ -51,8 +53,11 @@ class SearchConfig(BaseConfig):
         args = parser.parse_args()
         super().__init__(**vars(args))
 
-        self.data_path = './data/'
-        self.path = os.path.join('searchs', self.name)
+        # first get the grand-parent directory of the current main-script (search.py) '
+        self.data_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # then join the datapath
+        self.data_path = os.path.join(self.data_path, args.datapath)
+        self.path = os.path.join(self.data_path, self.name, 'searchs')
         self.plot_path = os.path.join(self.path, 'plots')
 
 
@@ -60,7 +65,9 @@ class AugmentConfig(BaseConfig):
     def build_parser(self):
         parser = argparse.ArgumentParser("Augment config")
         parser.add_argument('--name', required=True)
-        parser.add_argument('--dataset', required=True, help='CIFAR10 / MNIST / FashionMNIST')
+        parser.add_argument('--datapath', required=True)
+        parser.add_argument('--train_data', required=True)
+        parser.add_argument('--train_label', required=True)
         parser.add_argument('--batch_size', type=int, default=96)
         parser.add_argument('--lr', type=float, default=0.025, help='lr for weights')
         parser.add_argument('--momentum', type=float, default=0.9)
@@ -87,6 +94,9 @@ class AugmentConfig(BaseConfig):
         args = parser.parse_args()
         super().__init__(**vars(args))
 
-        self.data_path = './data/'
-        self.path = os.path.join('augments', self.name)
+        # first get the grand-parent directory of the current main-script (search.py) '
+        self.data_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # then join the datapath
+        self.data_path = os.path.join(self.data_path, args.datapath)
+        self.path = os.path.join(self.data_path, self.name, 'augments')
         self.genotype = gt.from_str(self.genotype)
