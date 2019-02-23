@@ -41,7 +41,7 @@ def main():
 
     # get data with meta info
     input_size, input_channels, n_classes, train_data = utils.get_data(
-        config.dataset, config.data_path, cutout_length=0, validation=False)
+        config.train_data, config.train_label, config.data_path, cutout_length=0, validation=False)
 
     net_crit = nn.BCEWithLogitsLoss().to(device)
     model = SearchCNN(input_channels, config.init_channels, n_classes, config.layers, net_crit)
@@ -56,20 +56,20 @@ def main():
 
 
     # split data to train/validation
-    # n_train = len(train_data)
-    # split = int(0.8 * n_train)
-    # indices = list(range(n_train))
-    # shuffle(indices)
-    # trainIndices = indices[:split]
-    # testIndices = indices[split:]
-    # with open("trainTestIndices.pickle", "wb") as indicesFile:
-    #     pickle.dump(trainIndices, indicesFile)
-    #     pickle.dump(testIndices, indicesFile)
-    with open("trainTestIndices.pickle", "rb") as indicesFile:
-        trainIndices = pickle.load(indicesFile)
+    n_train = len(train_data)
+    split = int(0.8 * n_train)
+    indices = list(range(n_train))
+    shuffle(indices)
+    trainIndices = indices[:split]
+    testIndices = indices[split:]
+    with open(config.data_path+"trainTestIndices.pickle", "wb") as indicesFile:
+        pickle.dump(trainIndices, indicesFile)
+        pickle.dump(testIndices, indicesFile)
 
-    n_train = len(trainIndices)
-    split = n_train // 2
+    # with open("trainTestIndices.pickle", "rb") as indicesFile:
+    #     trainIndices = pickle.load(indicesFile)
+    # n_train = len(trainIndices)
+    # split = n_train // 2
 
     train_sampler = torch.utils.data.sampler.SubsetRandomSampler(trainIndices[:split])
     valid_sampler = torch.utils.data.sampler.SubsetRandomSampler(trainIndices[split:])
