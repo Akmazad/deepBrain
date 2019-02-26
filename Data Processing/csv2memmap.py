@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import sys
+import os
+
 
 def makeMemmap(setType):
     df = pd.read_csv(setType + ".dat")#,
@@ -17,8 +19,8 @@ def makeMemmap(setType):
     numClasses = 131
     channels = 4
 
-    inputFileName = "/datasets/deepBrain/" + setType + "Input.memmap"
-    labelFileName = "/datasets/deepBrain/" + setType + "Label.memmap"
+    inputFileName = setType + "Input.memmap"
+    labelFileName = setType + "Label.memmap"
 
     inputMemmap = np.memmap(inputFileName, mode = "w+", shape = (1, channels, bpLength))
     labelMemmap = np.memmap(labelFileName, mode = "w+", shape = (1, numClasses))
@@ -75,9 +77,10 @@ def makeMemmap(setType):
     # del labelMemmap
 
 def main():
-    inputFileName=sys.argv[0]
-    #makeMemmap("H3K27ac_rnaSeq.Pos.Neg.tfSpecific")
-    makeMemmap(inputFileName)
+    os.chdir(sys.argv[1])	# first argument is the data directory
+    rawInputFileName=sys.argv[2]	# second argument is the raw input file name
+    # makeMemmap("H3K27ac_rnaSeq.Pos.Neg.tfSpecific")
+    makeMemmap(rawInputFileName)
 
 if __name__ == '__main__':
     main()
