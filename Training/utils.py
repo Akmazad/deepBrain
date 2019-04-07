@@ -10,11 +10,11 @@ import preproc
 import torch.utils.data as tdata
 
 # Class for reading training/testing dataset files.
-class deepSeaData(tdata.Dataset):
-    def __init__(self, dataFile, labelFile):
+class deepBrainData(tdata.Dataset):
+    def __init__(self, dataFile, labelFile, dataPath):
         # Load data from files.
-        self.inputs = np.memmap(dataFile, mode = "r").reshape(-1, 4, 1000)
-        self.labels = np.memmap(labelFile, mode = "r").reshape(-1, 2)
+        self.inputs = np.memmap(dataPath + dataFile, mode = "r").reshape(-1, 4, 1000)
+        self.labels = np.memmap(dataPath + labelFile, mode = "r").reshape(-1, 131)
 
         self.length = len(self.labels)
 
@@ -30,12 +30,19 @@ class deepSeaData(tdata.Dataset):
 
         return self.length
 
-def get_data(dataset, data_path, cutout_length, validation):
-    n_classes = 2
-    trn_data = deepSeaData("H3K27ac_binaryInput.memmap", "H3K27ac_binaryLabel.memmap")
+def get_data(train_data, train_label, data_path, logger, cutout_length, validation):
+    #logger.info('train_label size: {}'.format(train_label.size(1)))
+    # n_classes = train_label.size(1)
+    n_classes = 131
+    trn_data = deepBrainData(train_data, train_label, data_path)
     shape = trn_data.inputs.shape
     input_channels = shape[1]
     input_size = shape[2]
+    # logger.info('input size: {}'.format(input_size))
+    # logger.info('n_classes: {}'.format(train_label.size(1)))
+    # logger.info('input channels: {}'.format(input_size))
+
+
 
     ret = [input_size, input_channels, n_classes, trn_data]
 
@@ -107,7 +114,10 @@ class SumMeter():
         self.falseNeg += falseNeg
 
     def accuracy(self):
-        return (self.truePos + self.trueNeg) / (self.truePos + self.trueNeg + self.falsePos + self.falseNeg)
+        total = self.truePos + self.trueNeg + self.falsePos + self.falseNeg
+        if total==0:
+            return 0
+        return (self.truePos + self.trueNeg) / total
 
     def MCC(self):
         numerator = self.truePos * self.trueNeg - self.falsePos * self.falseNeg
