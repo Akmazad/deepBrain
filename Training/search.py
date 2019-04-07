@@ -13,10 +13,25 @@ from visualize import plot
 from random import shuffle
 import pickle
 
+# special import starts: this imports are helpful (may be) for multi-node multi-GPU support
+# from torch.cuda.comm import broadcast_coalesced
+# from torch.cuda import nccl
+# import torch.distributed as dist
+# if dist.is_available():
+#     from torch.distributed.distributed_c10d import _get_default_group
+
+# # from ..modules import Module
+# # from .replicate import replicate
+# # from .scatter_gather import scatter_kwargs, gather
+# # from .parallel_apply import parallel_apply
+# from torch.cuda._utils import _get_device_index
+
+# special import ends
+
 
 config = SearchConfig()
 
-device = torch.device("cuda")
+device = torch.device("cuda:0")
 
 # tensorboard
 writer = SummaryWriter(log_dir=os.path.join(config.path, "tb"))
@@ -31,135 +46,193 @@ def main():
 
     # set gpu device id
     torch.cuda.set_device(config.gpu)
-
+    
     # set seed
     np.random.seed(config.seed)
     torch.manual_seed(config.seed)
     torch.cuda.manual_seed_all(config.seed)
 
     torch.backends.cudnn.benchmark = True
+    torch.backends.cudnn.enabled = True
 
+    
     # get data with meta info
     input_size, input_channels, n_classes, train_data = utils.get_data(
-        config.train_data, config.train_label, config.data_path, cutout_length=0, validation=False)
+        config.train_data, config.train_label, config.data_path, logger, cutout_length=0, validation=False)
 
     net_crit = nn.BCEWithLogitsLoss().to(device)
     model = SearchCNN(input_channels, config.init_channels, n_classes, config.layers, net_crit)
-    model = model.to(device)
 
-    # weights optimizer
-    w_optim = torch.optim.SGD(model.weights(), config.w_lr, momentum=config.w_momentum,
-                              weight_decay=config.w_weight_decay)
-    # alphas optimizer
-    alpha_optim = torch.optim.Adam(model.alphas(), config.alpha_lr, betas=(0.5, 0.999),
-                                   weight_decay=config.alpha_weight_decay)
+    try:
+        logger.info("all gpus: {}".format(torch.cuda.device_count()))
+        # model = nn.DataParallel(model, device_ids=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31] )
+        model = nn.DataParallel(model, device_ids=range(torch.cuda.device_count()))
+        # model = nn.DataParallel(model)
+        # torch.distributed.init_process_group(backend="nccl")
+        # model = torch.nn.DistributedDataParallel(model)
+        # logger.info('1')
+    
+        model = model.to(device)
+        # logger.info('2')
+    
+
+        # weights optimizer
+        w_optim = torch.optim.SGD(model.module.weights(), config.w_lr, momentum=config.w_momentum,
+                                  weight_decay=config.w_weight_decay)
+        # logger.info('3')
+
+        # alphas optimizer
+        alpha_optim = torch.optim.Adam(model.module.alphas(), config.alpha_lr, betas=(0.5, 0.999),
+                                       weight_decay=config.alpha_weight_decay)
+        # logger.info('4')
 
 
-    # split data to train/validation
-    n_train = len(train_data)
-    split = int(0.8 * n_train)
-    indices = list(range(n_train))
-    shuffle(indices)
-    trainIndices = indices[:split]
-    testIndices = indices[split:]
-    with open(config.data_path+"trainTestIndices.pickle", "wb") as indicesFile:
-        pickle.dump(trainIndices, indicesFile)
-        pickle.dump(testIndices, indicesFile)
+        # split data to train/validation
+        n_train = len(train_data)
+        split = int(0.8 * n_train)
+        indices = list(range(n_train))
+        shuffle(indices)
+        trainIndices = indices[:split]
+        testIndices = indices[split:]
+        with open(config.data_path+"trainTestIndices.pickle", "wb") as indicesFile:
+            pickle.dump(trainIndices, indicesFile)
+            pickle.dump(testIndices, indicesFile)
 
-    # with open("trainTestIndices.pickle", "rb") as indicesFile:
-    #     trainIndices = pickle.load(indicesFile)
-    # n_train = len(trainIndices)
-    # split = n_train // 2
+        with open(config.data_path+"trainTestIndices.pickle", "rb") as indicesFile:
+            trainIndices = pickle.load(indicesFile)
+        n_train = len(trainIndices)
+        split = n_train // 2
 
-    train_sampler = torch.utils.data.sampler.SubsetRandomSampler(trainIndices[:split])
-    valid_sampler = torch.utils.data.sampler.SubsetRandomSampler(trainIndices[split:])
-    train_loader = torch.utils.data.DataLoader(train_data,
-                                               batch_size=config.batch_size,
-                                               sampler=train_sampler,
-                                               num_workers=config.workers,
-                                               pin_memory=True)
-    valid_loader = torch.utils.data.DataLoader(train_data,
-                                               batch_size=config.batch_size,
-                                               sampler=valid_sampler,
-                                               num_workers=config.workers,
-                                               pin_memory=True)
-    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        w_optim, config.epochs, eta_min=config.w_lr_min)
-    architect = Architect(model, config.w_momentum, config.w_weight_decay)
+        train_sampler = torch.utils.data.sampler.SubsetRandomSampler(trainIndices[:split])
+        valid_sampler = torch.utils.data.sampler.SubsetRandomSampler(trainIndices[split:])
+        train_loader = torch.utils.data.DataLoader(train_data,
+                                                   batch_size=config.batch_size,
+                                                   sampler=train_sampler,
+                                                   num_workers=config.workers,
+                                                   pin_memory=True)
+        valid_loader = torch.utils.data.DataLoader(train_data,
+                                                   batch_size=config.batch_size,
+                                                   sampler=valid_sampler,
+                                                   num_workers=config.workers,
+                                                   pin_memory=True)
+        # logger.info('5')
 
-    # training loop
-    best_top1 = 0.
-    for epoch in range(config.epochs):
-        lr_scheduler.step()
-        lr = lr_scheduler.get_lr()[0]
+        lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            w_optim, config.epochs, eta_min=config.w_lr_min)
+        # logger.info('6')
 
-        model.print_alphas()
+        architect = Architect(model, config.w_momentum, config.w_weight_decay)
+        # logger.info('7')
 
-        # training
-        train(train_loader, valid_loader, model, architect, w_optim, alpha_optim, lr, epoch)
+        # training loop
+        best_genotype = None
+        best_top1 = 0.
+        for epoch in range(config.epochs):
+            lr_scheduler.step()
+            lr = lr_scheduler.get_lr()[0]
 
-        # validation
-        cur_step = (epoch+1) * len(train_loader)
-        top1 = validate(valid_loader, model, epoch, cur_step)
+            model.module.print_alphas()
+            # logger.info('8')
 
-        # log
-        # genotype
-        genotype = model.genotype()
-        logger.info("genotype = {}".format(genotype))
+            # training
+            train(train_loader, valid_loader, model, architect, w_optim, alpha_optim, lr, epoch)
+            logger.info('9')
 
-        # genotype as a image
-        plot_path = os.path.join(config.plot_path, "EP{:02d}".format(epoch+1))
-        caption = "Epoch {}".format(epoch+1)
-        plot(genotype.normal, plot_path + "-normal", caption)
-        plot(genotype.reduce, plot_path + "-reduce", caption)
+            # validation
+            cur_step = (epoch+1) * len(train_loader)
+            top1 = validate(valid_loader, model, epoch, cur_step)
+            logger.info('10')
 
-        # save
-        if best_top1 < top1:
-            best_top1 = top1
-            best_genotype = genotype
-            is_best = True
-        else:
-            is_best = False
-        utils.save_checkpoint(model, config.path, is_best)
-        print("")
+            # log
+            # genotype
+            genotype = model.module.genotype()
+            logger.info("genotype = {}".format(genotype))
 
-    logger.info("Final best Prec@1 = {:.4%}".format(best_top1))
-    logger.info("Best Genotype = {}".format(best_genotype))
+            # genotype as a image
+            plot_path = os.path.join(config.plot_path, "EP{:02d}".format(epoch+1))
+            caption = "Epoch {}".format(epoch+1)
+            plot(genotype.normal, plot_path + "-normal", caption)
+            plot(genotype.reduce, plot_path + "-reduce", caption)
+
+            # save
+            if best_top1 < top1:
+                best_top1 = top1
+                best_genotype = genotype
+                is_best = True
+            else:
+                is_best = False
+            utils.save_checkpoint(model, config.path, is_best)
+            print("")
+
+        logger.info("Final best Prec@1 = {:.4%}".format(best_top1))
+        logger.info("Best Genotype = {}".format(best_genotype))
+    except Exception as e:
+        logger.info("error: {}".format(e))
+
 
 
 def train(train_loader, valid_loader, model, architect, w_optim, alpha_optim, lr, epoch):
     stats = utils.SumMeter()
+    # logger.info('8.1')
     # top1 = utils.AverageMeter()
     # top5 = utils.AverageMeter()
     losses = utils.AverageMeter()
+    # logger.info('8.2')
 
     cur_step = epoch*len(train_loader)
     writer.add_scalar('train/lr', lr, cur_step)
+    # logger.info('8.3')
 
     model.train()
+    # logger.info('8.4')
 
+    train_iter = iter(train_loader)
+    valid_iter = iter(valid_loader)
+    # logger.info('8.5')
+    
     for step, ((trn_X, trn_y), (val_X, val_y)) in enumerate(zip(train_loader, valid_loader)):
-        trn_X, trn_y = trn_X.to(device, non_blocking=True), trn_y.to(device, non_blocking=True)
-        val_X, val_y = val_X.to(device, non_blocking=True), val_y.to(device, non_blocking=True)
-        N = trn_X.size(0)
+        if not torch.cuda.is_available():
+            logging.info('no gpu device available')
+            sys.exit(1)
 
+        # logger.info('8.6')
+
+        trn_X, trn_y = trn_X.to(device, non_blocking=True), trn_y.to(device, non_blocking=True)
+        # logger.info('8.7')
+        val_X, val_y = val_X.to(device, non_blocking=True), val_y.to(device, non_blocking=True)
+        # logger.info('8.8')
+        N = trn_X.size(0)
+        # logger.info('8.9')
+                        
         # phase 2. architect step (alpha)
         alpha_optim.zero_grad()
-        architect.unrolled_backward(trn_X, trn_y, val_X, val_y, lr, w_optim)
+        # logger.info('8.10')
+        architect.unrolled_backward(trn_X, trn_y, val_X, val_y, lr, w_optim, logger)
+        # logger.info('8.11')
         alpha_optim.step()
+        # logger.info('8.12')
 
         # phase 1. child network step (w)
         w_optim.zero_grad()
+        # logger.info('8.13')
         logits = model(trn_X)
-        loss = model.criterion(logits, trn_y)
+        # logger.info('8.14')
+        loss = model.module.criterion(logits, trn_y)
+        # logger.info('8.15')
         loss.backward()
+        # logger.info('8.16')
         # gradient clipping
-        nn.utils.clip_grad_norm_(model.weights(), config.w_grad_clip)
+        nn.utils.clip_grad_norm_(model.module.weights(), config.w_grad_clip)
+        # logger.info('8.17')
         w_optim.step()
+        # logger.info('8.18')
 
         truePos, trueNeg, falsePos, falseNeg = utils.accuracy(logits, trn_y)
+        # logger.info('8.19')
         losses.update(loss.item(), N)
+        # logger.info('8.20')
         stats.update(truePos, trueNeg, falsePos, falseNeg)
+        # logger.info('8.21')
 
         if step % config.print_freq == 0 or step == len(train_loader)-1:
             logger.info(
@@ -190,7 +263,7 @@ def validate(valid_loader, model, epoch, cur_step):
             N = X.size(0)
 
             logits = model(X)
-            loss = model.criterion(logits, y)
+            loss = model.module.criterion(logits, y)
 
             truePos, trueNeg, falsePos, falseNeg = utils.accuracy(logits, y)
             losses.update(loss.item(), N)
