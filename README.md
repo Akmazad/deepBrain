@@ -1,4 +1,4 @@
-# deep Brain
+# deepBrain
 
 ## 1: Preparing RNA-seq data from Brain tissue for Deep learning applications
 # 1.1 Derfinder
