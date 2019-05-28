@@ -21,6 +21,7 @@ This is a PyTorch implementation of the DeepBrain project. This project aims to 
 ## Usage
 ### Data Preparation
 Data generated from preprocessing steps contains both input DNA seqeunce and corresponding label data for all chromosomes combined in a single file. This file looks like following:
+
 | chr | start | end | dna.seq | id | strand | 2 Accetylation features | 1 RNA-seq feature | 128 TF features |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
