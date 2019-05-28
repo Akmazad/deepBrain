@@ -16,59 +16,7 @@ import torch.cuda
 from sklearn.metrics import roc_auc_score
 import torch.tensor
 
-# parser = argparse.ArgumentParser("deepBrain2")
-# parser.add_argument('--name', required=True)
-# parser.add_argument('--DataDir', required=True)
-# parser.add_argument('--TrainingDataFile', required=True)
-# parser.add_argument('--TrainingLabelFile', required=True)
-# parser.add_argument('--TestingDataFile', required=True)
-# parser.add_argument('--TestingLabelFile', required=True)
-# # parser.add_argument('--w_lr', type=float, default=0.01, help='lr for weights')
-# parser.add_argument('--w_lr', type=float, default=1e-4, help='lr for weights')
-# parser.add_argument('--w_lr_min', type=float, default=1e-7, help='minimum lr for weights')
-# parser.add_argument('--w_momentum', type=float, default=0.9)
-# # parser.add_argument('--w_weight_decay', type=float, default=3e-4)
-# parser.add_argument('--w_weight_decay', type=float, default=1e-8)
-# parser.add_argument('--w_grad_clip', type=float, default=5.,
-#                     help='gradient clipping for weights')
-# parser.add_argument('--print_freq', type=int, default=50, help='print frequency')
-# parser.add_argument('--init_channels', type=int, default=16)
-# parser.add_argument('--layers', type=int, default=8)
-# parser.add_argument('--BATCH_SIZE', type=int, default=256, metavar='N',
-#                     help='mini-batch size, this is the total batch size of all GPUs on the current '
-#                          'node when using Data Parallel or Distributed Data Parallel')
-# parser.add_argument('--seed', type=int, default=1, help='seed for initializing training')
-# parser.add_argument('--workers', type=int, default=4, help='# of workers')
-# parser.add_argument('--alpha_lr', type=float, default=3e-4, help='lr for alpha')
-# parser.add_argument('--alpha_weight_decay', type=float, default=1e-4, help='weight decay for alpha')
-# parser.add_argument('--world-size', default=-1, type=int, help='number of nodes for distributed training')
-# parser.add_argument('--rank', default=0, type=int, help='node rank for distributed training')
-# parser.add_argument('--dist-url', default='env://', type=str, help='url used to set up distributed training')
-# parser.add_argument('--dist-backend', default='nccl', type=str, help='distributed backend')
-# parser.add_argument('--gpu', default=None, type=int, help='GPU id to use.')
-# parser.add_argument('--multiprocessing-distributed', default=True, action='store_true',
-#                     help='Use multi-processing distributed training to launch N processes per node, '
-#                          'which has N GPUs. This is the fastest way to use PyTorch for either single '
-#                          'node or multi node data parallel training')
-# parser.add_argument('--pretrained', dest='pretrained', action='store_true', help='use pre-trained model')
-# parser.add_argument('--nEpochs', default=5, type=int, metavar='N', help='number of total epochs to run')
-# parser.add_argument('--start-epoch', default=0, type=int, metavar='N', help='manual epoch number (useful on restarts)')
-# parser.add_argument('--resume', default='', type=str, metavar='PATH', help='path to latest checkpoint (default: none)')
-#
-# # architecture-related parameters
-# # 3 conv-layers, 1 fully connected layers (See DeepSEA paper)
-# parser.add_argument('--CONV1_INPUT_CHANNELS', type=int, default=4)
-# parser.add_argument('--CONV1_OUTPUT_CHANNELS', type=int, default=320)
-# parser.add_argument('--CONV2_OUTPUT_CHANNELS', type=int, default=480)
-# parser.add_argument('--CONV3_OUTPUT_CHANNELS', type=int, default=960)
-# parser.add_argument('--KERNEL_SIZE', type=int, default=8)
-# parser.add_argument('--POOLING_TH', type=int, default=4)
-# parser.add_argument('--DROPOUT_l1', type=float, default=0.2)
-# parser.add_argument('--DROPOUT_l2', type=float, default=0.2)
-# parser.add_argument('--DROPOUT_l3', type=float, default=0.5)
-# parser.add_argument('--NUM_OUTPUTS', type=int, default=131)
-# parser.add_argument('--SEQ_LEN', type=int, default=1000)
-
+# Setting arguments
 parser = argparse.ArgumentParser("deepBrain2")
 parser.add_argument('--name', required=True)
 parser.add_argument('--DataDir', required=True)
@@ -79,7 +27,6 @@ parser.add_argument('--TestingLabelFile', required=True)
 parser.add_argument('--w_lr', type=float, default=1e-2, help='lr for weights')
 parser.add_argument('--w_lr_min', type=float, default=8e-7, help='minimum lr for weights')
 parser.add_argument('--w_momentum', type=float, default=0.9)
-# parser.add_argument('--w_weight_decay', type=float, default=3e-4)
 parser.add_argument('--w_weight_decay', type=float, default=5e-7, help='L2 Regularization Coefficient')
 parser.add_argument('--w_grad_clip', type=float, default=5.,
                     help='gradient clipping for weights')
@@ -124,7 +71,9 @@ parser.add_argument('--SEQ_LEN', type=int, default=1000)
 
 best_acc1 = 0
 
-# model zone
+# MODEL zone
+
+# Own model (DeepSEA like)
 class BuildModel(nn.Module):
     def __init__(self, args):
         super(BuildModel, self).__init__()
@@ -171,6 +120,7 @@ class BuildModel(nn.Module):
 
         return x
 
+# DeepSEA (copied from "FunctionLab/selene")
 class DeepSEA(nn.Module):
     def __init__(self, sequence_length, n_genomic_features):
         """
@@ -227,7 +177,7 @@ class DeepSEA(nn.Module):
         predict = self.classifier(reshape_out)
         return predict
 
-
+# deeperDeepSEA (copied from "FunctionLab/selene")
 class DeeperDeepSEA(nn.Module):
     """
     A deeper DeepSEA model architecture.
@@ -301,6 +251,9 @@ class DeeperDeepSEA(nn.Module):
         predict = self.classifier(reshape_out)
         return predict
 
+# another DeepSEA implementation 
+# (copied from "https://github.com/kipoi/models/blob/master/DeepSEA/model_architecture.py")
+# Note: didn't perform better than DeeperDeepSEA on the small data (tempTrain5.dat/chr5)
 class ReCodeAlphabet(nn.Module):
     def __init__(self):
         super(ReCodeAlphabet, self).__init__()
@@ -356,7 +309,7 @@ def get_model(load_weights = True):
         deepsea_cpu.load_state_dict(torch.load('model_files/deepsea_cpu.pth'))
     return nn.Sequential(ReCodeAlphabet(), deepsea_cpu)
 
-
+# Loads data into numpy ndarray
 class LoadDataset(tdata.Dataset):
     def __init__(self, args, dataPath, dataFile, labelFile):
         # Load data from files.
