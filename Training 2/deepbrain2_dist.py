@@ -28,10 +28,7 @@ from torch.cuda import nccl
 if dist.is_available():
     from torch.distributed.distributed_c10d import _get_default_group
 
-# from ..modules import Module
-# from .replicate import replicate
-# from .scatter_gather import scatter_kwargs, gather
-# from .parallel_apply import parallel_apply
+
 from torch.cuda._utils import _get_device_index
 
 # configuration parameters
@@ -91,7 +88,9 @@ parser.add_argument('--SEQ_LEN', type=int, default=1000)
 best_acc1 = 0
 
 
-# model construction
+# MODEL zone
+
+# Own model (DeepSEA like)
 class BuildModel(nn.Module):
     def __init__(self, args):
         super(BuildModel, self).__init__()
@@ -133,7 +132,7 @@ class BuildModel(nn.Module):
 
         return x
 
-
+# DeepSEA (copied from "FunctionLab/selene")
 class DeepSEA(nn.Module):
     def __init__(self, sequence_length, n_genomic_features):
         """
@@ -185,7 +184,7 @@ class DeepSEA(nn.Module):
         predict = self.classifier(reshape_out)
         return predict
 
-
+# deeperDeepSEA (copied from "FunctionLab/selene")
 class DeeperDeepSEA(nn.Module):
     """
     A deeper DeepSEA model architecture.
@@ -258,8 +257,9 @@ class DeeperDeepSEA(nn.Module):
         reshape_out = out.view(out.size(0), 960 * self._n_channels)
         predict = self.classifier(reshape_out)
         return predict
+# Model Zone -- Ends
 
-
+# Loads data into numpy ndarray
 class LoadDataset(tdata.Dataset):
     def __init__(self, args, dataPath, dataFile, labelFile):
         # Load data from files.
@@ -301,22 +301,20 @@ def get_logger(file_path):
 
     return logger
 
-def getCustomAccuracy(predicted, target, args):
-    # predicted = torch.round(torch.sigmoid(predicted))
-    # predicted = torch.round(predicted)
-    n_digits = 3
-    _predicted = torch.round(predicted * 10 ** n_digits) / (10 ** n_digits)
-    __predicted = torch.round(_predicted)
 
-    N = predicted.size(0) * args.NUM_OUTPUTS
-
-    truePred = torch.sum(torch.eq(__predicted, target)).item()
-    acc_val = truePred / N
-
-    # print(torch.sum(torch.eq(target, torch.ones(target.shape))).item())
-    # print(torch.sum(torch.eq(predicted, torch.ones(target.shape))).item())
-    return acc_val
-
+"""
+  This function returns the true prediction ratio for each features
+  
+  Parameters
+  ----------
+  'predicted': 1D tensor (for a batch)
+  'target': 1D tensor (for a batch)
+  'args': argument vector (for a batch)
+  
+  Return
+  ------
+  An array of median accuracies accross each feature categories (Accetylation, RNS-seq, and TFs
+"""
 
 def getCustomAccuracy2(predicted, target, args):
     # predicted = torch.round(torch.sigmoid(predicted))
@@ -324,8 +322,6 @@ def getCustomAccuracy2(predicted, target, args):
     n_digits = 3    # to have something like 0.499 = 0.5
     _predicted = torch.round(predicted * 10 ** n_digits) / (10 ** n_digits)
     __predicted = torch.round(_predicted)
-
-
 
     N = predicted.size(0)
     custom_accuracy = np.zeros(args.NUM_OUTPUTS, dtype=np.float)
@@ -335,6 +331,21 @@ def getCustomAccuracy2(predicted, target, args):
 
     return np.median(custom_accuracy[:2]), np.median(custom_accuracy[2]), np.median(custom_accuracy[3:])
 
+
+"""
+  This function returns the AUC scores for each features
+  
+  Parameters
+  ----------
+  'predicted': 1D tensor (for a batch)
+  'target': 1D tensor (for a batch)
+  'args': argument vector (for a batch)
+  'logger': an object for keeping progress logs
+  
+  Return
+  ------
+  An array of median AUCs accross each feature categories (Accetylation, RNS-seq, and TFs
+"""
 
 def getAUCscore(predicted, target, args, logger):
     # n_digits = 3
@@ -354,11 +365,10 @@ def getAUCscore(predicted, target, args, logger):
             pass
             # logger.info("NA (No positive (i.e. signal) in Test region)")
 
-    # print('Medican AUCs: Accetylation marks: %.3f, RNA-seq: %.3f, TFs: %.3f' % (np.median(aucs[:2]), np.median(aucs[2]), np.median(aucs[3:])))
-
     return np.median(aucs[:2]), np.median(aucs[2]), np.median(aucs[3:])
 
 
+# This function is a modified version of this: https://github.com/pytorch/examples/blob/master/imagenet/main.py
 def main():
     # distributed code
     try:
@@ -402,7 +412,7 @@ def main():
     except RuntimeError as e:
         print(e)
 
-
+# Each GPU runs this process worker
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
     args.gpu = gpu
@@ -421,16 +431,15 @@ def main_worker(gpu, ngpus_per_node, args):
             # For multiprocessing distributed training, rank needs to be the
             # global rank among all the processes
             args.rank = args.rank * ngpus_per_node + gpu
-            # print(args.world_size)
-            # print(args.rank)
+            
+        # intialize the process group in the distributed environment
         dist.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
                                 world_size=args.world_size, rank=args.rank)
 
-    # create model
+    # build/Select the model and criterion
     # model = BuildModel(args)
     # model = DeepSEA(args.SEQ_LEN, args.NUM_OUTPUTS)
     model = DeeperDeepSEA(args.SEQ_LEN, args.NUM_OUTPUTS)
-    # logger.info("{}".format(model))
 
     if args.distributed:
         # For multiprocessing distributed, DistributedDataParallel constructor
@@ -470,27 +479,9 @@ def main_worker(gpu, ngpus_per_node, args):
     optimiser = torch.optim.SGD(model.parameters(), args.w_lr, momentum=args.w_momentum,
                               weight_decay=args.w_weight_decay)
 
-    # optionally resume from a checkpoint
-    if args.resume:
-        if os.path.isfile(args.resume):
-            print("=> loading checkpoint '{}'".format(args.resume))
-            checkpoint = torch.load(args.resume)
-            args.start_epoch = checkpoint['epoch']
-            best_acc1 = checkpoint['best_acc1']
-            if args.gpu is not None:
-                # best_acc1 may be from a checkpoint from a different GPU
-                best_acc1 = best_acc1.to(args.gpu)
-            model.load_state_dict(checkpoint['state_dict'])
-            optimiser.load_state_dict(checkpoint['optimizer'])
-            print("=> loaded checkpoint '{}' (epoch {})"
-                  .format(args.resume, checkpoint['epoch']))
-        else:
-            print("=> no checkpoint found at '{}'".format(args.resume))
-
     cudnn.benchmark = True
 
     # Load the training dataset, and create a data loader to generate a batch.
-
     trainDataset = LoadDataset(args, dataPath=DataPath, dataFile=args.TrainingDataFile, labelFile=args.TrainingLabelFile)
     # define sampler
     if args.distributed:
@@ -518,27 +509,26 @@ def main_worker(gpu, ngpus_per_node, args):
         # learning rate adjusting
         adjust_learning_rate(optimiser, epoch, args, lr_scheduler)    # option1
 
-
         # train for one epoch
         train(trainLoader, model, criterion, optimiser, epoch, args, logger)
 
         # evaluate on validation set
         acc1 = validate(valLoader, model, criterion, args, logger)
 
-        # remember best acc@1 and save checkpoint
-        is_best = acc1 > best_acc1
-        best_acc1 = max(acc1, best_acc1)
 
-        # if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-        #                                             and args.rank % ngpus_per_node == 0):
-        #     # save_checkpoint({
-        #     #     'epoch': epoch + 1,
-        #     #     'state_dict': model.state_dict(),
-        #     #     'best_acc1': best_acc1,
-        #     #     'optimizer': optimiser.state_dict(),
-        #     # }, is_best, args.name)
-
-
+"""
+  This function returns "percentage of uncertain predictions" e.g. range: [0.4, 0.6]
+  
+  Parameters
+  ----------
+  'output': a vector (for a batch)
+  'low': a vector (for a batch)
+  'high': argument vector (for a batch)
+  Return
+  ------
+  The proportion of tensor elements are within the given range
+"""
+        
 def find_perc_uncertainty(output, low, high):
     output = output.detach().cpu().numpy()
     return np.sum(np.logical_and(output >= low, output <= high)) / output.size    # returns the proportion of tensor elements are within the range
@@ -547,11 +537,7 @@ def find_perc_uncertainty(output, low, high):
 def train(train_loader, model, criterion, optimizer, epoch, args, logger):
     batch_time = AverageMeter('Time', ':6.3f')
     data_time = AverageMeter('Data', ':6.3f')
-    losses = AverageMeter('Loss', ':.4e')
-    # top1 = AverageMeter('Acc@1', ':6.2f')
-    # progress = ProgressMeter(len(train_loader), batch_time, data_time, losses, top1,
-    #                          prefix="Epoch: [{}]".format(epoch))
-
+    
     # switch to train mode
     model.train()
 
@@ -570,13 +556,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args, logger):
         loss = criterion(output, target)
 
         # measure accuracy and record loss
-        # acc = getAccuracy(output, target, args)
         perc_uncertainty = find_perc_uncertainty(output, 0.4, 0.6)
         custom_accuracy = getCustomAccuracy2(output, target, args)
         aucs = getAUCscore(output, target, args, logger)
-
-        losses.update(loss.item(), input.size(0))
-        # top1.update(acc, input.size(0))
 
         # compute gradient
         optimizer.zero_grad()
@@ -589,6 +571,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, logger):
 
         # do SGD step
         loss.backward()
+        # update gradients on all the GPUs
         average_gradients(model, args)
         optimizer.step()
 
@@ -606,13 +589,11 @@ def train(train_loader, model, criterion, optimizer, epoch, args, logger):
 def validate(val_loader, model, criterion, args, logger):
     batch_time = AverageMeter('Time', ':6.3f')
     losses = AverageMeter('Loss', ':.4e')
-    # top1 = AverageMeter('Acc@1', ':6.2f')
-    # progress = ProgressMeter(len(val_loader), batch_time, losses, top1,
-    #                          prefix='Test: ')
 
     # switch to evaluate mode
     total_ACC, total_RNA, total_TFs = 0, 0, 0
     model.eval()
+    
     perc_uncertainty = 0.0
 
     with torch.no_grad():
@@ -661,6 +642,7 @@ def validate(val_loader, model, criterion, args, logger):
 
     return np.median([total_ACC, total_RNA, total_TFs])
 
+
 def average_gradients(model, args):
     """ Gradient averaging. """
     # size = float(dist.get_world_size())
@@ -669,6 +651,7 @@ def average_gradients(model, args):
         dist.all_reduce(param.grad.data, op=dist.ReduceOp.SUM)
         param.grad.data /= size
 
+        
 def save_checkpoint(state, is_best, modelName):
     torch.save(state, modelName + "_checkpoint.pth.tar")
     if is_best:
@@ -697,23 +680,6 @@ class AverageMeter(object):
     def __str__(self):
         fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
         return fmtstr.format(**self.__dict__)
-
-
-# class ProgressMeter(object):
-#     def __init__(self, num_batches, prefix="", *meters):
-#         self.batch_fmtstr = self._get_batch_fmtstr(num_batches)
-#         self.meters = meters
-#         self.prefix = prefix
-#
-#     def _print_(self, batch):
-#         entries = [self.prefix + self.batch_fmtstr.format(batch)]
-#         entries += [str(meter) for meter in self.meters]
-#         print('\t'.join(entries))
-#
-#     def _get_batch_fmtstr(self, num_batches):
-#         num_digits = len(str(num_batches // 1))
-#         fmt = '{:' + str(num_digits) + 'd}'
-#         return '[' + fmt + '/' + fmt.format(num_batches) + ']'
 
 
 def adjust_learning_rate(optimizer, epoch, args, lr_scheduler):
