@@ -1,4 +1,4 @@
-# DeepBrain
+# DeepBrain Training [version 2]
 This is a PyTorch implementation of the DeepBrain project. This project aims to predict the functional effects of non-coding variants from sequence data.
 
 ## Requirements
