@@ -1,0 +1,17 @@
+04/23 08:50:33 PM | 1
+04/23 08:50:33 PM | 2
+04/23 08:50:33 PM | 3
+04/23 08:50:33 PM | 4
+04/23 08:50:33 PM | 5
+04/23 08:51:27 PM | 6
+04/23 08:51:31 PM | 7
+04/23 08:51:34 PM | 8
+04/23 08:51:39 PM | 9
+04/23 08:51:39 PM | 10
+04/23 08:51:42 PM | 11
+04/23 08:51:42 PM | 12
+04/23 08:51:42 PM | 13
+04/23 08:51:42 PM | 14
+04/23 08:51:42 PM | 15
+04/23 08:51:46 PM | 16
+/jobfs/local/pbs/mom_priv/jobs/8171687.r-man2.SC: line 28: 42672 Bus error               python3 /short/yr31/aa7970/azData/DeepBrain/Scripts/csv2memmap.py --datadir /short/yr31/aa7970/azData/DeepBrain/Data/ --datafilename H3K27ac_rnaSeq.Pos.tfSpecific_trainingData_chr1 --valid_chr_id 1
