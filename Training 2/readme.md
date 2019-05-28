@@ -20,7 +20,11 @@ This is a PyTorch implementation of the DeepBrain project. This project aims to 
 
 ## Usage
 ### Data Preparation
-Data generated from preprocessing steps contains both input DNA seqeunce and corresponding label data for all chromosomes combined in a single file. For training DeepBrain models with this data, we need to seperate them (value-label) and convert them to numpy ndarrays. Moreover, we wanted to leave one chromosome data out while training and test the model with that data. Hence, we have to do train-validation split on both the value and label data based on a single chromosome. This process runs on raijin (for details, see the pbs script: [```DL_input_TrainValid_Split_and_Numpy.sh```](https://github.com/Akmazad/deepBrain/blob/master/Training%202/pbs%20scripts/DL_input_TrainValid_Split_and_Numpy.sh))
+Data generated from preprocessing steps contains both input DNA seqeunce and corresponding label data for all chromosomes combined in a single file. This file looks like following:
+| chr | start | end | dna.seq | id | strand | 2 Accetylation features | 1 RNA-seq feature | 128 TF features |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+For training DeepBrain models with this data, we need to seperate them (value-label) and convert them to numpy ndarrays. Moreover, we wanted to leave one chromosome data out while training and test the model with that data. Hence, we have to do train-validation split on both the value and label data based on a single chromosome. This process runs on raijin (for details, see the pbs script: [```DL_input_TrainValid_Split_and_Numpy.sh```](https://github.com/Akmazad/deepBrain/blob/master/Training%202/pbs%20scripts/DL_input_TrainValid_Split_and_Numpy.sh))
 
 ### Training and Validation
  
