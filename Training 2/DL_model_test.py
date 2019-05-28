@@ -253,7 +253,7 @@ class DeeperDeepSEA(nn.Module):
 
 # another DeepSEA implementation 
 # (copied from "https://github.com/kipoi/models/blob/master/DeepSEA/model_architecture.py")
-# Note: didn't perform better than DeeperDeepSEA on the small data (tempTrain5.dat/chr5)
+# Note: didn't perform better than DeeperDeepSEA on our small data (tempTrain5.dat/chr5)
 class ReCodeAlphabet(nn.Module):
     def __init__(self):
         super(ReCodeAlphabet, self).__init__()
@@ -308,6 +308,7 @@ def get_model(load_weights = True):
     if load_weights:
         deepsea_cpu.load_state_dict(torch.load('model_files/deepsea_cpu.pth'))
     return nn.Sequential(ReCodeAlphabet(), deepsea_cpu)
+# Model Zone -- Ends
 
 # Loads data into numpy ndarray
 class LoadDataset(tdata.Dataset):
@@ -332,33 +333,21 @@ class LoadDataset(tdata.Dataset):
         return self.length
 
 
-
-
-def getCustomAccuracy(predicted, target, args):
-    # predicted = torch.round(torch.sigmoid(predicted))
-    # predicted = torch.round(predicted)
-    n_digits = 3
-    _predicted = torch.round(predicted * 10 ** n_digits) / (10 ** n_digits)
-    __predicted = torch.round(_predicted)
-
-    N = predicted.size(0) * args.NUM_OUTPUTS
-
-    truePred = torch.sum(torch.eq(__predicted, target)).item()
-    acc_val = truePred / N
-
-    # print(torch.sum(torch.eq(target, torch.ones(target.shape))).item())
-    # print(torch.sum(torch.eq(predicted, torch.ones(target.shape))).item())
-    return acc_val
-
-
+"""
+  this function returns the true prediction ratio for each features
+  
+  Parameters:
+  'predicted', a vector (for a batch)
+  'target', a vector (for a batch)
+  'args', argument vector (for a batch)
+  
+  Return:
+  An array of median accuracies accross each feature categories (Accetylation, RNS-seq, and TFs
+"""
 def getCustomAccuracy2(predicted, target, args):
-    # predicted = torch.round(torch.sigmoid(predicted))
-    # predicted = torch.round(predicted)
     n_digits = 3    # to have something like 0.499 = 0.5
     _predicted = torch.round(predicted * 10 ** n_digits) / (10 ** n_digits)
     __predicted = torch.round(_predicted)
-
-
 
     N = predicted.size(0)
     custom_accuracy = np.zeros(args.NUM_OUTPUTS, dtype=np.float)
@@ -368,28 +357,22 @@ def getCustomAccuracy2(predicted, target, args):
 
     return np.median(custom_accuracy[:2]), np.median(custom_accuracy[2]), np.median(custom_accuracy[3:])
 
-
-def getCustomAccuracy3(predicted, target, args):
-    preds = []
-    targets = []
-    for i in range(10):
-        o = F.log_softmax(torch.autograd.Variable(predicted), dim=1)
-        t = torch.autograd.Variable(target)
-
-        _, pred = torch.max(o, dim=1)
-        preds.append(pred.data)
-        targets.append(t.data)
-
-    preds = torch.cat(preds)
-    targets = torch.cat(targets)
-
-
+  
+"""
+  this function returns the AUC scores for each features
+  
+  Parameters:
+  'predicted', a vector (for a batch)
+  'target', a vector (for a batch)
+  'args', argument vector (for a batch)
+  'logger', an object for keeping progress logs
+  
+  Return:
+  An array of median AUCs accross each feature categories (Accetylation, RNS-seq, and TFs
+"""
 def getAUCscore(predicted, target, args, logger):
-    # n_digits = 3
-    # _predicted = torch.round(predicted * 10**n_digits) / (10**n_digits)
-    # __predicted = torch.round(_predicted)
-
-    # _predicted = torch.round(predicted).detach()
+  
+  # need to detach the tensors from GPU to use its the numpy version that runs on CPU only
     __predicted = predicted.detach()
     _target = target.detach()
 
@@ -401,8 +384,6 @@ def getAUCscore(predicted, target, args, logger):
         except ValueError as e:
             pass
             # logger.info("NA (No positive (i.e. signal) in Test region)")
-
-    # print('Medican AUCs: Accetylation marks: %.3f, RNA-seq: %.3f, TFs: %.3f' % (np.median(aucs[:2]), np.median(aucs[2]), np.median(aucs[3:])))
 
     return np.median(aucs[:2]), np.median(aucs[2]), np.median(aucs[3:])
 
@@ -425,6 +406,17 @@ def get_logger(file_path):
     return logger
 
 
+  """
+  this function returns percentage of uncertain prediction i.e. range: [0.4, 0.6]
+  
+  Parameters:
+  'output', a vector (for a batch)
+  'low', a vector (for a batch)
+  'high', argument vector (for a batch)
+
+  Return:
+  Average
+"""
 def find_perc_uncertainty(output, low, high):
     output = output.detach().numpy()
     return np.sum(np.logical_and(output>=low, output<=high))/output.size    # returns the proportion of tensor elements are within the range
