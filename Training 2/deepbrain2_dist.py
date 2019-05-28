@@ -476,8 +476,10 @@ def main_worker(gpu, ngpus_per_node, args):
     criterion = nn.BCELoss().cuda(args.gpu)
     # loss function.
     # optimiser = topti.Adam(model.parameters(), lr=args.w_lr)  # Minimise the loss using the Adam algorithm.
-    optimiser = torch.optim.SGD(model.parameters(), args.w_lr, momentum=args.w_momentum,
-                              weight_decay=args.w_weight_decay)
+    optimiser = torch.optim.Adam(model.parameters(), args.w_lr, betas=(0.5, 0.999),
+                                   weight_decay=args.w_weight_decay)
+    # optimiser = torch.optim.SGD(model.parameters(), args.w_lr, momentum=args.w_momentum,
+    #                           weight_decay=args.w_weight_decay)
 
     cudnn.benchmark = True
 
