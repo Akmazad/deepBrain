@@ -43,7 +43,7 @@ To run on CPU, use following command:
 --BATCH_SIZE 128
 ```
 
-For running [```deepbrain2_dist.py```](https://github.com/Akmazad/deepBrain/blob/master/Training%202/deepbrain2_dist.py) on Raijin GPUs on a distributed manner, please see the PBS script: [DeepBrain2_training_dist.sh](https://github.com/Akmazad/deepBrain/blob/master/Training%202/pbs%20scripts/DeepBrain2_training_dist.sh).
+For running [```deepbrain2_dist.py```](https://github.com/Akmazad/deepBrain/blob/master/Training%202/deepbrain2_dist.py) on Raijin GPUs on a distributed manner, please see the PBS script: [```DeepBrain2_training_dist.sh```](https://github.com/Akmazad/deepBrain/blob/master/Training%202/pbs%20scripts/DeepBrain2_training_dist.sh).
 
 ### Accuracy measures and Log reporting
 For this version, we've checked two accuracy measurements. In each training/testing iteration (for a mini-batch), we report "true prediction ratio" for each Feature columns and take median accross three Feature categories (e.g. Accetylation, RNA-seq, and TFs).we also report AUC scores in a similar manner. In addition, progress logs are reported in a log file within the current data directory and project name (e.g. deepbrainStaticConvnet) subdirectory.
