@@ -544,7 +544,7 @@ def main():
     # model = get_model(load_weights=False)
 
     # Add a sigmoid activation function to the output.  Use a binary cross entropy
-    criterion = nn.BCEWithLogitsLoss()
+    criterion = nn.BCELoss().to(device)
     # criterion = nn.CrossEntropyLoss()
 
     # optimiser = topti.Adam(model.parameters(), lr=args.w_lr)  # Minimise the loss using the Adam algorithm.
