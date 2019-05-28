@@ -313,13 +313,8 @@ def get_model(load_weights = True):
 # Loads data into numpy ndarray
 class LoadDataset(tdata.Dataset):
     def __init__(self, args, dataPath, dataFile, labelFile):
-        # Load data from files.
-        # self.inputs = np.memmap(dataPath + dataFile, mode="r").reshape(-1, args.CONV1_INPUT_CHANNELS, args.SEQ_LEN)
-        # self.labels = np.memmap(dataPath + labelFile, mode="r").reshape(-1, args.NUM_OUTPUTS)
-
         self.inputs = np.load(dataPath + dataFile)
         self.labels = np.load(dataPath + labelFile)
-
         self.length = len(self.labels)
 
     def __getitem__(self, index):
@@ -334,16 +329,19 @@ class LoadDataset(tdata.Dataset):
 
 
 """
-  this function returns the true prediction ratio for each features
+  This function returns the true prediction ratio for each features
   
-  Parameters:
-  'predicted', a vector (for a batch)
-  'target', a vector (for a batch)
-  'args', argument vector (for a batch)
+  Parameters
+  ----------
+  'predicted': 1D tensor (for a batch)
+  'target': 1D tensor (for a batch)
+  'args': argument vector (for a batch)
   
-  Return:
+  Return
+  ------
   An array of median accuracies accross each feature categories (Accetylation, RNS-seq, and TFs
 """
+
 def getCustomAccuracy2(predicted, target, args):
     n_digits = 3    # to have something like 0.499 = 0.5
     _predicted = torch.round(predicted * 10 ** n_digits) / (10 ** n_digits)
@@ -359,17 +357,20 @@ def getCustomAccuracy2(predicted, target, args):
 
   
 """
-  this function returns the AUC scores for each features
+  This function returns the AUC scores for each features
   
-  Parameters:
-  'predicted', a vector (for a batch)
-  'target', a vector (for a batch)
-  'args', argument vector (for a batch)
-  'logger', an object for keeping progress logs
+  Parameters
+  ----------
+  'predicted': 1D tensor (for a batch)
+  'target': 1D tensor (for a batch)
+  'args': argument vector (for a batch)
+  'logger': an object for keeping progress logs
   
-  Return:
+  Return
+  ------
   An array of median AUCs accross each feature categories (Accetylation, RNS-seq, and TFs
 """
+
 def getAUCscore(predicted, target, args, logger):
   
   # need to detach the tensors from GPU to use its the numpy version that runs on CPU only
@@ -406,27 +407,29 @@ def get_logger(file_path):
     return logger
 
 
-  """
-  this function returns percentage of uncertain prediction i.e. range: [0.4, 0.6]
-  
-  Parameters:
-  'output', a vector (for a batch)
-  'low', a vector (for a batch)
-  'high', argument vector (for a batch)
-
-  Return:
-  Average
 """
+  This function returns "percentage of uncertain predictions" e.g. range: [0.4, 0.6]
+  
+  Parameters
+  ----------
+  'output': a vector (for a batch)
+  'low': a vector (for a batch)
+  'high': argument vector (for a batch)
+
+  Return
+  ------
+  The proportion of tensor elements are within the given range
+"""
+
 def find_perc_uncertainty(output, low, high):
     output = output.detach().numpy()
-    return np.sum(np.logical_and(output>=low, output<=high))/output.size    # returns the proportion of tensor elements are within the range
+    return np.sum(np.logical_and(output>=low, output<=high))/output.size    # returns 
 
 
 def train(train_loader, model, criterion, optimizer, epoch, args, logger):
 
     # switch to train mode
     model.train()
-    # perc_uncertainty = 0.0
 
     for i, (input, target) in enumerate(train_loader):
         if (i == len(train_loader) - 1):
@@ -437,16 +440,14 @@ def train(train_loader, model, criterion, optimizer, epoch, args, logger):
         loss = criterion(output, target.squeeze(1))
 
         # measure accuracy and record loss
-        # acc = getCustomAccuracy(output, target, args)
         perc_uncertainty = find_perc_uncertainty(output, 0.4, 0.6)
         custom_accuracy = getCustomAccuracy2(output, target, args)
-        # tAccuracy = getCustomAccuracy3(output, target, args)
         aucs = getAUCscore(output, target, args, logger)
 
         # compute gradient
         optimizer.zero_grad()
 
-        # add l1 Sparsity
+        # add L1 Sparsity
         l1 = 0
         for p in model.parameters():
             l1 = l1 + p.abs().sum()
@@ -467,10 +468,9 @@ def validate(val_loader, model, criterion, args, logger):
 
     # switch to evaluate mode
     model.eval()
+    
     total_ACC, total_RNA, total_TFs = 0, 0, 0
     perc_uncertainty = 0.0
-
-    # losses = []
 
     with torch.no_grad():
         for i, (input, target) in enumerate(val_loader):
@@ -478,10 +478,8 @@ def validate(val_loader, model, criterion, args, logger):
             # output = model(input, args)
             output = model(input)
             loss = criterion(output, target)
-            # losses[i] = loss
 
             # measure accuracy and record loss
-            # acc = getCustomAccuracy(output, target, args)
             p = find_perc_uncertainty(output, 0.4, 0.6)
             custom_accuracy = getCustomAccuracy2(output, target, args)
             aucs = getAUCscore(output, target, args, logger)
@@ -491,21 +489,19 @@ def validate(val_loader, model, criterion, args, logger):
             total_TFs += np.median(aucs[2])
 
             if i % args.print_freq == 0 or i == len(val_loader) - 1:
-                # progress._print(i)
-                # logger.info("batch: %d, loss: %.3f; valid accuracy: custom_accuracy_metric: %.3f, ACC marks: %.3f, RNA-seq: %.3f, TFs: %.3f" % (i+1, loss, acc, aucs[0], aucs[1], aucs[2]))
                 logger.info("Batch: %d/%d, Loss: %.3f, perc_uncertainty: %.3f, custom[ACC:%.3f, rnaSEQ:%.3f, TFs:%.3f], roc[ACC: %.3f, rnSEQ: %.3f, TFs:%.3f]" % (
                         i, len(val_loader)-1, loss, perc_uncertainty, custom_accuracy[0], custom_accuracy[1], custom_accuracy[2], aucs[0], aucs[1], aucs[2]))
             perc_uncertainty += p
 
-        # logger.info(' * Acc@1 {top1.avg:.3f}'.format(top1=acc))
         logger.info("percentage of uncertainty in validation prediction: {}".format(perc_uncertainty / len(val_loader)))
 
     total_ACC /= len(val_loader)
     total_RNA /= len(val_loader)
     total_TFs /= len(val_loader)
 
+    # Return median AUC scores across all three categories
+    # Note, this score is not reported in the log now
     return np.median([total_ACC, total_RNA, total_TFs])
-    # return np.median(losses), np.median([total_ACC, total_RNA, total_TFs])
 
 
 def adjust_learning_rate(optimizer, epoch, args, lr_scheduler):
@@ -541,28 +537,23 @@ def main():
     valLoader = tdata.DataLoader(dataset=valDataset, batch_size=args.BATCH_SIZE, shuffle=False,
                                  num_workers=args.workers, pin_memory=True)
 
-    # build the model and criterion
+    # build/Select the model and criterion
     # model = BuildModel(args).to(device)
     # model = DeepSEA(args.SEQ_LEN, args.NUM_OUTPUTS).to(device)
     model = DeeperDeepSEA(args.SEQ_LEN, args.NUM_OUTPUTS).to(device)
     # model = get_model(load_weights=False)
 
     # Add a sigmoid activation function to the output.  Use a binary cross entropy
-    # criterion = nn.BCEWithLogitsLoss()
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.BCEWithLogitsLoss()
+    # criterion = nn.CrossEntropyLoss()
 
     # optimiser = topti.Adam(model.parameters(), lr=args.w_lr)  # Minimise the loss using the Adam algorithm.
     # optimiser = torch.optim.Adam(model.parameters(), args.w_lr, betas=(0.5, 0.999),
     #                                weight_decay=args.w_weight_decay)
-    # print(model.parameters())
     optimiser = torch.optim.SGD(model.parameters(), args.w_lr, momentum=args.w_momentum, weight_decay=args.w_weight_decay)
 
-    # model = DeepSEA(args.SEQ_LEN, args.NUM_OUTPUTS).to(device)
-    # criterion = nn.BCELoss()
-    # optimiser = (torch.optim.SGD, {"lr": args.w_lr, "weight_decay": 1e-6, "momentum": 0.9})
 
-
-
+    # Learning rate scheduler
     lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimiser, args.nEpochs, eta_min=args.w_lr_min)
     # lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimiser, args.nEpochs, eta_min=0)
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimiser, 'min')
@@ -578,11 +569,9 @@ def main():
         # evaluate on validation set
         acc1 = validate(valLoader, model, criterion, args, logger)
 
-        # scheduler.step(acc1[1])
-
-        # remember best acc@1 and save checkpoint
-        is_best = acc1 > best_acc1
-        best_acc1 = max(acc1, best_acc1)
+#         # remember best acc@1 and save checkpoint
+#         is_best = acc1 > best_acc1
+#         best_acc1 = max(acc1, best_acc1)
 
     # if (args.save_model):
     #     torch.save(model.state_dict(), "mnist_cnn.pt")
