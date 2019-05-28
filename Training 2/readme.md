@@ -12,4 +12,4 @@ This is a PyTorch implementation of the DeepBrain project. This project aims to 
 | File | Description |
 | --- | --- |
 | [DL_model_test.py](https://github.com/Akmazad/deepBrain/blob/master/Training%202/DL_model_test.py) | DeepBrain with static Convnet (e.g. [DeepSEA](https://github.com/FunctionLab/selene/blob/master/models/deepsea.py) and [DeeperDeepSEA](https://github.com/FunctionLab/selene/blob/master/tutorials/quickstart_training/deeperdeepsea.py)) models |
-| DL_model_test_DARTS.py | DARTs (Differentiable Architecture Search) implementation of the "DL_model_test.py" * | 
+| [DL_model_test_DARTS.py](https://github.com/Akmazad/deepBrain/blob/master/Training%202/DL_model_test_DARTS.py) | [DARTs](https://github.com/quark0/darts) (Differentiable Architecture Search) implementation of the "DL_model_test.py" * | 
