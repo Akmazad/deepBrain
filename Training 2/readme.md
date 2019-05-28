@@ -11,7 +11,7 @@ This is a PyTorch implementation of the DeepBrain project. This project aims to 
 ## Overview
 | File | Description |
 | --- | --- |
-| [split_and_Numpy.py](https://github.com/Akmazad/deepBrain/blob/master/Training%202/split_and_Numpy.py) | Prepares data for running DeepBrain models |
+| [split_and_Numpy.py](https://github.com/Akmazad/deepBrain/blob/master/Training%202/split_and_Numpy.py) | Prepares data for running DeepBrain models; train-validation split based on a chromosome |
 | [DL_model_test.py](https://github.com/Akmazad/deepBrain/blob/master/Training%202/DL_model_test.py) | DeepBrain with static Convnet (e.g. [DeepSEA](https://github.com/FunctionLab/selene/blob/master/models/deepsea.py) and [DeeperDeepSEA](https://github.com/FunctionLab/selene/blob/master/tutorials/quickstart_training/deeperdeepsea.py)) models |
 | [DL_model_test_DARTS.py](https://github.com/Akmazad/deepBrain/blob/master/Training%202/DL_model_test_DARTS.py) | [DARTs](https://github.com/quark0/darts) (Differentiable Architecture Search) implementation of the "DL_model_test.py" * | 
 | [DL_model_test_DeepSEA_data.py]() | "DL_model_test" with DeepSEA data |
