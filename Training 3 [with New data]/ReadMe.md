@@ -8,3 +8,7 @@
 | UCSD-YALE (ba41) | ChIP-seq | 66 | 56,503 |
 | UCSD-YALE (baVermis) | ChIP-seq | 62 | 38,069 |
 | UCSD-YALE | RNA-seq | 209 | 392,033 |
+
+## Thresholding Acetylation data
+### Methodology
+Choose peaks that has non-zero values 
