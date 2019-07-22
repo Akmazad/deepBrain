@@ -1,6 +1,6 @@
 ## Acetylation data
 
-| Study | Assay | Type	| Nsamples	| Number of peaks/Transcripts |
+| Study | Assay | Type | Nsamples | Number of peaks/Transcripts |
 HumanFC	ATAC-seq	288	197,263
 EpiMap	ChIP-seq	150	479,476
 UCSD-YALE (ba9)	ChIP-seq	81	56,503
