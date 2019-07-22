@@ -17,7 +17,7 @@ This is a PyTorch implementation of the DeepBrain project. This project aims to 
 | [```DL_model_test_DeepSEA_data.py```](https://github.com/Akmazad/deepBrain/blob/master/Training%202/DL_model_test_DeepSEA_data.py) | ```DL_model_test.py``` with DeepSEA data  * |
 | [```deepbrain2_dist.py```](https://github.com/Akmazad/deepBrain/blob/master/Training%202/deepbrain2_dist.py) | Distributed (Multi-processs, Multi-GPU implementation of ```DL_model_test.py```  * |
 | [```deepbrain2_dist_DeepSEA_data.py```](https://github.com/Akmazad/deepBrain/blob/master/Training%202/deepbrain2_dist_DeepSEA_data.py) | ```deepbrain2_dist.py``` with DeepSEA data  * |
-| * | under implementation-phase |
+| --- | * under implementation-phase |
 
 ## Usage
 ### Data Preparation
