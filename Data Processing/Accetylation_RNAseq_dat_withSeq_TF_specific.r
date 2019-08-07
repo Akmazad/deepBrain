@@ -5,7 +5,7 @@ output.pos.datFile="pos.tfSpecific.dat"
 output.neg.datFile="neg.tfSpecific.dat"
 output.combinedFile="pos.neg.tfSpecific.dat"
 tfProfFile="UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"
-selectedTFs="tf.genes.expr_0.5_perc.csv"
+selectedTFs="tf.genes.expr_0.5_perc.csv"  # total 128 TFs
 
 library("data.table")
 tfProf=fread(paste0(dataDir,tfProfFile),header=T)[,c(2,6)]
