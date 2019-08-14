@@ -194,8 +194,8 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
 ### 2.6 Merge binned TF profiles with other features
 [```Accetylation_RNAseq_dat_withSeq.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq.r) files merges those selected TF profiles (595 columns) with other features (i.e. Acetylation ChipSeq and ATACseq). After that [```Accetylation_RNAseq_dat_withSeq_TF_specific.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq_TF_specific.r) aggregates those TF proriles columns into Gene-symbol based columns (128 columns)
 
-######################################
-### 1.1.7 Bin the transcript abundance data
+###################################### This pipeline ends here ##############
+#### Bin the transcript abundance data
 
 - "transcript_fpkm" or "transcript_cov" matrices contains transcript-level fpkm or coverage values in all the samples in all the chromosomes. Hence, we can apply "AccetylationDat3.r" (may need slight modification) code for binning these datasets into chromosome-wise files.  
 - definition:
@@ -205,7 +205,7 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
 
 - [update: 14/01/2019]: Use "transcript_fpkm" metrix, and convert it into a BED file for processing with the code "Accetylation_Bedtools.r"
 
-### 1.1.6.5 Overlap the filtered transctipts with the Bins [side analysis: off-the pipeline]
+####  Overlap the filtered transctipts with the Bins [side analysis: off-the pipeline]
 ```r
 bedDir="/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
 fileDir="/Volumes/Data1/PROJECTS/DeepLearning/Test"
@@ -223,18 +223,18 @@ system2("./filteredTrascript_bins_overlap.sh",
 message("Done",appendLF=T)
 ## the output of this overlap is named as "stringTie.Transcript.SpikeIns_filtered.overlaps.bed", located in the "fileDir"
 ```
-### 1.1.6.5.1 Further expression matrix (filtered) for only TFs that are expressed [side analysis: off-the pipeline]
+#### Further expression matrix (filtered) for only TFs that are expressed [side analysis: off-the pipeline]
 ```r
 tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
 tf_genes.dat.ucscAcc = tf.dat[which(tf.dat$Factor %in% tf_genes.rnaSeq$gene_name),3]    # third column holds the UCSC accession number
 ```
-### 2.3 Load UCSC TF profile (with gene-symbol & ucsc accession number) [side analysis: off-the pipeline]
+#### Load UCSC TF profile (with gene-symbol & ucsc accession number) [side analysis: off-the pipeline]
 ```r
 ## download [one-ff] Transcription Factor (161 distinct TF) ChIP-seq Uniform Peaks from ENCODE/Analysis (source UCSC: http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeAwgTfbsUniform)
 tf.dat <- read.csv("/Volumes/Data1/PROJECTS/DeepLearning/Test/UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv", header=F)
 tf_genes <- unique(tf.dat[,2]) ## second column contains the gene-symbol
 ```
-### 1.1.6b [test analysis] intersect with Enhancer locations (PsychEncode) [side analysis: off-the pipeline] [IGNORED]
+#### intersect with Enhancer locations (PsychEncode) [side analysis: off-the pipeline] [IGNORED]
 ```r
 ############## Overlap StringTie features with Enhancer locations, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
   # Step-1: create a shell script namely "rnaSeqEnhancer_Bed_ShellScript.sh" (see attached) within the "workingDir"
