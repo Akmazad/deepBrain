@@ -192,9 +192,9 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
 
 ```
 ### 2.6 Merge binned TF profiles with other features
-[```Accetylation_RNAseq_dat_withSeq.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq.r) files merges those selected TF profiles with other features (i.e. Acetylation ChipSeq and ATACseq)
+[```Accetylation_RNAseq_dat_withSeq.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq.r) files merges those selected TF profiles (595 columns) with other features (i.e. Acetylation ChipSeq and ATACseq). After that [```Accetylation_RNAseq_dat_withSeq_TF_specific.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq_TF_specific.r) aggregates those TF proriles columns into Gene-symbol based columns (128 columns)
 
-
+######################################
 ### 1.1.7 Bin the transcript abundance data
 
 - "transcript_fpkm" or "transcript_cov" matrices contains transcript-level fpkm or coverage values in all the samples in all the chromosomes. Hence, we can apply "AccetylationDat3.r" (may need slight modification) code for binning these datasets into chromosome-wise files.  
