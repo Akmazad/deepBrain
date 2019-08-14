@@ -191,6 +191,9 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
  message("Done",appendLF=T)
 
 ```
+### 2.6 Merge binned TF profiles with other features
+[```Accetylation_RNAseq_dat_withSeq.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq.r) files merges those selected TF profiles with other features (i.e. Acetylation ChipSeq and ATACseq)
+
 
 ### 1.1.7 Bin the transcript abundance data
 
