@@ -238,7 +238,28 @@ fwrite(rbind(pos.bins,neg.bins), file=Comb.OutputFileName, row.names=F, quote=F,
 ```
 
 #### 2.6.4 Collapsing TF profiles into TF gene-symbol
+```r
+library("data.table")
+input.pos.datFile = "H3K27ac_rnaSeq.Pos.dat"
+output.pos.datFile = "H3K27ac_rnaSeq.Pos.tfSpecific.dat"
+tfProfFile = "UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"
+selectedTFs = tf.genes.expr
+tfProf=read.csv(paste0(dataDir,tfProfFile),header=T)[,c(2,6)] # TF gene-symbol and ucsc acession number for the profile
+tfs=read.csv(paste0(dataDir,selectedTFs),header=T)
+pos.dat=fread(paste0(dataDir,input.pos.datFile), sep="\t", header=T)
+processAtf <- function(aTF,dat,tfProf){
+  print(aTF)
+  aTF.Prof = paste0(as.vector(tfProf[as.character(tfProf$Factor)==aTF,2]),".narrowPeak.overlaps.bed")
+  aTF.Prof.dat = as.data.frame(dat[,aTF.Prof])
+  agg.val =  data.frame(x1 = apply(aTF.Prof.dat[1:ncol(aTF.Prof.dat)], 1, sum))
+  colnames(agg.val)=aTF
+  agg.val= as.data.frame(ifelse(agg.val>0,1,0))
+}
+new.pos.dat = pos.dat[,c(1:9)]
+new.pos.dat = cbind(new.pos.dat, apply(as.matrix(tfs),1,FUN=function(x) processAtf(x,pos.dat,tfProf)))
+write.csv(new.pos.dat,paste0(dataDir,output.pos.datFile), row.names=F, quote=F, sep="\t")
 
+```
 
 [```Accetylation_RNAseq_dat_withSeq.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq.r) files merges those selected TF profiles (595 columns) with other features (i.e. Acetylation ChipSeq and ATACseq). After that [```Accetylation_RNAseq_dat_withSeq_TF_specific.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq_TF_specific.r) aggregates those TF proriles columns (595) into Gene-symbol based columns (128)
 
