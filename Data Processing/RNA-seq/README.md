@@ -261,7 +261,7 @@ write.csv(new.pos.dat,paste0(dataDir,output.pos.datFile), row.names=F, quote=F, 
 
 ```
 
-[```Accetylation_RNAseq_dat_withSeq.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq.r) files merges those selected TF profiles (595 columns) with other features (i.e. Acetylation ChipSeq and ATACseq). After that [```Accetylation_RNAseq_dat_withSeq_TF_specific.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq_TF_specific.r) aggregates those TF proriles columns (595) into Gene-symbol based columns (128)
+Subsections 2.6.3 and 2.6.4 are in light of [```Accetylation_RNAseq_dat_withSeq.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq.r) and [```Accetylation_RNAseq_dat_withSeq_TF_specific.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq_TF_specific.r) files, respectively.
 
 ###################################### This pipeline ends here ##############
 #### Bin the transcript abundance data
