@@ -192,6 +192,54 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
 
 ```
 ### 2.6 Merge binned TF profiles with other features
+#### 2.6.1 Read pre-made bins (fixed width) with genomic sequence
+```r
+library(data.table)
+# binFile <- 'hg19.binwise.fasta.200bp.bed' # with genome sequence
+binFile <- 'hg19_bins_200bp.bed' # without genome sequence
+```
+#### 2.6.2 Augment each TF profiles (595) with Bins
+```r
+setwd('/Volumes/Data1/PROJECTS/DeepLearning/Test/')
+bins=read.table(binFile, sep="\t", header=FALSE) # this takes a while; 15M bins to read
+colnames(bins)=c("chr", "start", "end", "id",  "strand")    # strand is artificial based on discussion
+dir <- "/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCExprMatchFiles/"
+tfProfiles <- list.files(dir,pattern="*.narrowPeak.overlaps.bed$")
+for (j in c(1:length(tfProfiles))){
+    overlaps=fread(paste0(dir,tfProfiles[j]))
+    colnames(overlaps)=c("chr", "start", "end", "id",  "strand")
+    ov=which(bins$id %in% overlaps$id); rm(overlaps)
+    binData=matrix(0, nrow=nrow(bins), ncol=1) ## one column vector for each TF profile
+    colnames(binData)=c(tfProfiles[j])
+    binData[ov,]=1
+    bins=cbind(bins, binData)
+    rm(binData)
+    print(paste0(j," is processed!"))
+}
+```
+#### 2.6.3 Generate positive data for DL training
+```r
+# ind <- 6 for bins without sequence, and all features considered for non-zero checking 
+# ind <- 7 for bins with sequence, and all features considered for non-zero checking 
+ind <- 6 
+pos.ind=which(apply(bins, 1, FUN = function(x) any(x[c(ind:ncol(bins))]==1)))
+pos.bins = bins[pos.ind,]
+neg.bins = bins[-pos.ind,]
+# equalizing sizes of positive and negative datasets (by randomly down-sampling) 
+pos.bins = if(nrow(pos.bins) > nrow(neg.bins)) pos.bins[sample(nrow(pos.bins),replace = F, nrow(neg.bins)),] else pos.bins
+neg.bins = if(nrow(neg.bins) > nrow(pos.bins)) neg.bins[sample(nrow(neg.bins),replace = F, nrow(pos.bins)),] else neg.bins
+  
+Pos.OutputFileName = "H3K27ac_rnaSeq.Pos.dat"
+Neg.OutputFileName = "H3K27ac_rnaSeq.Neg.dat"
+Comb.OutputFileName= "H3K27ac_rnaSeq.Pos.Neg.dat"
+fwrite(pos.bins, file=Pos.OutputFileName, row.names=F, quote=F, sep="\t")
+fwrite(neg.bins, file=Neg.OutputFileName, row.names=F, quote=F, sep="\t")
+fwrite(rbind(pos.bins,neg.bins), file=Comb.OutputFileName, row.names=F, quote=F, sep="\t")
+```
+
+#### 2.6.4 Collapsing TF profiles into TF gene-symbol
+
+
 [```Accetylation_RNAseq_dat_withSeq.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq.r) files merges those selected TF profiles (595 columns) with other features (i.e. Acetylation ChipSeq and ATACseq). After that [```Accetylation_RNAseq_dat_withSeq_TF_specific.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq_TF_specific.r) aggregates those TF proriles columns (595) into Gene-symbol based columns (128)
 
 ###################################### This pipeline ends here ##############
