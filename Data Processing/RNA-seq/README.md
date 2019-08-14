@@ -27,12 +27,12 @@ stringtie /Volumes/Seagate/STAR_Output/AN00493_ba41_42_22/AN00493_ba41_42_22Alig
 stringtie --merge -p 8 -G Homo_sapiens.GRCh38.94.chr.gtf -o /Volumes/Seagate/STAR_Output/stringtie_merged.gtf /Volumes/Seagate/STAR_Output/StringTieMergeList.txt
 ```
 
-### 1.1.4 Count how many transcripts?
+### 1.1.4 Count how many transcripts? [off-the-pipeline]
 ```
 cat /Volumes/Seagate/STAR_Output/stringtie_merged.gtf | grep -v "^#" | awk '$3=="transcript" {print}' | wc -l
 ```
 
-### 1.1.5 Estimate transcript abundance
+### 1.1.5 Estimate transcript abundance [off-the-pipeline]
 - Run "StringTieAbundance.sh". An examle line is as follows:
 ```
 stringtie -e -B -p 8 -G /Volumes/Seagate/STAR_Output/stringtie_merged.gtf -o /Volumes/Seagate/STAR_Output/StringTieAbundance/AN00493_ba41_42_22/AN00493_ba41_42_22.gtf /Volumes/Seagate/STAR_Output/AN00493_ba41_42_22/AN00493_ba41_42_22Aligned.out.sorted.bam
@@ -59,18 +59,13 @@ bg = ballgown(dataDir=data_directory, meas='all', samplePattern="")
 ## ----get transcript spike-in (FPKM is the value we are interested in) ---
 transcript_fpkm = texpr(bg, 'FPKM')
 ```
-### 1.1.6.2 Load UCSC TF profile find TF genes that are expressed in the RNA-seq data
+# 2: Select TFs using transcripts from Stringtie RNA-seq analysis
+### 2.1 Determine a threshold for the percentage of samples with non-zero RNA-seq samples [Side analysis]
 ```r
-## download Transcription Factor (161 distinct TF) ChIP-seq Uniform Peaks from ENCODE/Analysis (source UCSC: http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeAwgTfbsUniform)
-tf.dat <- read.csv("/Volumes/Data1/PROJECTS/DeepLearning/Test/UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv", header=F)
-tf_genes <- unique(tf.dat[,2]) ## second column contains the gene-symbol
-```
-### 1.1.6.3 Determine a threshold for the percentage of samples with non-zero RNA-seq samples
-```r
+fpkm_val_th=0.0 
 transcript_fpkm = texpr(bg, 'FPKM')
 whole_tx_table = texpr(bg, 'all')
 plot_dat<-NULL
-fpkm_val_th=0.0 ## basicaly to ignore this parameter and reuse the existing filtering-code
 for(fpkm_perc_th in seq(0.1,1,0.05)){
     filtered.row=which(rowMeans(transcript_fpkm > fpkm_val_th) >= fpkm_perc_th)
     print(length(filtered.row))
@@ -87,10 +82,10 @@ pdf("rplot.pdf")
 plot(plot_dat$fpkm_perc_th,plot_dat$nTFs))
 dev.off() 
 ```
-### 1.1.6.4 Filter the transcription matrix (percentage threshold only)
+### 2.2 Filter the transcription matrix (with val_th & perc_th)
 ```r
-fpkm_val_th=0.0
-fpkm_perc_th=0.5
+fpkm_val_th=0.0 # decided this threshold since TFs expression are very low in general
+fpkm_perc_th=0.5    # decided after "rplot.pdf" still picks as many TFs (150/161) as found in UCSC
 
 filtered.row=which(rowMeans(transcript_fpkm > fpkm_val_th) >= fpkm_perc_th)
 transcript_fpkm=transcript_fpkm[filtered.row,]
@@ -101,40 +96,16 @@ pref[,1]=paste0("chr",pref[,1])
 pref = cbind(pref, whole_tx_table[filtered.row,c(3,10)])
 colnames(pref) = c("chr","start","end","strand","gene_name")
 newMat = cbind(pref,transcript_fpkm)
-output_directory="/Volumes/Data1/PROJECTS/DeepLearning/Test"
+output_directory="/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 fwrite(pref,paste0(output_directory,"stringTie.Transcript.SpikeIns_filtered.bed"),sep="\t",quote=F,row.names=F)
 # Draw the frequency distribution of the filtered expression matrix
 pdf("FD_filtered_transcript_matrix.pdf") 
 hist(transcript_fpkm)
 dev.off() 
-#save the TF_genes in the expression data
+# save the expressed TF_genes : should be 128 TF genes
 tf.genes.expr = intersect(tf_genes,pref$gene_name)
 ```
-### 1.1.6.5 Overlap the filtered transctipts with the Bins
-```r
-bedDir="/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
-fileDir="/Volumes/Data1/PROJECTS/DeepLearning/Test"
-binFile="hg19_bins_200bp"
-overlapCutoff=0.05
-transctiptFile="stringTie.Transcript.SpikeIns_filtered"
-message(paste0("Overlapping filtered transctipts with Bin locations, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
-system2("./filteredTrascript_bins_overlap.sh",
-            paste(bedDir, 
-            fileDir, 
-            binFile, 
-            overlapCutoff,
-            transctiptFile,
-            sep=" "))
-message("Done",appendLF=T)
-## the output of this overlap is named as "stringTie.Transcript.SpikeIns_filtered.overlaps.bed", located in the "fileDir"
-```
-### 1.1.6.5.1 Further expression matrix (filtered) for only TFs that are expressed 
-```r
-tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
-tf_genes.dat.ucscAcc = tf.dat[which(tf.dat$Factor %in% tf_genes.rnaSeq$gene_name),3]    # third column holds the UCSC accession number
-
-```
-### 1.1.6.5.2 Download and extract all the TF profiles from the UCSC DCC portal
+### 2.3 Download and extract all the TF peak profiles (BED format; total 691) from the UCSC DCC portal [one-off]
 ```r
 library(RCurl)
 library(XML)
@@ -158,7 +129,8 @@ download.Save.file <- function(url,f) {
 }
 apply(as.array(allFilePaths), MARGIN = 1, FUN = function(x) download.Save.file(url,x))
 ```
-### 1.1.6.5.3 Pick the TF (expressed) profiles 
+
+### 2.4 Select peak profiles for expressed TFs (should be 595/691) 
 ```r
 lookupDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/"
 ucsc.tf.profileName=read.csv(paste0(lookupDir,"UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"),header=T)
@@ -178,7 +150,7 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
 ##library(stringr)
 ##expr.ucsc.tf.profileName=apply(as.array(tf.genes.expr),MARGIN = 1, FUN = function(x) str_detect(ucsc.tf.profileName,str_to_title(x)))
 ```
-### 1.1.6b [test analysis] intersect with TFBS locations (Encode) 
+### 2.5 Intersect Bins with selected TF peaks
 ```r
 ############## Overlap Bins with TFB locations, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
   # Step-1: create a shell script namely "tfbs_bins_overlap.sh" (see attached) within the "workingDir"
@@ -219,7 +191,47 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
  message("Done",appendLF=T)
 
 ```
-### 1.1.6b [test analysis] intersect with Enhancer locations (PsychEncode) [IGNORED]
+
+### 1.1.7 Bin the transcript abundance data
+
+- "transcript_fpkm" or "transcript_cov" matrices contains transcript-level fpkm or coverage values in all the samples in all the chromosomes. Hence, we can apply "AccetylationDat3.r" (may need slight modification) code for binning these datasets into chromosome-wise files.  
+- definition:
+    - cov: The average per-base coverage for the transcript or exon.
+    - FPKM: Fragments per kilobase of transcript per million read pairs. This is the number of pairs of reads aligning to this feature, normalized by the total number of fragments sequenced (in millions) and the length of the transcript (in kilobases).
+    - TPM: Transcripts per million. This is the number of transcripts from this particular gene normalized first by gene length, and then by sequencing depth (in millions) in the sample. A detailed explanation and a comparison of TPM and FPKM can be found here, and TPM was defined by B. Li and C. Dewey here.
+
+- [update: 14/01/2019]: Use "transcript_fpkm" metrix, and convert it into a BED file for processing with the code "Accetylation_Bedtools.r"
+
+### 1.1.6.5 Overlap the filtered transctipts with the Bins [side analysis: off-the pipeline]
+```r
+bedDir="/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
+fileDir="/Volumes/Data1/PROJECTS/DeepLearning/Test"
+binFile="hg19_bins_200bp"
+overlapCutoff=0.05
+transctiptFile="stringTie.Transcript.SpikeIns_filtered"
+message(paste0("Overlapping filtered transctipts with Bin locations, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
+system2("./filteredTrascript_bins_overlap.sh",
+            paste(bedDir, 
+            fileDir, 
+            binFile, 
+            overlapCutoff,
+            transctiptFile,
+            sep=" "))
+message("Done",appendLF=T)
+## the output of this overlap is named as "stringTie.Transcript.SpikeIns_filtered.overlaps.bed", located in the "fileDir"
+```
+### 1.1.6.5.1 Further expression matrix (filtered) for only TFs that are expressed [side analysis: off-the pipeline]
+```r
+tf_genes.rnaSeq =  newMat[which(newMat$gene_name %in% tf_genes),]
+tf_genes.dat.ucscAcc = tf.dat[which(tf.dat$Factor %in% tf_genes.rnaSeq$gene_name),3]    # third column holds the UCSC accession number
+```
+### 2.3 Load UCSC TF profile (with gene-symbol & ucsc accession number) [side analysis: off-the pipeline]
+```r
+## download [one-ff] Transcription Factor (161 distinct TF) ChIP-seq Uniform Peaks from ENCODE/Analysis (source UCSC: http://genome.ucsc.edu/cgi-bin/hgFileUi?db=hg19&g=wgEncodeAwgTfbsUniform)
+tf.dat <- read.csv("/Volumes/Data1/PROJECTS/DeepLearning/Test/UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv", header=F)
+tf_genes <- unique(tf.dat[,2]) ## second column contains the gene-symbol
+```
+### 1.1.6b [test analysis] intersect with Enhancer locations (PsychEncode) [side analysis: off-the pipeline] [IGNORED]
 ```r
 ############## Overlap StringTie features with Enhancer locations, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
   # Step-1: create a shell script namely "rnaSeqEnhancer_Bed_ShellScript.sh" (see attached) within the "workingDir"
@@ -254,13 +266,3 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
  
  message("Done",appendLF=T)
 ```
-
-### 1.1.7 Bin the transcript abundance data
-
-- "transcript_fpkm" or "transcript_cov" matrices contains transcript-level fpkm or coverage values in all the samples in all the chromosomes. Hence, we can apply "AccetylationDat3.r" (may need slight modification) code for binning these datasets into chromosome-wise files.  
-- definition:
-    - cov: The average per-base coverage for the transcript or exon.
-    - FPKM: Fragments per kilobase of transcript per million read pairs. This is the number of pairs of reads aligning to this feature, normalized by the total number of fragments sequenced (in millions) and the length of the transcript (in kilobases).
-    - TPM: Transcripts per million. This is the number of transcripts from this particular gene normalized first by gene length, and then by sequencing depth (in millions) in the sample. A detailed explanation and a comparison of TPM and FPKM can be found here, and TPM was defined by B. Li and C. Dewey here.
-
-- [update: 14/01/2019]: Use "transcript_fpkm" metrix, and convert it into a BED file for processing with the code "Accetylation_Bedtools.r"
