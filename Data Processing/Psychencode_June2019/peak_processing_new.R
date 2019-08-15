@@ -1,3 +1,6 @@
+### Author: Irina Voineagu, Assoc Professor, School of BABS, UNSW Sydney
+### Modified: AKM Azad, Postdoc, School of BABS, UNSW Sydeny
+
 
 #######################STEP1: For each sample, add a column with the sample name and one with peakCoordinate_sample
 rm(list=ls())
