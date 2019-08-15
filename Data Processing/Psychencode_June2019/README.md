@@ -4,9 +4,16 @@ In this data collection, we've gathered and preprocessed (using [```peak_process
 |Name|nSample|nPeaks|
 |---|---|---|
 |EpiMap|150|479,476|
-|HumanFC|288 samples|197,263 peaks|
+|HumanFC|288|197,263|
 
 # Method
 ## Peak filtering
-We dropped rows for which there are no more than 1 sample peaks found by using [```peak_filtering.R```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Psychencode_June2019/peak_filtering.R)) script. It outputs filtered data in BED format along with binarized peak value yielding 353.
+We dropped rows for which there are no more than 1 sample peaks found by using [```peak_filtering.R```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Psychencode_June2019/peak_filtering.R)) script. It outputs filtered data in BED format along with binarized peak value at threshold 0.
+
+|Name|nSample|nPeaks|
+|---|---|---|
+|EpiMap|150|353,566|
+|HumanFC|288|118,347|
+
+This filtered peak matrices can be augmented with TF features sets using [```Merge_binned_TF_profiles_with_other_features.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/Merge_binned_TF_profiles_with_other_features.sh) script on Raijin *hugemem* queue.
 # Result
