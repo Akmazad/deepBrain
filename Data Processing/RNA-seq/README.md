@@ -192,6 +192,7 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
 
 ```
 ### 2.6 Merge binned TF profiles with other features
+This section causes following error on RNA machine (@Irina's Lab). So, please run "
 #### 2.6.1 Read pre-made bins (fixed width) with genomic sequence
 ```r
 library(data.table)
@@ -202,7 +203,7 @@ binFile <- 'hg19_bins_200bp.bed' # without genome sequence
 ```r
 setwd('/Volumes/Data1/PROJECTS/DeepLearning/Test/')
 bins=read.table(binFile, sep="\t", header=FALSE) # this takes a while; 15M bins to read
-binIDs=bins[,4]   # save only binIDS
+binIDs=as.data.frame(bins[,4])   # save only binIDS
 rm(bins)
 colnames(binIDs)=c("id")    # strand is artificial based on discussion
 dir <- "/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCExprMatchFiles/"
@@ -224,12 +225,12 @@ for (j in c(1:length(tfProfiles))){
 # ind <- 6 for bins without sequence, and all features considered for non-zero checking 
 # ind <- 7 for bins with sequence, and all features considered for non-zero checking 
 ind <- 6 
-pos.ind=which(apply(bins, 1, FUN = function(x) any(x[c(ind:ncol(bins))]==1)))
+pos.ind=which(apply(binIDs, 1, FUN = function(x) any(x[c(ind:ncol(binIDs))]==1)))
 pos.bins = bins[pos.ind,]
-neg.bins = bins[-pos.ind,]
-# equalizing sizes of positive and negative datasets (by randomly down-sampling) 
-pos.bins = if(nrow(pos.bins) > nrow(neg.bins)) pos.bins[sample(nrow(pos.bins),replace = F, nrow(neg.bins)),] else pos.bins
-neg.bins = if(nrow(neg.bins) > nrow(pos.bins)) neg.bins[sample(nrow(neg.bins),replace = F, nrow(pos.bins)),] else neg.bins
+neg.bins = bins[-pos.ind,]; rm(pos.ind)
+## equalizing sizes of positive and negative datasets (by randomly down-sampling) 
+#pos.bins = if(nrow(pos.bins) > nrow(neg.bins)) pos.bins[sample(nrow(pos.bins),replace = F, nrow(neg.bins)),] else pos.bins
+#neg.bins = if(nrow(neg.bins) > nrow(pos.bins)) neg.bins[sample(nrow(neg.bins),replace = F, nrow(pos.bins)),] else neg.bins
   
 Pos.OutputFileName = "H3K27ac_rnaSeq.Pos.dat"
 Neg.OutputFileName = "H3K27ac_rnaSeq.Neg.dat"
@@ -237,18 +238,19 @@ Comb.OutputFileName= "H3K27ac_rnaSeq.Pos.Neg.dat"
 fwrite(pos.bins, file=Pos.OutputFileName, row.names=F, quote=F, sep="\t")
 fwrite(neg.bins, file=Neg.OutputFileName, row.names=F, quote=F, sep="\t")
 fwrite(rbind(pos.bins,neg.bins), file=Comb.OutputFileName, row.names=F, quote=F, sep="\t")
+rm(neg.bins)
 ```
 
 #### 2.6.4 Collapsing TF profiles into TF gene-symbol
 ```r
 library("data.table")
-input.pos.datFile = "H3K27ac_rnaSeq.Pos.dat"
+#input.pos.datFile = "H3K27ac_rnaSeq.Pos.dat"
 output.pos.datFile = "H3K27ac_rnaSeq.Pos.tfSpecific.dat"
 tfProfFile = "UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"
-selectedTFs = tf.genes.expr
-tfProf=read.csv(paste0(dataDir,tfProfFile),header=T)[,c(2,6)] # TF gene-symbol and ucsc acession number for the profile
-tfs=read.csv(paste0(dataDir,selectedTFs),header=T)
-pos.dat=fread(paste0(dataDir,input.pos.datFile), sep="\t", header=T)
+#selectedTFs = tf.genes.expr
+tfProf = read.csv(paste0(dataDir,tfProfFile),header=T)[,c(2,6)] # TF gene-symbol and ucsc acession number for the profile
+tfs = tf.genes.expr
+pos.dat = pos.bins
 processAtf <- function(aTF,dat,tfProf){
   print(aTF)
   aTF.Prof = paste0(as.vector(tfProf[as.character(tfProf$Factor)==aTF,2]),".narrowPeak.overlaps.bed")
