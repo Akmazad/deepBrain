@@ -1,6 +1,7 @@
 # Data preprocessing for Deep learning training by analysing RNA-seq, CHIP-seq, ATAC-seq, and TF info (from UCSC-DCC)
+Our pipeline considers only those chromosomal bins for DL training that has at least one TF features activated. Hence, we first constructed bins with at least one TF signal found, and after that augmented other features from e.g. EpiMap, HumanFC, or other sources.
 ## 1.1 StringTie 
-A unix-based tool for finding expressed transcriptomic, exonic, and intronic chromosomal regions in the RNA-seq data
+To get TFs that are expressed in brain tissue, we've analysed RNA-seq data (Sun *et al.*) using Stringtie. Its a unix-based tool for finding expressed transcriptomic, exonic, and intronic chromosomal regions in the RNA-seq data.
 
 ### 1.1.1 Installation:
 ```
