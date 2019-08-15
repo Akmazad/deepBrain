@@ -221,37 +221,17 @@ for (j in c(1:length(tfProfiles))){
     print(paste0(j," is processed!"))
 }
 ```
-#### 2.6.3 Generate positive data for DL training
+#### 2.6.3 Get non-Zero data for DL training
 ```r
-# ind <- 6 for bins without sequence, and all features considered for non-zero checking 
-# ind <- 7 for bins with sequence, and all features considered for non-zero checking 
-ind <- 6 
-pos.ind=which(apply(binIDs, 1, FUN = function(x) any(x[c(ind:ncol(binIDs))]==1)))
-pos.bins = bins[pos.ind,]
-neg.bins = bins[-pos.ind,]; rm(pos.ind)
-## equalizing sizes of positive and negative datasets (by randomly down-sampling) 
-#pos.bins = if(nrow(pos.bins) > nrow(neg.bins)) pos.bins[sample(nrow(pos.bins),replace = F, nrow(neg.bins)),] else pos.bins
-#neg.bins = if(nrow(neg.bins) > nrow(pos.bins)) neg.bins[sample(nrow(neg.bins),replace = F, nrow(pos.bins)),] else neg.bins
-  
-Pos.OutputFileName = "H3K27ac_rnaSeq.Pos.dat"
-Neg.OutputFileName = "H3K27ac_rnaSeq.Neg.dat"
-Comb.OutputFileName= "H3K27ac_rnaSeq.Pos.Neg.dat"
-fwrite(pos.bins, file=Pos.OutputFileName, row.names=F, quote=F, sep="\t")
-fwrite(neg.bins, file=Neg.OutputFileName, row.names=F, quote=F, sep="\t")
-fwrite(rbind(pos.bins,neg.bins), file=Comb.OutputFileName, row.names=F, quote=F, sep="\t")
-rm(neg.bins)
+ind <- 2 
+nonZero.ind=which(apply(binIDs, 1, FUN = function(x) any(x[c(ind:ncol(binIDs))]==1)))
+nonZero.bins = binIDs[nonZero.ind,]; rm(nonZero.ind)
 ```
 
-#### 2.6.4 Collapsing TF profiles into TF gene-symbol
+#### 2.6.4 Collapsing TF profiles into TF gene-symbol and generate Positive data (!)
 ```r
-library("data.table")
-#input.pos.datFile = "H3K27ac_rnaSeq.Pos.dat"
-output.pos.datFile = "H3K27ac_rnaSeq.Pos.tfSpecific.dat"
 tfProfFile = "UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"
-#selectedTFs = tf.genes.expr
-tfProf = read.csv(paste0(dataDir,tfProfFile),header=T)[,c(2,6)] # TF gene-symbol and ucsc acession number for the profile
-tfs = tf.genes.expr
-pos.dat = pos.bins
+tfs = read.csv("tf.genes.expr_0.5_perc.csv", header = F)  #128 TF genes were saved locally 
 processAtf <- function(aTF,dat,tfProf){
   print(aTF)
   aTF.Prof = paste0(as.vector(tfProf[as.character(tfProf$Factor)==aTF,2]),".narrowPeak.overlaps.bed")
@@ -260,10 +240,14 @@ processAtf <- function(aTF,dat,tfProf){
   colnames(agg.val)=aTF
   agg.val= as.data.frame(ifelse(agg.val>0,1,0))
 }
-new.pos.dat = pos.dat[,c(1:9)]
-new.pos.dat = cbind(new.pos.dat, apply(as.matrix(tfs),1,FUN=function(x) processAtf(x,pos.dat,tfProf)))
-write.csv(new.pos.dat,paste0(dataDir,output.pos.datFile), row.names=F, quote=F, sep="\t")
+nonZero.tf.dat = nonZero.bins[,1] # take the binID as the first column
+nonZero.tf.dat = cbind(nonZero.tf.dat, apply(as.matrix(tfs),1,FUN=function(x) processAtf(x,nonZero.bins,tfProf)))
 
+ind <- 2
+pos.ind = which(apply(nonZero.tf.dat, 1, FUN = function(x) any(x[c(ind:ncol(nonZero.tf.dat))]==1)))
+pos.dat = nonZero.tf.dat[pos.ind,]; rm(pos.ind)
+fwrite(pos.dat, "pos.dat.TFonly.dat", row.names = F, quote = F, sep = "\t")
+rm(pos.dat)
 ```
 
 Subsections 2.6.3 and 2.6.4 are in light of [```Accetylation_RNAseq_dat_withSeq.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq.r) and [```Accetylation_RNAseq_dat_withSeq_TF_specific.r```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Accetylation_RNAseq_dat_withSeq_TF_specific.r) files, respectively.
