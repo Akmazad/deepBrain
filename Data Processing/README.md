@@ -1,4 +1,4 @@
-# 1: Identify chromosomal regions (bins) with TFs that are expressed in Brain-tissue by analysig RNA-seq data
+# Data preprocessing for Deep learning training by analysing RNA-seq, CHIP-seq, ATAC-seq, and TF info (from UCSC-DCC)
 ## 1.1 StringTie 
 A unix-based tool for finding expressed transcriptomic, exonic, and intronic chromosomal regions in the RNA-seq data
 
