@@ -5,4 +5,6 @@ In this data collection, we've gathered and preprocessed (using [```peak_process
  - HumanFC: 288 samples; 197,263 peaks
 
 # Method
+## Peak filtering
+We dropped rows for which there are no more than 1 sample peaks found by using [```peak_filtering.R```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Psychencode_June2019/peak_filtering.R)) script.
 # Result
