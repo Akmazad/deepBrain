@@ -1,4 +1,4 @@
-# 1: Preparing RNA-seq data from Brain tissue for Deep learning applications
+# 1: Identify chromosomal regions (bins) with TFs that are expressed in Brain-tissue by analysig RNA-seq data
 ## 1.1 StringTie 
 A unix-based tool for finding expressed transcriptomic, exonic, and intronic chromosomal regions in the RNA-seq data
 
