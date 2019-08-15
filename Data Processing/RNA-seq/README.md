@@ -202,17 +202,19 @@ binFile <- 'hg19_bins_200bp.bed' # without genome sequence
 ```r
 setwd('/Volumes/Data1/PROJECTS/DeepLearning/Test/')
 bins=read.table(binFile, sep="\t", header=FALSE) # this takes a while; 15M bins to read
-colnames(bins)=c("chr", "start", "end", "id",  "strand")    # strand is artificial based on discussion
+binIDs=bins[,4]   # save only binIDS
+rm(bins)
+colnames(binIDs)=c("id")    # strand is artificial based on discussion
 dir <- "/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCExprMatchFiles/"
 tfProfiles <- list.files(dir,pattern="*.narrowPeak.overlaps.bed$")
 for (j in c(1:length(tfProfiles))){
     overlaps=fread(paste0(dir,tfProfiles[j]))
     colnames(overlaps)=c("chr", "start", "end", "id",  "strand")
-    ov=which(bins$id %in% overlaps$id); rm(overlaps)
-    binData=matrix(0, nrow=nrow(bins), ncol=1) ## one column vector for each TF profile
+    ov=which(binIDs$id %in% overlaps$id); rm(overlaps)
+    binData=matrix(0, nrow=nrow(binIDs), ncol=1) ## one column vector for each TF profile
     colnames(binData)=c(tfProfiles[j])
     binData[ov,]=1
-    bins=cbind(bins, binData)
+    binIDs=cbind(binIDs, binData)
     rm(binData)
     print(paste0(j," is processed!"))
 }
