@@ -192,7 +192,8 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
 
 ```
 ### 2.6 Merge binned TF profiles with other features
-This section causes following error on RNA machine (@Irina's Lab). So, please run "
+This section causes **Error: vector memory exhausted (limit reached?)** error on RNA machine (@Irina's Lab). So, please run [```Merge_binned_TF_profiles_with_other_features.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/Merge_binned_TF_profiles_with_other_features.sh) on Raijin *hugemem* queue.
+
 #### 2.6.1 Read pre-made bins (fixed width) with genomic sequence
 ```r
 library(data.table)
