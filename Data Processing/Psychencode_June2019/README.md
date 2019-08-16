@@ -20,8 +20,12 @@ This filtered peak matrices can be augmented with TF features sets using [```Mer
 ## Bin overlapping
 Next, we need to intersect each peaks with chromosomal bins of fixed-width. Following commands were used to get it done.
 
+```shell
+intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b mergedPeakHeightMatrix_Hum                                               anFC_filtered.bed > mergedPeakHeightMatr.overlaps.bed
+intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b mergedPeakHeightMatrix_EpiMap_filtered.bed > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.bed
+```
 ```awk
-awk '{$5=$6=$7=$8=$9=$298=""; print $0}' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.bed > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.bed
+awk '{$5=$6=$7=$8=$9=$298=""; print $0}' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.bed > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.bed
 awk '{$5=$6=$7=$8=$9=$298=""; print $0}' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.bed > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.bed
 ```
 # Result
