@@ -18,13 +18,13 @@ We dropped rows for which there are no more than 1 sample peaks found by using [
 This filtered peak matrices can be augmented with TF features sets using [```Merge_binned_TF_profiles_with_other_features.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/Merge_binned_TF_profiles_with_other_features.sh) script on Raijin *hugemem* queue.
 
 ## Bin overlapping
-### Post-processing
-- Next, we need to intersect each peaks with chromosomal bins of fixed-width. Following commands were used to get it done.
+Next, we need to intersect each peaks with chromosomal bins of fixed-width. Following commands were used to get it done.
 
 ```sh
 intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b mergedPeakHeightMatrix_HumanFC_filtered.bed > mergedPeakHeightMatr.overlaps.bed
 intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b mergedPeakHeightMatrix_EpiMap_filtered.bed > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.bed
 ```
+## Post-processing
 - We need to drop few information that aren't relevant (comes from peaks' binIDs after [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)).
 ```sh
 cut -f1-4,10-297 mergedPeakHeightMatrix_HumanFC_filtered.overlaps.bed > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.bed
