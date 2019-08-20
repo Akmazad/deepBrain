@@ -221,6 +221,7 @@ for (j in c(1:length(tfProfiles))){
     rm(binData)
     print(paste0(j," is processed!"))
 }
+save(binIDs, file="binIDs_TFs_200bp.rda")
 ```
 #### 2.6.3 Get non-Zero data for DL training
 ```r
