@@ -41,7 +41,7 @@ sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.bed > me
 
 
 ################## End of Pipeline ##############
-Few commands used for intermmediate sanity checks:
+1) Few commands used for intermmediate sanity checks:
 - counts number of unique binIDs in file:
 ```sh
 cut -f 4 mergedPeakHeightMatrix_HumanFC_filtered.overlaps.bed | sort | uniq | wc -l
