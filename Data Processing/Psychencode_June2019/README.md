@@ -36,3 +36,13 @@ sed 's/\./0/g' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.bed > mer
 sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.bed > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.bed
 ```
 # Result
+
+
+
+
+################## End of Pipeline ##############
+Few commands used for intermmediate sanity checks:
+- counts number of unique binIDs in file:
+```sh
+cut -f 4 mergedPeakHeightMatrix_HumanFC_filtered.overlaps.bed | sort | uniq | wc -l
+```
