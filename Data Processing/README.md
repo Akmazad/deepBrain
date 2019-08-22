@@ -151,45 +151,113 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
 ##library(stringr)
 ##expr.ucsc.tf.profileName=apply(as.array(tf.genes.expr),MARGIN = 1, FUN = function(x) str_detect(ucsc.tf.profileName,str_to_title(x)))
 ```
-### 2.5 Intersect Bins with selected TF peaks
-```r
-############## Overlap Bins with TFB locations, with a min of 5% overlap ; done in shell using bedTools (can be embeded in R)
-  # Step-1: create a shell script namely "tfbs_bins_overlap.sh" (see attached) within the "workingDir"
-  # Step-2: register that script for running with appropriate permission under UNIX using "chmod u+x tfbs_bins_overlap.sh"
-  # Step-3: Put following commands for Bedtools in that shell script which assumes the arguments should be passed from R
-  
-  ##### "tfbs_bins_overlap.sh" ########
-  ## #!/bin/bash
-  ## bedDir=$1
-  ## fileDir=$2
-  ## bins=$3/$4
-  ## overlapCutof=$(echo $5| bc)
-  ## for tfFile in "$fileDir"/*.narrowPeak
-  ## do
-    ## $bedDir/intersectBed -u -f $overlapCutof -a $bins.bed -b $tfFile > $tfFile.overlaps.bed
-    ## filename="${tfFile##*/}"
-    ## echo "$filename: [DONE]"
-  ## done
 
-  
-  # Step-4: use system2 R function to run this script with arguments passed for the shell script
-  bedDir="/Volumes/MacintoshHD_RNA/Users/rna/PROGRAMS/bedtools2/bin"
-  fileDir="/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCExprMatchFiles"
-  binFileDir="/Volumes/Data1/PROJECTS/DeepLearning/Test"
-  binFile="hg19_bins_200bp"
-  overlapCutoff=0.05
-  
-  message(paste0("Overlapping tf locations with Bin locations, with a min of ",overlapCutoff*100, "% overlap: "),appendLF=F)
-  system2("./tfbs_bins_overlap.sh",
-            paste(bedDir, 
-            fileDir, 
-            binFileDir, 
-            binFile, 
-            overlapCutoff,
-            sep=" "))
-  # this will create Three overlap bed files
- 
- message("Done",appendLF=T)
+### 2.5 Merge all TF peak profiles into a single matrix
+This section is influenced by [```peak_processing_new.R```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Psychencode_June2019/peak_processing_new.R) code with necessary modifications.
+#### 2.5.1 For each sample, add a column with the sample name and one with peakCoordinate_sample
+```r
+setwd('/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCExprMatchFiles/')
+files <- list.files(getwd(),pattern="*.narrowPeak$")
+for (j in c(1:length(files)))
+{
+  data=read.table(as.character(files[j]), sep="\t", header=FALSE)
+  sample=gsub(".narrowPeak", "", files[j])
+  data=cbind(data,sample,paste(data[,1],data[,2],data[,3], sample, sep="_"))
+  write.table(data, paste0(files[j],".sampleID.bed"), sep="\t", col.names=FALSE, row.names=FALSE, quote=FALSE)
+  print(j)
+}
+```
+#### 2.5.2 Merge peaks using BEDTOOLS
+```sh
+cd /Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCExprMatchFiles/
+outdir=/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCC_PeakProccessedData/
+# concatenate all peak files in one; runtime 3min
+cat *.sampleID.bed >> $outdir/allPeaks.sampleID.bed
+# sort and merge peaks (mergebed requires sorted input)
+sortbed -i $outdir/allPeaks.sampleID.bed > $outdir/allPeaks.sampleID.sorted.bed
+mergebed -c 12 -o collapse -i $outdir/allPeaks.sampleID.sorted.bed > $outdir/allPeaks.sampleID.merged.bed
+# wc -l $outdir/allPeaks.sampleID.merged.bed
+#725276
+```
+#### 2.5.3 Generate a data matrix with peak height info for merged peaks
+```r
+library(tidyr)
+library(dplyr)
+library(data.table)
+rm(list=ls())
+setwd('/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCExprMatchFiles/')
+merged=read.table("/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCC_PeakProccessedData/allPeaks.sampleID.merged.bed", sep="\t")
+files <- list.files(getwd(),pattern="*.narrowPeak$")
+# uncollapse merged peak table to one entry per row
+merged$V4=as.character(merged$V4)
+merged_uncollapsed= merged %>% unnest(V4 = strsplit(V4, ","))
+dim(merged_uncollapsed)
+#[1] 11881686        4
+# remove duplicate rows. not sure why they exist
+merged_uncollapsed=distinct(merged_uncollapsed)
+dim(merged_uncollapsed)
+#[1] 11795482        4
+
+# split column 4 into initialPeakID and sample name and add a mergedPeakID
+initialPeakInfo=transpose(strsplit(merged_uncollapsed$V4, "_"))
+merged_uncollapsed=cbind(merged_uncollapsed, 
+                         paste(merged_uncollapsed$V1, merged_uncollapsed$V2, merged_uncollapsed$V3, sep="_"),
+                         paste(initialPeakInfo[[1]], initialPeakInfo[[2]], initialPeakInfo[[3]], sep="_"),
+                         initialPeakInfo[[4]])
+colnames(merged_uncollapsed)=c("chr", "start", "end", "initialPeakID_Sample", "mergedPeakID", "initialPeakID", "Sample")
+peaks=matrix(NA, nrow=length(unique(merged_uncollapsed$mergedPeakID)), ncol=length(files))
+rownames(peaks)=unique(merged_uncollapsed$mergedPeakID)
+colnames(peaks)=as.character(gsub(".narrowPeak", "", files))
+# specify peakHeight column from the initial peak files (can differ between datasets), as well as initialPeak_SampleCol and sampleCol  (which were created in step 1).
+peakHeightCol=7
+sampleCol=11  
+initialPeak_SampleCol=12  
+for (j in c(1:length(files)))
+{ # read in peak height data
+  data=read.table(paste0(as.character(files[j]), ".sampleID.bed"), sep="\t", header=FALSE)
+  # subset merged peaks by those with contributing peaks from sample j
+  use_peaks=merged_uncollapsed[which(merged_uncollapsed$Sample%in%data[,sampleCol]),]
+  use_peaks$peakHeight=data[match(use_peaks$initialPeakID_Sample, data[,initialPeak_SampleCol]), peakHeightCol]
+  # sum all peaks from sampleJ by merged peak coordinates
+  peak_sum=aggregate(use_peaks$peakHeight, by=as.data.frame(use_peaks$mergedPeakID), FUN="sum")
+  # add data to the matrix            
+  s=which(colnames(peaks)%in% as.character(data[, sampleCol]))
+  p=match(rownames(peaks), peak_sum[,1])
+  peaks[,s]=peak_sum[p,2]
+  print(j)
+}
+save(peaks,file= "/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCC_PeakProccessedData/mergedPeakHeightMatrix_ENCODE_DCC_TFs.rda")
+
+# Peak filtering (from peak_filtering.R)
+outdir <- "/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCC_PeakProccessedData/"
+filename <- "mergedPeakHeightMatrix_EncodeDCC_TFs"
+val_th <- 0 # can be decided later
+new_peaks <- ifelse(peaks>val_th, 1, 0)
+rm(peaks)
+new_peaks <- ifelse(!is.na(new_peaks), 1, 0) # replacing NAs with 0
+binInfo <- as.data.frame(do.call(rbind,strsplit(rownames(new_peaks), "_")))
+final.dat <- cbind(binInfo, rownames(new_peaks), new_peaks)
+colnames(final.dat) <- c("chr","start","end", "id", colnames(new_peaks))
+fwrite(final.dat, paste0(outdir, filename, "_binarized.BED"), row.names = F, quote = F, sep = "\t")
+```
+#### 2.5.4 convert it TF gene-symbol based matrix
+```r
+setwd('/Volumes/Data1/PROJECTS/DeepLearning/Test/')
+tfProfFile = "UCSC_Encode_wgEncodeAwgTfbsUniform_metadata_690_TF_profiles.csv"
+tfProf <- read.csv(tfProfFile, header = T)[,c(2,6)]
+tfs = read.csv("tf.genes.expr_0.5_perc.csv", header = T) 
+processAtf <- function(aTF,dat,tfProf){
+  print(aTF)
+  aTF.Prof = as.vector(tfProf[as.character(tfProf$Factor)==aTF,2])
+  aTF.Prof.dat = as.data.frame(dat[,aTF.Prof])
+  agg.val <- data.frame(x1 = rowSums2(as.matrix(aTF.Prof.dat)))
+  colnames(agg.val)=aTF
+  agg.val= as.data.frame(ifelse(agg.val>0,1,0))
+  return(agg.val)
+}
+temp <- apply(as.matrix(tfs),1,FUN=function(x) processAtf(x,final.dat,tfProf)) %>% as.data.frame()
+final.dat.tf <- cbind(final.dat[,1:4], temp) 
+colnames(final.dat.tf) <- c("chr", "start", "end", "id", colnames(temp))
+fwrite(final.dat.tf,file = "final.dat.tf", sep="\t", row.names=F, quote=F)
 
 ```
-### 2.6 Merge binned TF profiles with other features
