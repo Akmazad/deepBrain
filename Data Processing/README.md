@@ -259,5 +259,10 @@ temp <- apply(as.matrix(tfs),1,FUN=function(x) processAtf(x,final.dat,tfProf)) %
 final.dat.tf <- cbind(final.dat[,1:4], temp) 
 colnames(final.dat.tf) <- c("chr", "start", "end", "id", colnames(temp))
 fwrite(final.dat.tf,file = "final.dat.tf", sep="\t", row.names=F, quote=F)
-
+```
+### 2.6 Intersect TF peak BED (gene-symbol based) with genomic Bins and post-process
+This subsection follows similar steps as in [```Psychencode data```](https://github.com/Akmazad/deepBrain/tree/master/Data%20Processing/Psychencode_June2019#bin-overlapping).
+```sh
+intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b final.dat.tf > final.dat.tf.overlaps.bed
+cut -f1-4,10-138 final.dat.tf.overlaps.bed > final.dat.tf.overlaps.dropped.bed
 ```
