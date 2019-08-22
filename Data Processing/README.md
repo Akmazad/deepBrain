@@ -265,4 +265,5 @@ This subsection follows similar steps as in [```Psychencode data```](https://git
 ```sh
 intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b final.dat.tf > final.dat.tf.overlaps.bed
 cut -f1-4,10-138 final.dat.tf.overlaps.bed > final.dat.tf.overlaps.dropped.bed
+sed 's/\./0/g' final.dat.tf.overlaps.dropped.bed > final.dat.tf.overlaps.dropped.fixed.bed
 ```
