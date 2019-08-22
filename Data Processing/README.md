@@ -153,7 +153,7 @@ file.copy(paste0(oldDir,expr.ucsc.tf.profileName), newDir)
 ```
 
 ### 2.5 Merge all TF peak profiles into a single matrix
-This section is influenced by [```peak_processing_new.R```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Psychencode_June2019/peak_processing_new.R) code with necessary modifications.
+This section (from 2.5.1 - 2.5.3) is a slightly modified version of [```peak_processing_new.R```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Psychencode_June2019/peak_processing_new.R) code with necessary modifications.
 #### 2.5.1 For each sample, add a column with the sample name and one with peakCoordinate_sample
 ```r
 setwd('/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCCExprMatchFiles/')
