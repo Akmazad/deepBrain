@@ -30,12 +30,33 @@ intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b mergedPeakHeightMatrix_EpiMa
 cut -f1-4,10-298 mergedPeakHeightMatrix_HumanFC_filtered.overlaps.bed > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.bed
 cut -f1-4,10-160 mergedPeakHeightMatrix_EpiMap_filtered.overlaps.bed > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.bed
 ```
-- For the same bin that overlaps with multiple peak vectors, we should chose the one with max overlap, i.e. the last column indicates overlap ammount after running [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)). This subsection follows similar steps in [```TF processing pipeline```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/README.md#27-filter-similar-overlapping-bins-with-the-max-overlap-size-last-column)
+- For the same bin that overlaps with multiple peak vectors, we should chose the one with max overlap, i.e. the last column indicates overlap ammount after running [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)). This subsection follows similar steps in [```TF processing pipeline```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/README.md#27-filter-similar-overlapping-bins-with-the-max-overlap-size-last-column). But the codes are copied here though.
+```r
+# for HumanFC
+# read the header (i.e. sample names)
+con <- file("mergedPeakHeightMatrix_HumanFC_filtered.bed","r")
+header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
+close(con)
+dat <- fread("mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.bed", sep="\t", header=F)
+dat <- dat %>% group_by(V4) %>% slice(which.max(V293)) %>% select(-c(V293))
+colnames(dat) <- header
+fwrite(dat, file="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.dat", sep="\t")
+
+# for EpiMap
+# read the header (i.e. sample names)
+con <- file("mergedPeakHeightMatrix_EpiMap_filtered.bed","r")
+header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
+close(con)
+dat <- fread("mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.bed", sep="\t", header=F)
+dat <- dat %>% group_by(V4) %>% slice(which.max(V155)) %>% select(-c(V155))
+colnames(dat) <- header
+fwrite(dat, file="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.dat", sep="\t")
+```
 
 - Replace all the dots (comes from the [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)) when no matches are found.
 ```sh
-sed 's/\./0/g' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.bed > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.bed
-sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.bed > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.bed
+sed 's/\./0/g' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.dat > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.fixed.dat
+sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.dat > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.fixed.dat
 ```
 # Result
 
