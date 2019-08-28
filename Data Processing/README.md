@@ -271,7 +271,7 @@ sed 's/\./0/g' final.dat.tf.overlaps.dropped.bed > final.dat.tf.overlaps.dropped
 This subsection ensures each bin in the file is unique by filtering them with maximum overlap among similar bins. 
 ```r
 con <- file("final.dat.tf","r")
-header <- readLines(con,n=1) %>% strsplit("\t") %>% as.vector()
+header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
 close(con)
 dat <- fread("final.dat.tf.overlaps.dropped.fixed.bed", sep="\t", header=F)
 dat <- dat %>% group_by(V4) %>% slice(which.max(V133)) %>% select(-c(V133))
