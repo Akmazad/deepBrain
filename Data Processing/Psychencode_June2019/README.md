@@ -32,6 +32,8 @@ cut -f1-4,10-160 mergedPeakHeightMatrix_EpiMap_filtered.overlaps.bed > mergedPea
 ```
 - For the same bin that overlaps with multiple peak vectors, we should chose the one with max overlap, i.e. the last column indicates overlap ammount after running [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)). This subsection follows similar steps in [```TF processing pipeline```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/README.md#27-filter-similar-overlapping-bins-with-the-max-overlap-size-last-column). But the codes are copied here though.
 ```r
+library(dplyr)
+library(data.table)
 # for HumanFC
 # read the header (i.e. sample names)
 con <- file("mergedPeakHeightMatrix_HumanFC_filtered.bed","r")
