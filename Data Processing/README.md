@@ -268,6 +268,7 @@ cut -f1-4,10-138 final.dat.tf.overlaps.bed > final.dat.tf.overlaps.dropped.bed
 sed 's/\./0/g' final.dat.tf.overlaps.dropped.bed > final.dat.tf.overlaps.dropped.fixed.bed
 ```
 ### 2.7 Filter similar overlapping bins with the max overlap size (last column)
+This subsection ensures each bin in the file is unique by filtering them with maximum overlap among similar bins. 
 ```r
 con <- file("final.dat.tf","r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% as.vector()
