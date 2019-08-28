@@ -270,6 +270,8 @@ sed 's/\./0/g' final.dat.tf.overlaps.dropped.bed > final.dat.tf.overlaps.dropped
 ### 2.7 Filter similar overlapping bins with the max overlap size (last column)
 This subsection ensures each bin in the file is unique by filtering them with maximum overlap among similar bins. 
 ```r
+library(dplyr)
+library(data.table)
 # get the file header (i.e. TF gene symbols)
 con <- file("final.dat.tf","r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
