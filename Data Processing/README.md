@@ -267,3 +267,13 @@ intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b final.dat.tf > final.dat.tf.
 cut -f1-4,10-138 final.dat.tf.overlaps.bed > final.dat.tf.overlaps.dropped.bed
 sed 's/\./0/g' final.dat.tf.overlaps.dropped.bed > final.dat.tf.overlaps.dropped.fixed.bed
 ```
+### 2.7 Filter similar overlapping bins with the max overlap size (last column)
+```r
+con <- file("final.dat.tf","r")
+header <- readLines(con,n=1) %>% strsplit("\t") %>% as.vector()
+close(con)
+dat <- fread("final.dat.tf.overlaps.dropped.fixed.bed", sep="\t", header=F)
+dat <- dat %>% group_by(V4) %>% slice(which.max(V133)) %>% select(-c(V133))
+colnames(dat) <- header
+fwrite(dat, file="final.dat.tf.overlaps.dropped.fixed.filtered.dat", sep="\t")
+```
