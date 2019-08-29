@@ -74,6 +74,14 @@ fwrite(dat, file="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filter
 sed 's/\./0/g' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.dat > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.dat
 sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.dat > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.dat
 ```
+
+## Sorting bins
+This subsection sorts bins (they are in BED format) by chromosome then by start position (same as [```this subsection```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/README.md#28-sorting-bins)).
+```sh
+sort -k 1,1 -k2,2n mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.dat > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat
+sort -k 1,1 -k2,2n mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.dat > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat
+```
+
 # Result
 
 
