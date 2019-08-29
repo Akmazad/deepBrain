@@ -19,7 +19,7 @@ Fastq files were first processed with cut-adaptor (version 1.2.0) to remove low 
 Then Bedtools were used to combine all bed files
 
 The table below shows the number of samples per study selected from PsychEncode Consortium:
-
+[TBD: from Jerry's Email]
 
 ## Peak filtering
 We dropped rows for which there are no more than 1 sample peaks found by using [```peak_filtering.R```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Psychencode_June2019/peak_filtering.R)) script. It outputs filtered data in BED format along with binarized peak value at threshold 0.
