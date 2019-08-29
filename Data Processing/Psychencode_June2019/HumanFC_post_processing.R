@@ -2,7 +2,7 @@ library(dplyr)
 library(data.table)
 # for HumanFC
 # read the header (i.e. sample names)
-setwd("/short/yr31/aa7970/azData/DeepBrain/Data/")
+setwd("/srv/scratch/z3526914/DeepBrain/Data/")
 con <- file("mergedPeakHeightMatrix_HumanFC_filtered.bed","r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
 close(con)
