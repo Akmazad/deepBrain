@@ -81,13 +81,13 @@ This subsection sorts bins (they are in BED format) by chromosome then by start 
 sort -k 1,1 -k2,2n mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.dat > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat
 sort -k 1,1 -k2,2n mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.dat > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat
 ```
+################## End of data-processing Pipeline ##############
 
 # Result
 
 
 
 
-################## End of Pipeline ##############
 1) Few commands used for intermmediate sanity checks:
 - counts number of unique binIDs in file:
 ```sh
