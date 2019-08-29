@@ -71,7 +71,11 @@ sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered
 ```sh
 cut -f 4 mergedPeakHeightMatrix_HumanFC_filtered.overlaps.bed | sort | uniq | wc -l
 ```
-- print lines where a string 'e+' (scientific notation) appears in the 4th column of a file:
+- print lines in a file where a string 'e+' (scientific notation) appears in the 4th column of a file:
 ```sh
 awk '$4 ~ /e+/ { print }' final.dat.tf.overlaps.dropped.fixed.filtered.dat > freq.tf.bed
+```
+- count the number of times a word 'e+' apprears in the whole file
+```sh
+grep -o 'e+' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.fixed.dat | wc -l
 ```
