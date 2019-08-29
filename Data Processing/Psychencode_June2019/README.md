@@ -35,6 +35,7 @@ cut -f1-4,10-160 mergedPeakHeightMatrix_EpiMap_filtered.overlaps.bed > mergedPea
 library(dplyr)
 library(data.table)
 # for HumanFC
+# NOTE: THIS SCRIPT FOR HUMANFC IS EXHAUSTING RNA MACHINE'S MEMORY: RAIJIN IS APPLIED ([```HumanFC_post_processing.sh```]())
 # read the header (i.e. sample names)
 con <- file("mergedPeakHeightMatrix_HumanFC_filtered.bed","r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
