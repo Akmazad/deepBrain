@@ -7,6 +7,20 @@ In this data collection, we've gathered and preprocessed (using [```peak_process
 |HumanFC|288|197,263|
 
 # Method
+## Data Collection [Contributor: Jerry Offor]
+EpiMap and HumanFC studies were download from the PsychEncode Consortium using synapseClient
+
+### EpiMap Data-ChiPseq
+BWA (VERSION 0.7.8) was used to align paired end FASTQ files to the human genome (HG19). Duplicates were mark into bamfiles using Picard (version 1.1.12) MarkDups. Filtering of improperly paired reads and multi-mapped reads was done with Samtools with defined parameters. The peaks (Narrow peaks) from Duplicate marked were call with Macs2.
+
+### HumanFC Data-ATAC_seq
+Fastq files were first processed with cut-adaptor (version 1.2.0) to remove low quality read and adaptors and then aligned with bowtie 2(version 2.1.0) to the human genome (hg19) with default parameters. All reads during alignment were treated as single read sequence even if sequencing libraries were single or paired end. Samtools (version 0.1.18) was used to sort bam files, picard.jar MarkDuplicate was used to filter-out duplicates and then converted to bed format using bamToBed before narrow peaks were called using MACS2 with a threshold FDR < 0.01.
+
+Then Bedtools were used to combine all bed files
+
+The table below shows the number of samples per study selected from PsychEncode Consortium:
+
+
 ## Peak filtering
 We dropped rows for which there are no more than 1 sample peaks found by using [```peak_filtering.R```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Psychencode_June2019/peak_filtering.R)) script. It outputs filtered data in BED format along with binarized peak value at threshold 0.
 
