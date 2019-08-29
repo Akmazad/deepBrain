@@ -30,12 +30,11 @@ intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b mergedPeakHeightMatrix_EpiMa
 cut -f1-4,10-298 mergedPeakHeightMatrix_HumanFC_filtered.overlaps.bed > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.bed
 cut -f1-4,10-160 mergedPeakHeightMatrix_EpiMap_filtered.overlaps.bed > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.bed
 ```
-- For the same bin that overlaps with multiple peak vectors, we should chose the one with max overlap, i.e. the last column indicates overlap ammount after running [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)). This subsection follows similar steps in [```TF processing pipeline```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/README.md#27-filter-similar-overlapping-bins-with-the-max-overlap-size-last-column). But the codes are copied here though.
+- For the same bin that overlaps with multiple peak vectors, we should chose the one with max overlap, i.e. the last column indicates overlap ammount after running [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)). This subsection follows similar steps in [```TF processing pipeline```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/README.md#27-filter-similar-overlapping-bins-with-the-max-overlap-size-last-column). But the codes are copied here though. NOTE: THIS SCRIPT FOR HUMANFC IS EXHAUSTING RNA MACHINE'S MEMORY: RAIJIN IS APPLIED ([```HumanFC_post_processing.sh```]())
 ```r
 library(dplyr)
 library(data.table)
 # for HumanFC
-# NOTE: THIS SCRIPT FOR HUMANFC IS EXHAUSTING RNA MACHINE'S MEMORY: RAIJIN IS APPLIED ([```HumanFC_post_processing.sh```]())
 # read the header (i.e. sample names)
 con <- file("mergedPeakHeightMatrix_HumanFC_filtered.bed","r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
