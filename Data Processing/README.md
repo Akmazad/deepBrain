@@ -282,3 +282,9 @@ dat <- dat %>% group_by(V4) %>% slice(which.max(V133)) %>% select(-c(V133))
 colnames(dat) <- header
 fwrite(dat, file="final.dat.tf.overlaps.dropped.fixed.filtered.dat", sep="\t")
 ```
+### 2.8 Sorting bins
+This subsection sorts bins (they are in BED format) by chromosome then by start position. Ideally we could've use BinIDs for sorting but due to intermediate processing some binIDs are changed to scientific notation (e.g. chr10_100999801_1001e+08).
+```sh
+sort -k 1,1 -k2,2n final.dat.tf.overlaps.dropped.fixed.filtered.dat > final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat
+```
+
