@@ -1,13 +1,14 @@
 #!/bin/sh
-#PBS -l wd
-#PBS -o humanFC.out
-#PBS -e humanFC.err
-#PBS -q hugemem
-#PBS -l mem=1TB
-#PBS -l ncpus=7
-#PBS -P yr31
-#PBS -l walltime=06:00:00
 
-module load R/3.5.1
+#PBS -N HumanFC_katana
+#PBS -o HumanFC.out
+#PBS -e HumanFC.err
+#PBS -l select=ncpus=8:mem=90G
+#PBS -l walltime=12:00:00
+#PBS -M akm.azad@unsw.edu.au
+#PBS -m ae
 
-Rscript /short/yr31/aa7970/azData/DeepBrain/Scripts/HumanFC_post_processing.R
+
+module load R/3.5.3
+
+Rscript /srv/scratch/z3526914/DeepBrain/Scripts/HumanFC_post_processing.R
