@@ -227,7 +227,7 @@ for (j in c(1:length(files)))
   print(j)
 }
 save(peaks,file= "/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCC_PeakProccessedData/mergedPeakHeightMatrix_ENCODE_DCC_TFs.rda")
-# nPeaks: 725,276 (compared to EpiMap=479,476 and HumanFC=197,263: before applying thresholds)
+# nPeaks: 725,276 (compared to EpiMap=479,476 and HumanFC=197,263: before peak filtering)
 
 # Peak filtering (from peak_filtering.R)
 outdir <- "/Volumes/Data1/PROJECTS/DeepLearning/Test/EncodeDCC_PeakProccessedData/"
