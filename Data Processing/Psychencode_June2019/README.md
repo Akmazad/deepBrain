@@ -57,8 +57,8 @@ fwrite(dat, file="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filter
 
 - Replace all the dots (comes from the [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)) when no matches are found.
 ```sh
-sed 's/\./0/g' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.dat > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.fixed.dat
-sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.dat > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.fixed.dat
+sed 's/\./0/g' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.dat > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.dat
+sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.dat > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.dat
 ```
 # Result
 
