@@ -11,6 +11,7 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 |HumanFC|288|118,347|
 |ENCODE TFs|128|725,276|
 
+### Non-zero genomic bins
 - Genomic Bins (sized = 200bp) with at least one signal (binary 1) among all samples
 
 |Name|nBins|nPeak coordinates (filtered)|
