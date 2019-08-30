@@ -83,8 +83,6 @@ rm(list = ls(all.names = TRUE))
 setwd('/srv/scratch/z3526914/DeepBrain/Data')
 library(data.table)
 library(dplyr)
-# read non-zero bins
-nonZerobins <- fread("HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat", sep="\t", header=T)
 
 # Label data files: 
 # 1. HumanFC_nonzero_labels.dat
