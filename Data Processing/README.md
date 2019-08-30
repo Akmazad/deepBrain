@@ -29,7 +29,7 @@ awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; br
 ```
 ```r
 # for making Union of all non-zero binInfo
-# on KATANA: 
+# on KATANA (head node): 
 setwd('/srv/scratch/z3526914/DeepBrain/Data')
 library(dplyr)
 library(data.table)
