@@ -17,7 +17,7 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 |Name|nBins|nPeak coordinates (filtered)|
 |---|---|---|
 |EpiMap|1,744,883|353,566|
-|HumanFC|490,23|118,347|
+|HumanFC|490,233|118,347|
 |ENCODE TFs|2,441,723|725,276|
 
 
