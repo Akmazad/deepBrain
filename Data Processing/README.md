@@ -3,12 +3,20 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 
 ## Processed data
 ### Merged and filtered peaks
-Filtering thresholds applied: peak value > 0; nSample >= 2
+- Filtering thresholds applied: peak value > 0; nSample >= 2
 
 |Name|nSample|nPeaks|
 |---|---|---|
 |EpiMap|150|353,566|
 |HumanFC|288|118,347|
 |ENCODE TFs|128|725,276|
+
+- Genomic Bins (sized = 200bp) with at least one signal (binary 1) among all samples
+|Name|nBins|nPeak coordinates (filtered|
+|---|---|---|
+|EpiMap|1,744,883|353,566|
+|HumanFC|490,23|118,347|
+|ENCODE TFs|2,441,723|725,276|
+
 
 
