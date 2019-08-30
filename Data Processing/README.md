@@ -96,3 +96,11 @@ output <- cbind(human, epi[which(epi$id %in% human$id),-c(1:4)], tf[which(tf$id 
 colnames(output) <- c(colnames(human), colnames(epi)[-c(1:4)], colnames(tf)[-c(1:4)])
 fwrite(output,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.dat", sep="\t", row.names=F, quote=F)
 ```
+
+# Results
+Final set of data (before entering DL pipeline) stats are as follows:
+
+|Type|Filename|Location|nBins|nLabels|
+|---|---|---|---|---|
+|Genomic DNA|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|---|
+|Binary Labels|HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.dat|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
