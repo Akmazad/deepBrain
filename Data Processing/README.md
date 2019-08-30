@@ -1,6 +1,14 @@
 # Data preprocessing for Deep learning training by analysing RNA-seq, CHIP-seq, ATAC-seq, and Transcription factor peaks (also CHIP-seq from UCSC-DCC)
 Our pipeline considers only those chromosomal bins for DL training that has at least one TF features activated. Hence, we first constructed bins with at least one TF signal found, and after that augmented other features from e.g. EpiMap, HumanFC, or other sources.
 
+## Processing pipeline
+|Data|Used for|Pipeline Documentations|
+|---|---|---|
+|EpiMap (Chip-seq)|Sample peak Label extraction|[```ReadMe```](https://github.com/Akmazad/deepBrain/tree/master/Data%20Processing/Psychencode_June2019/README.md)|
+|HumanFC (ATAC-seq)|Sample peak Label extraction|[```ReadMe```](https://github.com/Akmazad/deepBrain/tree/master/Data%20Processing/Psychencode_June2019/README.md)|
+|ENCODE TFs (RNA-seq + ENCODE DCC)|TF label extraction|[```ReadMe```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/README.md)|
+
+
 ## Processed data
 ### Merged and filtered peaks
 - Filtering thresholds applied: peak value > 0; nSample >= 2
