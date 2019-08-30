@@ -68,3 +68,23 @@ fwrite(nonZerobins.seq, file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat", sep="\
 
 ## Extract Labels (binary signals) for non-zero bins
 Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh))
+```r
+rm(list = ls(all.names = TRUE))
+setwd('/srv/scratch/z3526914/DeepBrain/Data')
+library(data.table)
+library(dplyr)
+# read non-zero bins
+nonZerobins <- fread("HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat", sep="\t", header=T)
+
+# Label data files: 
+# 1. mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat
+# 2. mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat
+# 3. final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat
+human <- fread("mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat", sep="\t", header=T)
+epi <- fread("mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat", sep="\t", header=T)
+tf <- fread("final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat", sep="\t", header=T)
+
+hLabels <- 
+eLables <-
+tfLabels <- 
+```
