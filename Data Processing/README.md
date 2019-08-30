@@ -67,7 +67,7 @@ fwrite(nonZerobins.seq, file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat", sep="\
 ```
 
 ## Extract Labels (binary signals) for non-zero bins
-
+- Extract labels for non-zero bins from each data files (HumanFC, EpiMap and ENCODE_TFs)
 ```sh
 # its checking binInfo of both files (chr, start and end coordinates of bins)
 awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat > HumanFC_nonzero_labels.dat
@@ -77,7 +77,7 @@ awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat"{A[$1$2$
 awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat"{A[$1$2$3]=$1$2$3} FILENAME=="final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat > ENCODE_TFs_nonzero_labels.dat
 
 ```
-Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh))
+- Merge all labels. Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh))
 ```r
 rm(list = ls(all.names = TRUE))
 setwd('/srv/scratch/z3526914/DeepBrain/Data')
