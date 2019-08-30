@@ -20,5 +20,12 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 |HumanFC|490,233|118,347|
 |ENCODE TFs|2,441,723|725,276|
 
+- Scripts used:
+```sh
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat > EpiMap_nonZero.binInfo.dat
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat > HumanFC_nonZero.binInfo.dat
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat > ENCODE_nonZero.binInfo.dat
+```
+
 
 
