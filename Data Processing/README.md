@@ -30,7 +30,7 @@ awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; br
 # on KATANA: 
 setwd('/srv/scratch/z3526914/DeepBrain/Data')
 library(dplyr)
-# binIDs got damaged somehow (don't know when), so need to reconstruct
+# binIDs got damaged somehow (ie. scientific notation appears) - don't know when and why, so need to reconstruct
 epi <- read.table("EpiMap_nonZero.binInfo.dat", sep='\t', header=F); epi <- cbind(epi[,-4],paste0(epi[,1],"_",epi[,2],"_",epi[,3]))
 human <- read.table("HumanFC_nonZero.binInfo.dat", sep='\t', header=F);  human <- cbind(human[,-4],paste0(human[,1],"_",human[,2],"_",human[,3]))
 tf <- read.table("ENCODE_nonZero.binInfo.dat", sep='\t', header=F); tf <- cbind(tf[,-4],paste0(tf[,1],"_",tf[,2],"_",tf[,3]))
