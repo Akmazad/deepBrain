@@ -277,7 +277,7 @@ con <- file("final.dat.tf","r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
 close(con)
 dat <- fread("final.dat.tf.overlaps.dropped.fixed.bed", sep="\t", header=F)
-# V4, V133 are binID and overlapSize, respectively
+# V4, V133 are binID and overlapSize, respectively; NOTE: the last command in the pipe drops the overlapInfo column
 dat <- dat %>% group_by(V4) %>% slice(which.max(V133)) %>% select(-c(V133))
 colnames(dat) <- header
 fwrite(dat, file="final.dat.tf.overlaps.dropped.fixed.filtered.dat", sep="\t")
