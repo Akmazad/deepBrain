@@ -30,6 +30,8 @@ awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; br
 # on KATANA: 
 setwd('/srv/scratch/z3526914/DeepBrain/Data')
 library(dplyr)
+library(data.table)
+
 # binIDs got damaged somehow (ie. scientific notation appears) - don't know when and why, so need to reconstruct
 epi <- read.table("EpiMap_nonZero.binInfo.dat", sep='\t', header=F); epi <- cbind(epi[,-4],paste0(epi[,1],"_",epi[,2],"_",epi[,3]))
 human <- read.table("HumanFC_nonZero.binInfo.dat", sep='\t', header=F);  human <- cbind(human[,-4],paste0(human[,1],"_",human[,2],"_",human[,3]))
@@ -41,6 +43,7 @@ human.epi <- dplyr::union(human,epi)
 human.epi.tf <- dplyr::union(human.epi,tf)
 # nrow(human.epi.tf):
 # [1] 3528533
+fwrite(human.epi.tf,file="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat", sep="\t", row.names=F, quote=F)
 ```
 
 
