@@ -4,6 +4,7 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 ## Processed data
 ### Merged and filtered peaks
 Filtering thresholds applied: peak value > 0; nSample >= 2
+
 |Name|nSample|nPeaks|
 |---|---|---|
 |EpiMap|150|353,566|
