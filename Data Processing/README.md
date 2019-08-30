@@ -67,4 +67,4 @@ fwrite(nonZerobins.seq, file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat", sep="\
 ```
 
 ## Extract Labels (binary signals) for non-zero bins
-
+Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh))
