@@ -87,14 +87,14 @@ library(dplyr)
 nonZerobins <- fread("HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat", sep="\t", header=T)
 
 # Label data files: 
-# 1. mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat
-# 2. mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat
-# 3. final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat
-human <- fread("mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat", sep="\t", header=T)
-epi <- fread("mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat", sep="\t", header=T)
-tf <- fread("final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat", sep="\t", header=T)
+# 1. HumanFC_nonzero_labels.dat
+# 2. EpiMap_nonzero_labels.dat
+# 3. ENCODE_TFs_nonzero_labels.dat
+human <- fread("HumanFC_nonzero_labels.dat", sep="\t", header=T)
+epi <- fread("EpiMap_nonzero_labels.dat", sep="\t", header=T)
+tf <- fread("ENCODE_TFs_nonzero_labels.dat", sep="\t", header=T)
 
-hLabels <- 
-eLables <-
-tfLabels <- 
+output <- cbind(human, epi[which(epi$id %in% human$id),-c(1:4)], tf[which(tf$id %in% human$id),-c(1:4)])
+colnames(output) <- c(colnames(human), colnames(epi)[-c(1:4)], colnames(tf)[-c(1:4)])
+fwrite(output,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.dat", sep="\t", row.names=F, quote=F)
 ```
