@@ -66,4 +66,5 @@ colnames(nonZerobins.seq) <- c(colnames(nonZerobins),"dna.seq")
 fwrite(nonZerobins.seq, file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat", sep="\t", row.names=F, quote=F)
 ```
 
+## Extract Labels (binary signals) for non-zero bins
 
