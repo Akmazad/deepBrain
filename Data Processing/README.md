@@ -2,7 +2,8 @@
 Our pipeline considers only those chromosomal bins for DL training that has at least one TF features activated. Hence, we first constructed bins with at least one TF signal found, and after that augmented other features from e.g. EpiMap, HumanFC, or other sources.
 
 ## Processed data
-### Merged peaks
+### Merged and filtered peaks
+Filtering thresholds applied: peak value > 0; nSample >= 2
 |Name|nSample|nPeaks|
 |---|---|---|
 |EpiMap|150|353,566|
