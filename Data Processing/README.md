@@ -19,7 +19,7 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 |EpiMap|1,744,883|353,566|
 |HumanFC|490,233|118,347|
 |ENCODE TFs|2,441,723|725,276|
-
+|union|3,528,533|---|
 - Scripts used:
 ```sh
 awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat > EpiMap_nonZero.binInfo.dat
@@ -35,6 +35,12 @@ epi <- read.table("EpiMap_nonZero.binInfo.dat", sep='\t', header=F); epi <- cbin
 human <- read.table("HumanFC_nonZero.binInfo.dat", sep='\t', header=F);  human <- cbind(human[,-4],paste0(human[,1],"_",human[,2],"_",human[,3]))
 tf <- read.table("ENCODE_nonZero.binInfo.dat", sep='\t', header=F); tf <- cbind(tf[,-4],paste0(tf[,1],"_",tf[,2],"_",tf[,3]))
 colnames(human)=colnames(epi)=colnames(tf) <- c("chr","start","end","id")
+
+# perform Union of records (bininfo); Ignore the warnings (auto-coercing of columns is helpful here)
+human.epi <- dplyr::union(human,epi)
+human.epi.tf <- dplyr::union(human.epi,tf)
+# nrow(human.epi.tf):
+# [1] 3528533
 ```
 
 
