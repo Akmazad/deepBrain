@@ -86,6 +86,7 @@ awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat"{A[$1$2$
 
 ```
 - Merge all labels. Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh))
+- DNA sequences (Data) will be also augmented
 ```r
 rm(list = ls(all.names = TRUE))
 setwd('/srv/scratch/z3526914/DeepBrain/Data')
@@ -96,6 +97,9 @@ library(dplyr)
 # 1. HumanFC_nonzero_labels.dat
 # 2. EpiMap_nonzero_labels.dat
 # 3. ENCODE_TFs_nonzero_labels.dat
+# 4. HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat
+
+dna.dat <- fread("HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat", sep="\t", header=T)
 human <- fread("HumanFC_nonzero_labels.dat", sep="\t", header=T)
 epi <- fread("EpiMap_nonzero_labels.dat", sep="\t", header=T)
 tf <- fread("ENCODE_TFs_nonzero_labels.dat", sep="\t", header=T)
