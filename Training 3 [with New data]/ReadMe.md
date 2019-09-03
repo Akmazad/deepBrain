@@ -1,6 +1,6 @@
 # DeepBrain Training [version 3]
-- This is a PyTorch implementation of the DeepBrain project. This project aims to predict the functional effects of non-coding variants from sequence data.
 - In this version [V3], we've used Essays from HumanFC, EpiMap and TF profiles from ENCODE DCC to train deep learning model.
+- Same as Training [V2], this is a PyTorch implementation of the DeepBrain project. This project aims to predict the functional effects of non-coding variants from sequence data.
 
 ## Requirements
 - python 3.6 or higher
@@ -42,20 +42,9 @@ To run on CPU, use following command:
 ```
 
 ### Accuracy measures and Log reporting
-For this version, we've checked two accuracy measurements. In each training/testing iteration (for a mini-batch), we report "true prediction ratio" for each Feature columns and take median accross three Feature categories (e.g. Accetylation, RNA-seq, and TFs).we also report AUC scores in a similar manner. In addition, progress logs are reported in a log file within the current data directory and project name (e.g. deepbrainStaticConvnet) subdirectory.
+For this version, we've checked two accuracy measurements. In each training/testing iteration (for a mini-batch), we report "true prediction ratio" for each Feature columns and take median accross three Feature categories (e.g. Accetylation, RNA-seq, and TFs). We also report AUC scores in a similar manner. In addition, progress logs are reported in a log file within the current data directory and project name (e.g. deepbrainStaticConvnet) subdirectory.
 
 
 ## Data Description
 
-| Study | Assay Type | Nsamples | Number of peaks/Transcripts |
-| --- | --- | --- | --- |
-| HumanFC | ATAC-seq | 288 | 197,263 |
-| EpiMap | ChIP-seq | 150 | 479,476 |
-| UCSD-YALE (ba9) | ChIP-seq | 81 | 56,503 |
-| UCSD-YALE (ba41) | ChIP-seq | 66 | 56,503 |
-| UCSD-YALE (baVermis) | ChIP-seq | 62 | 38,069 |
-| UCSD-YALE | RNA-seq | 209 | 392,033 |
-
-## Thresholding Acetylation data
-### Methodology
-Choose peaks that has non-zero values 
+For data description and preprocessing details, [```please follow this```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/README.md).
