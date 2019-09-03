@@ -1,4 +1,4 @@
-## Acetylation data
+## Data Description
 
 | Study | Assay Type | Nsamples | Number of peaks/Transcripts |
 | --- | --- | --- | --- |
