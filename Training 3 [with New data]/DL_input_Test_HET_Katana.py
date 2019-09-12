@@ -14,6 +14,9 @@ import logging
 import os
 import torch.cuda
 from sklearn.metrics import roc_auc_score
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score
+
 import torch.tensor
 
 class config():
@@ -39,7 +42,7 @@ class config():
     self.init_channels = 16
     self.layers = 8
     self.BATCH_SIZE = 128
-    self.val_batch_size = 256
+    self.val_batch_size = 128
     self.seed = 0
     self.workers = 4 
     self.alpha_lr = 3e-4
@@ -327,31 +330,10 @@ class LoadDataset(tdata.Dataset):
 
 
 
-def getCustomAccuracy(predicted, target, args):
-    # predicted = torch.round(torch.sigmoid(predicted))
-    # predicted = torch.round(predicted)
-    n_digits = 3
-    _predicted = torch.round(predicted * 10 ** n_digits) / (10 ** n_digits)
-    __predicted = torch.round(_predicted)
-
-    N = predicted.size(0) * args.NUM_OUTPUTS
-
-    truePred = torch.sum(torch.eq(__predicted, target)).item()
-    acc_val = truePred / N
-
-    # print(torch.sum(torch.eq(target, torch.ones(target.shape))).item())
-    # print(torch.sum(torch.eq(predicted, torch.ones(target.shape))).item())
-    return acc_val
-
-
 def getCustomAccuracy2(predicted, target, args):
-    # predicted = torch.round(torch.sigmoid(predicted))
-    # predicted = torch.round(predicted)
     n_digits = 3    # to have something like 0.499 = 0.5
     _predicted = torch.round(predicted * 10 ** n_digits) / (10 ** n_digits)
     __predicted = torch.round(_predicted)
-
-
 
     N = predicted.size(0)
     custom_accuracy = np.zeros(args.NUM_OUTPUTS, dtype=np.float)
@@ -362,42 +344,71 @@ def getCustomAccuracy2(predicted, target, args):
     return np.median(custom_accuracy[:288]), np.median(custom_accuracy[288:438]), np.median(custom_accuracy[438:])
 
 
-def getCustomAccuracy3(predicted, target, args):
-    preds = []
-    targets = []
-    for i in range(10):
-        o = F.log_softmax(torch.autograd.Variable(predicted), dim=1)
-        t = torch.autograd.Variable(target)
-
-        _, pred = torch.max(o, dim=1)
-        preds.append(pred.data)
-        targets.append(t.data)
-
-    preds = torch.cat(preds)
-    targets = torch.cat(targets)
-
-
 def getAUCscore(predicted, target, args, logger):
-    # n_digits = 3
-    # _predicted = torch.round(predicted * 10**n_digits) / (10**n_digits)
-    # __predicted = torch.round(_predicted)
+    n_digits = 3
+    _predicted = torch.round(predicted * 10**n_digits) / (10**n_digits)
+    __predicted = torch.round(_predicted)
 
-    # _predicted = torch.round(predicted).detach()
-    __predicted = predicted.detach()
+#     _predicted = torch.round(predicted).detach()
+    __predicted = __predicted.detach()
     _target = target.detach()
 
     aucs = np.zeros(args.NUM_OUTPUTS, dtype=np.float)
     for i in range(args.NUM_OUTPUTS):
         try:
-            auc = roc_auc_score(_target.cpu().numpy()[:, i], __predicted.cpu().numpy()[:, i], average='weighted')
+            auc = roc_auc_score(_target.cpu().numpy()[:, i], __predicted.cpu().numpy()[:, i])
             aucs[i] = auc
         except ValueError as e:
             pass
             # logger.info("NA (No positive (i.e. signal) in Test region)")
 
-    # print('Medican AUCs: Accetylation marks: %.3f, RNA-seq: %.3f, TFs: %.3f' % (np.median(aucs[:2]), np.median(aucs[2]), np.median(aucs[3:])))
-
     return np.median(aucs[:288]), np.median(aucs[288:438]), np.median(aucs[438:])
+
+def getAccuracyScore(predicted, target, args, logger):
+    n_digits = 3
+    _predicted = torch.round(predicted * 10**n_digits) / (10**n_digits)
+    __predicted = torch.round(_predicted)
+
+    # _predicted = torch.round(predicted).detach()
+    __predicted = __predicted.detach()
+    _target = target.detach()
+
+    accs = np.zeros(args.NUM_OUTPUTS, dtype=np.float)
+    for i in range(args.NUM_OUTPUTS):
+        try:
+            acc = accuracy_score(_target.cpu().numpy()[:, i], __predicted.cpu().numpy()[:, i])
+            accs[i] = acc
+        except ValueError as e:
+            pass
+            # logger.info("NA (No positive (i.e. signal) in Test region)")
+
+    return np.median(accs[:288]), np.median(accs[288:438]), np.median(accs[438:])
+
+
+def getF1Score(predicted, target, args, logger):
+    n_digits = 3
+    _predicted = torch.round(predicted * 10 ** n_digits) / (10 ** n_digits)
+    __predicted = torch.round(_predicted)
+
+    #     _predicted = torch.round(predicted).detach()
+    __predicted = __predicted.detach()
+    _target = target.detach()
+
+    N = target.size(0)
+
+    f1s = np.zeros(args.NUM_OUTPUTS, dtype=np.float)
+    for i in range(args.NUM_OUTPUTS):
+
+        nOnes = torch.sum(torch.eq(torch.ones(N), target.cpu()[:, i])).item()
+        nZeros = torch.sum(torch.eq(torch.zeros(N), target.cpu()[:, i])).item()
+        if (nOnes != N & nZeros != N):
+            f1 = f1_score(_target.cpu().numpy()[:, i], __predicted.cpu().numpy()[:, i])
+            f1s[i] = f1
+        else:
+            pass
+            # logger.info("NA (No positive (i.e. signal) in Test region)")
+
+    return np.median(f1s[:288]), np.median(f1s[288:438]), np.median(f1s[438:])
 
 
 def get_logger(file_path):
@@ -419,9 +430,10 @@ def get_logger(file_path):
 
 
 def find_perc_uncertainty(output, low, high):
+    n_digits = 3
+    output = torch.round(output * 10**n_digits) / (10**n_digits)
     output = output.detach().cpu().numpy()
     return np.sum(np.logical_and(output>=low, output<=high))/output.size    # returns the proportion of tensor elements are within the range
-
 
 def train(train_loader, model, criterion, optimizer, epoch, args, logger, device):
 
@@ -443,8 +455,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args, logger, device
         # acc = getCustomAccuracy(output, target, args)
         perc_uncertainty = find_perc_uncertainty(output, 0.4, 0.6)
         custom_accuracy = getCustomAccuracy2(output, target, args)
-        # tAccuracy = getCustomAccuracy3(output, target, args)
         aucs = getAUCscore(output, target, args, logger)
+        accs = getAccuracyScore(output, target, args, logger)
+        f1s = getF1Score(output, target, args, logger)
 
         # compute gradient
         optimizer.zero_grad()
@@ -460,12 +473,19 @@ def train(train_loader, model, criterion, optimizer, epoch, args, logger, device
         optimizer.step()
 
         if i % args.print_freq == 0 or i == len(train_loader) - 1:
-          logger.info("TRAINING: Epoch: %d, Batch: %d/%d, Loss: %.3f, perc_uncertainty: %.3f, custom[HumanFC:%.3f, EpiMap:%.3f, TFs:%.3f], roc[HumanFC:%.3f, EpiMap:%.3f, TFs:%.3f]" 
-                      % (epoch + 1, i, len(train_loader) - 1,
-                         loss, perc_uncertainty, custom_accuracy[0], 
-                         custom_accuracy[1], custom_accuracy[2], 
-                         aucs[0], aucs[1], aucs[2]))
-
+            #           logger.info("TRAINING: Epoch: %d, Batch: %d/%d, Loss: %.3f, perc_uncertainty: %.3f, custom[HumanFC:%.3f, EpiMap:%.3f, TFs:%.3f], roc[HumanFC:%.3f, EpiMap:%.3f, TFs:%.3f]"
+            #                       % (epoch + 1, i, len(train_loader) - 1,
+            #                          loss, perc_uncertainty, custom_accuracy[0],
+            #                          custom_accuracy[1], custom_accuracy[2],
+            #                          aucs[0], aucs[1], aucs[2]))
+            logger.info(
+                "TRAINING: Epoch: %d, Batch: %d/%d, Loss: %.3f, perc_uncertainty: %.3f, custom[HumanFC: %.3f, EpiMap: %.3f, TFs: %.3f], roc[HumanFC: %.3f, EpiMap: %.3f, TFs: %.3f ], accuracy[HumanFC: %.3f, EpiMap: %.3f, TFs: %.3f ], f1[HumanFC: %.3f, EpiMap: %.3f, TFs: %.3f ]"
+                % (epoch + 1, i, len(train_loader) - 1,
+                   loss, perc_uncertainty, custom_accuracy[0],
+                   custom_accuracy[1], custom_accuracy[2],
+                   aucs[0], aucs[1], aucs[2],
+                   accs[0], accs[1], accs[2],
+                   f1s[0], f1s[1], f1s[2]))
 
 
 def validate(val_loader, model, criterion, args, logger, device):
@@ -473,7 +493,6 @@ def validate(val_loader, model, criterion, args, logger, device):
     # switch to evaluate mode
     model.eval()
     total_ACC, total_RNA, total_TFs = 0, 0, 0
-    perc_uncertainty = 0.0
 
     # losses = []
 
@@ -492,6 +511,8 @@ def validate(val_loader, model, criterion, args, logger, device):
             p = find_perc_uncertainty(output, 0.4, 0.6)
             custom_accuracy = getCustomAccuracy2(output, target, args)
             aucs = getAUCscore(output, target, args, logger)
+            accs = getAccuracyScore(output, target, args, logger)
+            f1s = getF1Score(output, target, args, logger)
 
             total_ACC += np.median(aucs[0])
             total_RNA += np.median(aucs[1])
@@ -500,11 +521,15 @@ def validate(val_loader, model, criterion, args, logger, device):
             if i % args.print_freq == 0 or i == len(val_loader) - 1:
                 # progress._print(i)
                 # logger.info("batch: %d, loss: %.3f; valid accuracy: custom_accuracy_metric: %.3f, ACC marks: %.3f, RNA-seq: %.3f, TFs: %.3f" % (i+1, loss, acc, aucs[0], aucs[1], aucs[2]))
-                logger.info("VALIDATION: Batch: %d/%d, Loss: %.3f, perc_uncertainty: %.3f, custom[HumanFC:%.3f, EpiMap:%.3f, TFs:%.3f], roc[HumanFC: %.3f, EpiMap: %.3f, TFs:%.3f]" % (i, len(val_loader)-1, loss, perc_uncertainty, custom_accuracy[0], custom_accuracy[1], custom_accuracy[2], aucs[0], aucs[1], aucs[2]))
-            perc_uncertainty += p
-
-        # logger.info(' * Acc@1 {top1.avg:.3f}'.format(top1=acc))
-        logger.info("percentage of uncertainty in validation prediction: {}".format(perc_uncertainty / len(val_loader)))
+                #                 logger.info("VALIDATION: Batch: %d/%d, Loss: %.3f, perc_uncertainty: %.3f, custom[HumanFC:%.3f, EpiMap:%.3f, TFs:%.3f], roc[HumanFC: %.3f, EpiMap: %.3f, TFs:%.3f]" % (i, len(val_loader)-1, loss, perc_uncertainty, custom_accuracy[0], custom_accuracy[1], custom_accuracy[2], aucs[0], aucs[1], aucs[2]))
+                logger.info(
+                    "VALIDATION: Batch: %d/%d, Loss: %.3f, perc_uncertainty: %.3f, custom[HumanFC: %.3f, EpiMap: %.3f, TFs: %.3f], roc[HumanFC: %.3f, EpiMap: %.3f, TFs: %.3f ], accuracy[HumanFC: %.3f, EpiMap: %.3f, TFs: %.3f ], f1[HumanFC: %.3f, EpiMap: %.3f, TFs: %.3f ]"
+                    % (i, len(val_loader) - 1,
+                       loss, p, custom_accuracy[0],
+                       custom_accuracy[1], custom_accuracy[2],
+                       aucs[0], aucs[1], aucs[2],
+                       accs[0], accs[1], accs[2],
+                       f1s[0], f1s[1], f1s[2]))
 
     total_ACC /= len(val_loader)
     total_RNA /= len(val_loader)
