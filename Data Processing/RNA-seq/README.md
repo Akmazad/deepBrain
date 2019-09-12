@@ -273,7 +273,7 @@ This subsection ensures each bin in the file is unique by filtering them with ma
 library(dplyr)
 library(data.table)
 # get the file header (i.e. TF gene symbols)
-con <- file("final.dat.tf","r")
+con <- file("final.tf.bed","r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
 close(con)
 dat <- fread("final.dat.tf.overlaps.dropped.fixed.bed", sep="\t", header=F)
