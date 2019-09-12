@@ -258,14 +258,14 @@ processAtf <- function(aTF,dat,tfProf){
 temp <- apply(as.matrix(tfs),1,FUN=function(x) processAtf(x,final.dat,tfProf)) %>% as.data.frame()
 final.dat.tf <- cbind(final.dat[,1:4], temp) 
 colnames(final.dat.tf) <- c("chr", "start", "end", "id", colnames(temp))
-fwrite(final.dat.tf,file = "final.dat.tf", sep="\t", row.names=F, quote=F)
+fwrite(final.dat.tf,file = "final.tf.dat", sep="\t", row.names=F, quote=F)
 ```
 ### 2.6 Intersect TF peak BED (gene-symbol based) with genomic Bins and post-process
 This subsection follows similar steps as in [```Psychencode data```](https://github.com/Akmazad/deepBrain/tree/master/Data%20Processing/Psychencode_June2019#bin-overlapping).
 ```sh
-intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b final.dat.tf > final.dat.tf.overlaps.bed
-cut -f1-4,10-138 final.dat.tf.overlaps.bed > final.dat.tf.overlaps.dropped.bed
-sed 's/\./0/g' final.dat.tf.overlaps.dropped.bed > final.dat.tf.overlaps.dropped.fixed.bed
+intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b final.tf.dat > final.tf.overlaps.bed
+cut -f1-4,10-138 final.tf.overlaps.bed > final.tf.overlaps.dropped.bed
+sed 's/\./0/g' final.tf.overlaps.dropped.bed > final.tf.overlaps.dropped.fixed.bed
 ```
 ### 2.7 Filter similar overlapping bins with the max overlap size (last column)
 This subsection ensures each bin in the file is unique by filtering them with maximum overlap among similar bins. 
@@ -280,11 +280,11 @@ dat <- fread("final.dat.tf.overlaps.dropped.fixed.bed", sep="\t", header=F)
 # V4, V133 are binID and overlapSize, respectively; NOTE: the last command in the pipe drops the overlapInfo column
 dat <- dat %>% group_by(V4) %>% slice(which.max(V133)) %>% select(-c(V133))
 colnames(dat) <- header
-fwrite(dat, file="final.dat.tf.overlaps.dropped.fixed.filtered.dat", sep="\t")
+fwrite(dat, file="final.tf.overlaps.dropped.fixed.filtered.bed", sep="\t")
 ```
 ### 2.8 Sorting bins
 This subsection sorts bins (they are in BED format) by chromosome then by start position. Ideally we could've use BinIDs for sorting but due to intermediate processing some binIDs are changed to scientific notation (e.g. chr10_100999801_1001e+08).
 ```sh
-sort -k 1,1 -k2,2n final.dat.tf.overlaps.dropped.fixed.filtered.dat > final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat
+sort -k 1,1 -k2,2n final.tf.overlaps.dropped.fixed.filtered.bed > final.tf.overlaps.dropped.fixed.filtered.sorted.bed
 ```
 
