@@ -37,16 +37,11 @@ class config():
     self.w_lr_min = 8e-7
     self.w_momentum = 0.9
     self.w_weight_decay = 5e-7
-    self.w_grad_clip = 5
     self.print_freq = 50
-    self.init_channels = 16
-    self.layers = 8
     self.BATCH_SIZE = 128
     self.val_batch_size = 128
     self.seed = 0
     self.workers = 4 
-    self.alpha_lr = 3e-4
-    self.alpha_weight_decay = 1e-4
     self.world_size = -1
     self.rank = 0
     self.dist_url = 'env://'
