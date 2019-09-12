@@ -31,9 +31,9 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 - Scripts used:
 ```sh
 # for saving non-zero binInfo
-awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat > EpiMap_nonZero.binInfo.dat
-awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat > HumanFC_nonZero.binInfo.dat
-awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat > ENCODE_nonZero.binInfo.dat
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > EpiMap_nonZero.binInfo.bed
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_nonZero.binInfo.bed
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.dat.tf.overlaps.dropped.filtered.fixed.sorted.bed > ENCODE_nonZero.binInfo.bed
 ```
 ```r
 # for making Union of all non-zero binInfo
@@ -43,9 +43,9 @@ library(dplyr)
 library(data.table)
 
 # binIDs got damaged somehow (ie. scientific notation appears) - don't know when and why, so need to reconstruct
-epi <- read.table("EpiMap_nonZero.binInfo.dat", sep='\t', header=F); epi <- cbind(epi[,-4],paste0(epi[,1],"_",epi[,2],"_",epi[,3]))
-human <- read.table("HumanFC_nonZero.binInfo.dat", sep='\t', header=F);  human <- cbind(human[,-4],paste0(human[,1],"_",human[,2],"_",human[,3]))
-tf <- read.table("ENCODE_nonZero.binInfo.dat", sep='\t', header=F); tf <- cbind(tf[,-4],paste0(tf[,1],"_",tf[,2],"_",tf[,3]))
+epi <- read.table("EpiMap_nonZero.binInfo.bed", sep='\t', header=F); epi <- cbind(epi[,-4],paste0(epi[,1],"_",epi[,2],"_",epi[,3]))
+human <- read.table("HumanFC_nonZero.binInfo.bed", sep='\t', header=F);  human <- cbind(human[,-4],paste0(human[,1],"_",human[,2],"_",human[,3]))
+tf <- read.table("ENCODE_nonZero.binInfo.bed", sep='\t', header=F); tf <- cbind(tf[,-4],paste0(tf[,1],"_",tf[,2],"_",tf[,3]))
 colnames(human)=colnames(epi)=colnames(tf) <- c("chr","start","end","id")
 
 # perform Union of records (bininfo); Ignore the warnings (auto-coercing of columns is helpful here)
@@ -53,7 +53,7 @@ human.epi <- dplyr::union(human,epi)
 human.epi.tf <- dplyr::union(human.epi,tf)
 # nrow(human.epi.tf):
 # [1] 3528533
-fwrite(human.epi.tf,file="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat", sep="\t", row.names=F, quote=F)
+fwrite(human.epi.tf,file="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed", sep="\t", row.names=F, quote=F)
 ```
 
 ## Extract genomic data (dna seq) for non-zero bins
@@ -69,23 +69,23 @@ hg <- BSgenome.Hsapiens.UCSC.hg19
 flankingLength <- 400  
 
 # read non-zero bins
-nonZerobins <- fread("HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat", sep="\t", header=T)
+nonZerobins <- fread("HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed", sep="\t", header=T)
 seq <- getSeq(hg,nonZerobins$chr,start=nonZerobins$start-flankingLength,end=nonZerobins$end+flankingLength)
 seq <- as.character(as.data.frame(seq)[[1]])
 nonZerobins.seq <- cbind(nonZerobins,seq)
 colnames(nonZerobins.seq) <- c(colnames(nonZerobins),"dna.seq")
-fwrite(nonZerobins.seq, file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat", sep="\t", row.names=F, quote=F)
+fwrite(nonZerobins.seq, file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed", sep="\t", row.names=F, quote=F)
 ```
 
 ## Extract Labels (binary signals) for non-zero bins
 - Extract labels for non-zero bins from each data files (HumanFC, EpiMap and ENCODE_TFs)
 ```sh
 # its checking binInfo of both files (chr, start and end coordinates of bins)
-awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat > HumanFC_nonzero_labels.dat
+awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_nonzero_labels.bed
 
-awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat > EpiMap_nonzero_labels.dat
+awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > EpiMap_nonzero_labels.bed
 
-awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat"{A[$1$2$3]=$1$2$3} FILENAME=="final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.dat final.dat.tf.overlaps.dropped.fixed.filtered.sorted.dat > ENCODE_TFs_nonzero_labels.dat
+awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed"{A[$1$2$3]=$1$2$3} FILENAME=="final.dat.tf.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed final.dat.tf.overlaps.dropped.fixed.filtered.sorted.bed > ENCODE_TFs_nonzero_labels.bed
 
 ```
 - Merge all labels. Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh))
@@ -97,26 +97,26 @@ library(data.table)
 library(dplyr)
 
 # Label data files: 
-# 1. HumanFC_nonzero_labels.dat
-# 2. EpiMap_nonzero_labels.dat
-# 3. ENCODE_TFs_nonzero_labels.dat
-# 4. HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat
+# 1. HumanFC_nonzero_labels.bed
+# 2. EpiMap_nonzero_labels.bed
+# 3. ENCODE_TFs_nonzero_labels.bed
+# 4. HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed
 
-dna.dat <- fread("HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat", sep="\t", header=T) # ids seemed fine: "grep -o 'e+' HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat | wc -l" return 0
+dna.dat <- fread("HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed", sep="\t", header=T) # ids seemed fine: "grep -o 'e+' HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed | wc -l" return 0
 
-human <- fread("HumanFC_nonzero_labels.dat", sep="\t", header=T)
+human <- fread("HumanFC_nonzero_labels.bed", sep="\t", header=T)
 human$id <- paste0(human$chr, "_", human$start, "_", human$end) # fix the 746 ids (scientific notation appread!!)
-epi <- fread("EpiMap_nonzero_labels.dat", sep="\t", header=T)
+epi <- fread("EpiMap_nonzero_labels.bed", sep="\t", header=T)
 epi$id <- paste0(epi$chr, "_", epi$start, "_", epi$end) # fix the 746 ids (scientific notation appread!!)
-tf <- fread("ENCODE_TFs_nonzero_labels.dat", sep="\t", header=T)
+tf <- fread("ENCODE_TFs_nonzero_labels.bed", sep="\t", header=T)
 tf$id <- paste0(tf$chr, "_", tf$start, "_", tf$end) # fix the 746 ids (scientific notation appread!!)
 
 output <- cbind(human, epi[which(epi$id %in% human$id),-c(1:4)], tf[which(tf$id %in% human$id),-c(1:4)])
 output_full <- cbind(dna.dat[which(dna.dat$id %in% human$id), ], human[,-c(1:4)], epi[which(epi$id %in% human$id),-c(1:4)], tf[which(tf$id %in% human$id),-c(1:4)])
 colnames(output) <- c(colnames(human), colnames(epi)[-c(1:4)], colnames(tf)[-c(1:4)])
 colnames(output_full) <- c(colnames(dna.dat), colnames(human)[-c(1:4)], colnames(epi)[-c(1:4)], colnames(tf)[-c(1:4)])
-fwrite(output,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.dat", sep="\t", row.names=F, quote=F)
-fwrite(output_full,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels.dat", sep="\t", row.names=F, quote=F)
+fwrite(output,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.bed", sep="\t", row.names=F, quote=F)
+fwrite(output_full,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels.bed", sep="\t", row.names=F, quote=F)
 ```
 
 # Results
@@ -124,6 +124,6 @@ Final set of data (before entering DL pipeline) stats are as follows:
 
 |Type|Filename|Location|nBins|nLabels|
 |---|---|---|---|---|
-|Genomic DNA|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.dat|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|---|
-|Binary Labels|HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.dat|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
-|Data + Labels|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels.dat|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
+|Genomic DNA|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|---|
+|Binary Labels|HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
+|Data + Labels|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
