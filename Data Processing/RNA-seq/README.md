@@ -265,7 +265,6 @@ This subsection follows similar steps as in [```Psychencode data```](https://git
 ```sh
 intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b final.tf.dat > final.tf.overlaps.bed
 cut -f1-4,10-138 final.tf.overlaps.bed > final.tf.overlaps.dropped.bed
-sed 's/\./0/g' final.tf.overlaps.dropped.bed > final.tf.overlaps.dropped.fixed.bed
 ```
 ### 2.7 Filter similar overlapping bins with the max overlap size (last column)
 This subsection ensures each bin in the file is unique by filtering them with maximum overlap among similar bins. 
@@ -276,15 +275,19 @@ library(data.table)
 con <- file("final.tf.bed","r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
 close(con)
-dat <- fread("final.dat.tf.overlaps.dropped.fixed.bed", sep="\t", header=F)
+dat <- fread("final.dat.tf.overlaps.dropped.bed", sep="\t", header=F)
 # V4, V133 are binID and overlapSize, respectively; NOTE: the last command in the pipe drops the overlapInfo column
 dat <- dat %>% group_by(V4) %>% slice(which.max(V133)) %>% select(-c(V133))
 colnames(dat) <- header
-fwrite(dat, file="final.tf.overlaps.dropped.fixed.filtered.bed", sep="\t")
+fwrite(dat, file="final.tf.overlaps.dropped.filtered.bed", sep="\t")
+```
+### Replace all the dots
+```sh
+sed 's/\./0/g' final.tf.overlaps.dropped.filtered.bed > final.tf.overlaps.dropped.filtered.fixed.bed
 ```
 ### 2.8 Sorting bins
 This subsection sorts bins (they are in BED format) by chromosome then by start position. Ideally we could've use BinIDs for sorting but due to intermediate processing some binIDs are changed to scientific notation (e.g. chr10_100999801_1001e+08).
 ```sh
-sort -k 1,1 -k2,2n final.tf.overlaps.dropped.fixed.filtered.bed > final.tf.overlaps.dropped.fixed.filtered.sorted.bed
+sort -k 1,1 -k2,2n final.tf.overlaps.dropped.filtered.fixed.bed > final.tf.overlaps.dropped.filtered.fixed.sorted.bed
 ```
 
