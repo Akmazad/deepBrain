@@ -21,7 +21,7 @@ def split_util(fileName, df, logger):
     inputs = df["dna.seq"].apply(lambda x: pd.Series(list(x)))  # creating the neucleotide array from the string
     inputs = inputs.astype("category", categories=["A", "C", "G", "T"], ordered=True)  # categorize them
     logger.info("nRow values: {}".format(inputs.shape[0]))
-    inputNumpy = pd.get_dummies(inputs).to_numpy().reshape(-1, 1000, 4).swapaxes(1, 2)  # one-hot encoding of inputs
+    inputNumpy = pd.get_dummies(inputs).to_numpy().reshape(-1, inputs.shape[0], 4).swapaxes(1, 2)  # one-hot encoding of inputs
     np.save(fileName + "_value", inputNumpy[:])  # save the numpy nDarray into the file
     logger.info("value saved")
     del inputNumpy
