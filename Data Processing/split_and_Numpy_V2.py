@@ -36,7 +36,7 @@ def split_util(fileName, df, logger):
 
 
 def split(filename, args, logger):
-    df = pd.read_csv(filename + ".dat", low_memory=True, sep='\t')
+    df = pd.read_csv(filename + ".bed", low_memory=True, sep='\t')
     chrName = 'chr' + args.valid_chr_id
 
     train_df = df[df['chr'] != chrName]
