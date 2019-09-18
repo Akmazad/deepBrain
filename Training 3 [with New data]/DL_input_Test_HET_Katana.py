@@ -553,7 +553,7 @@ def main():
     print(device)
 
     DataPath = args.DataDir
-        if not (os.path.exists(os.path.join(DataPath, args.name))):
+    if not (os.path.exists(os.path.join(DataPath, args.name))):
         os.mkdir(os.path.join(DataPath, args.name))
     f = open(os.path.join(DataPath, args.name)+"/"+"{}.log".format(args.name), "w+")
     f.close()
