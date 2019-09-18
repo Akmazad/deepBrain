@@ -13,11 +13,11 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 ### Merged and filtered peaks
 - Filtering thresholds applied: peak value > 0; nSample >= 2
 
-|Name|nSample|nPeaks|
-|---|---|---|
-|EpiMap|150|353,566|
-|HumanFC|288|118,347|
-|ENCODE TFs|128|725,276|
+|Name|nSample|nPeaks|FileName|FileLocation|FileSize|
+|---|---|---|---|---|---|
+|EpiMap|150|353,566|mergedPeakHeightMatrix_EpiMap_filtered.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|123,333,174B|
+|HumanFC|288|118,347|mergedPeakHeightMatrix_HumanFC_filtered.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|73,943,685B|
+|ENCODE TFs|128|final.tf.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|725,276|220,373,843|
 
 ### Non-zero genomic bins
 - Genomic Bins (sized = 200bp) with at least one signal (binary 1) found among all samples
