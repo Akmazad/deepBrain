@@ -553,7 +553,11 @@ def main():
     print(device)
 
     DataPath = args.DataDir
-    logger = get_logger(os.path.join(os.path.join(DataPath, args.name, 'staticConvNet'), "{}.log".format(args.name)))
+        if not (os.path.exists(os.path.join(DataPath, args.name))):
+        os.mkdir(os.path.join(DataPath, args.name))
+    f = open(os.path.join(DataPath, args.name)+"/"+"{}.log".format(args.name), "w+")
+    f.close()
+    logger = get_logger(os.path.join(os.path.join(DataPath, args.name), "{}.log".format(args.name)))
 
     trainDataset = LoadDataset(args, dataPath=DataPath, dataFile=args.TrainingDataFile,
                                labelFile=args.TrainingLabelFile)
