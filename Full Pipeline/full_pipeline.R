@@ -2,9 +2,11 @@
 #         mergedPeaks (mergedPeakHeightMatrix_HumanFC_filtered.bed, 
 #         mergedPeakHeightMatrix_EpiMap_filtered.bed, 
 #         final.dat.tf.overlaps.bed)
-# Host: KATANA 
-#       Data dir: /srv/scratch/z3526914/DeepBrain/Data
-#       Script dir: /srv/scratch/z3526914/DeepBrain/Scripts
+# Host: RNA machine/KATANA 
+#       RNA:    Data dir: /Volumes/Data1/PROJECTS/DeepLearning/Test
+#               Script dir: /Volumes/Data1/PROJECTS/DeepLearning/Test
+#       KATANA: Data dir: /srv/scratch/z3526914/DeepBrain/Data
+#               Script dir: /srv/scratch/z3526914/DeepBrain/Scripts
 options(scipen=999) # prevent auto-scientific notations of numeric values
 
 binSize = 200
