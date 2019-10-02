@@ -11,4 +11,8 @@
 
 module load R/3.5.3
 
-Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R
+Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
+	/srv/scratch/z3526914/DeepBrain/Data \
+	400 \
+	HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed \
+	HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed
