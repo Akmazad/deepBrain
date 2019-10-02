@@ -57,7 +57,14 @@ fwrite(human.epi.tf,file="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed", sep=
 ```
 
 ### Extract genomic data (dna seq) for non-zero bins
-Need to run on KATANA ([```ExtractDNAseq_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractDNAseq_KATANA.sh))
+Need to run on KATANA ([```ExtractDNAseq_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractDNAseq_KATANA.sh)) with following command (excerpt from the bash script):
+```sh
+Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
+	/srv/scratch/z3526914/DeepBrain/Data \
+	400 \
+	HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed \
+	HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed
+```
 ```r
 rm(list = ls(all.names = TRUE))
 setwd('/srv/scratch/z3526914/DeepBrain/Data')
