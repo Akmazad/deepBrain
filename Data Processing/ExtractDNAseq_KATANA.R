@@ -4,15 +4,13 @@ args = commandArgs(trailingOnly=FALSE)
 print(args)
 
 dataDir = args[6]
-flankingLength = args[7]
+flankingLength = strtoi(args[7])
 inputFile = args[8]
 outputFile = args[9]
 
 setwd(dataDir)
 library(data.table)
 library(dplyr)
-
-
 
 library("BSgenome.Hsapiens.UCSC.hg19")
 hg <- BSgenome.Hsapiens.UCSC.hg19
