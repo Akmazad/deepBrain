@@ -1,16 +1,18 @@
 rm(list = ls(all.names = TRUE))
-setwd('/srv/scratch/z3526914/DeepBrain/Data')
+# Option list
+args = commandArgs(trailingOnly=FALSE)
+print(args)
+
+dataDir = args[6]
+flankingLength = args[7]
+inputFile = args[8]
+outputFile = args[9]
+
+setwd(dataDir)
 library(data.table)
 library(dplyr)
 
-# ### Option list
-args = commandArgs(trailingOnly=FALSE)
 
-### Make Cluster nodes for parallelizing
-dataDir = args[3]
-flankingLength = args[4]
-inputFile = args[5]
-outputFile = args[5]
 
 library("BSgenome.Hsapiens.UCSC.hg19")
 hg <- BSgenome.Hsapiens.UCSC.hg19
