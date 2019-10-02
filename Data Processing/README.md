@@ -33,7 +33,7 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 # for saving non-zero binInfo
 awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > EpiMap_nonZero.binInfo.bed
 awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_nonZero.binInfo.bed
-awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.dat.tf.overlaps.dropped.filtered.fixed.sorted.bed > ENCODE_nonZero.binInfo.bed
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.tf.overlaps.dropped.filtered.fixed.sorted.bed > ENCODE_nonZero.binInfo.bed
 ```
 ```r
 # for making Union of all non-zero binInfo
