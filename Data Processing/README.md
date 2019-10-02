@@ -19,7 +19,7 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 |HumanFC|288|118,347|mergedPeakHeightMatrix_HumanFC_filtered.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|73,943,685 byte|
 |ENCODE TFs|128|725,276|final.tf.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|220,373,843 byte|
 
-### Non-zero genomic bins
+## (Non-zero genomic bins) based pipeline
 - Genomic Bins (sized = 200bp) with at least one signal (binary 1) found among all samples
 
 |Name|nBins|nPeak coordinates (filtered)|
@@ -56,7 +56,7 @@ human.epi.tf <- dplyr::union(human.epi,tf)
 fwrite(human.epi.tf,file="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed", sep="\t", row.names=F, quote=F)
 ```
 
-## Extract genomic data (dna seq) for non-zero bins
+### Extract genomic data (dna seq) for non-zero bins
 Need to run on KATANA ([```ExtractDNAseq_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractDNAseq_KATANA.sh))
 ```r
 rm(list = ls(all.names = TRUE))
@@ -64,17 +64,25 @@ setwd('/srv/scratch/z3526914/DeepBrain/Data')
 library(data.table)
 library(dplyr)
 
+# ### Option list
+args = commandArgs(trailingOnly=FALSE)
+
+### Make Cluster nodes for parallelizing
+dataDir = args[3]
+flankingLength = args[4]
+inputFile = args[5]
+outputFile = args[5]
+
 library("BSgenome.Hsapiens.UCSC.hg19")
 hg <- BSgenome.Hsapiens.UCSC.hg19
-flankingLength <- 400  
 
 # read non-zero bins
-nonZerobins <- fread("HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed", sep="\t", header=T)
+nonZerobins <- fread(inputFile, sep="\t", header=T)
 seq <- getSeq(hg,nonZerobins$chr,start=nonZerobins$start-flankingLength,end=nonZerobins$end+flankingLength)
 seq <- as.character(as.data.frame(seq)[[1]])
 nonZerobins.seq <- cbind(nonZerobins,seq)
 colnames(nonZerobins.seq) <- c(colnames(nonZerobins),"dna.seq")
-fwrite(nonZerobins.seq, file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed", sep="\t", row.names=F, quote=F)
+fwrite(nonZerobins.seq, file=outputFile, sep="\t", row.names=F, quote=F)
 ```
 
 ## Extract Labels (binary signals) for non-zero bins
@@ -119,7 +127,7 @@ fwrite(output,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.bed", sep="\t", row
 fwrite(output_full,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels.bed", sep="\t", row.names=F, quote=F)
 ```
 
-# Results
+### Results
 Final set of data (before entering DL pipeline) stats are as follows:
 
 |Type|Filename|Location|nBins|nLabels|
@@ -127,3 +135,17 @@ Final set of data (before entering DL pipeline) stats are as follows:
 |Genomic DNA|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|---|
 |Binary Labels|HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
 |Data + Labels|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
+
+## (TF-specific genomic bins) based pipeline
+- Genomic Bins (sized = 200bp) with at least TF signal (binary 1) found among ENCODE TF genes
+
+|Name|nBins|nPeak coordinates (filtered)|
+|---|---|---|
+|ENCODE TFs|2,441,723|725,276|
+
+### Get genomic bins with non-Zero TF signals
+```sh
+# for saving non-zero binInfo
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.tf.overlaps.dropped.filtered.fixed.sorted.bed > ENCODE_nonZero.binInfo.bed
+```
+
