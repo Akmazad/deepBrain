@@ -65,33 +65,6 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
 	HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed \
 	HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed
 ```
-```r
-rm(list = ls(all.names = TRUE))
-setwd('/srv/scratch/z3526914/DeepBrain/Data')
-library(data.table)
-library(dplyr)
-
-# ### Option list
-args = commandArgs(trailingOnly=FALSE)
-
-### Make Cluster nodes for parallelizing
-dataDir = args[3]
-flankingLength = args[4]
-inputFile = args[5]
-outputFile = args[5]
-
-library("BSgenome.Hsapiens.UCSC.hg19")
-hg <- BSgenome.Hsapiens.UCSC.hg19
-
-# read non-zero bins
-nonZerobins <- fread(inputFile, sep="\t", header=T)
-seq <- getSeq(hg,nonZerobins$chr,start=nonZerobins$start-flankingLength,end=nonZerobins$end+flankingLength)
-seq <- as.character(as.data.frame(seq)[[1]])
-nonZerobins.seq <- cbind(nonZerobins,seq)
-colnames(nonZerobins.seq) <- c(colnames(nonZerobins),"dna.seq")
-fwrite(nonZerobins.seq, file=outputFile, sep="\t", row.names=F, quote=F)
-```
-
 ## Extract Labels (binary signals) for non-zero bins
 - Extract labels for non-zero bins from each data files (HumanFC, EpiMap and ENCODE_TFs)
 ```sh
@@ -155,4 +128,15 @@ Final set of data (before entering DL pipeline) stats are as follows:
 # for saving non-zero binInfo
 awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.tf.overlaps.dropped.filtered.fixed.sorted.bed > ENCODE_nonZero.binInfo.bed
 ```
+### Extract genomic data (dna seq) for non-zero bins
+Need to run on KATANA ([```ExtractDNAseq_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractDNAseq_KATANA.sh)) with following command (excerpt from the bash script):
+```sh
+Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
+	/srv/scratch/z3526914/DeepBrain/Data \
+	400 \
+	ENCODE_nonZero.binInfo.bed \
+	HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed
+```
+Note, the input file (args[4]) is the 'ENCODE_nonZero.binInfo.bed', and only those bins (non-zero TFs) were considered for all other datasets. Hence the output file name 'HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed'.
+
 
