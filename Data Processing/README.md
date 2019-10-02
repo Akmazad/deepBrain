@@ -1,7 +1,7 @@
 # Data preprocessing for Deep learning training by analysing RNA-seq, CHIP-seq, ATAC-seq, and Transcription factor peaks (also CHIP-seq from UCSC-DCC)
 Our pipeline considers only those chromosomal bins for DL training that has at least feature found. 
 
-## Processing pipeline
+## 1. Processing pipeline
 |Data|Used for|Pipeline Documentations|
 |---|---|---|
 |EpiMap (Chip-seq)|Sample peak Label extraction|[```ReadMe```](https://github.com/Akmazad/deepBrain/tree/master/Data%20Processing/Psychencode_June2019/README.md)|
@@ -9,8 +9,8 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 |ENCODE TFs (RNA-seq + ENCODE DCC)|TF label extraction|[```ReadMe```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/README.md)|
 
 
-## Processed data
-### Merged and filtered peaks
+## 2. Processed data
+### 2.1 Merged and filtered peaks
 - Filtering thresholds applied: peak value > 0; nSample >= 2
 
 |Name|nSample|nPeaks|FileName|FileLocation|FileSize|
@@ -19,7 +19,7 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 |HumanFC|288|118,347|mergedPeakHeightMatrix_HumanFC_filtered.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|73,943,685 byte|
 |ENCODE TFs|128|725,276|final.tf.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|220,373,843 byte|
 
-## (Non-zero genomic bins) based pipeline
+## 3. (Non-zero genomic bins) based pipeline
 - Genomic Bins (sized = 200bp) with at least one signal (binary 1) found among all samples
 
 |Name|nBins|nPeak coordinates (filtered)|
@@ -56,7 +56,7 @@ human.epi.tf <- dplyr::union(human.epi,tf)
 fwrite(human.epi.tf,file="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed", sep="\t", row.names=F, quote=F)
 ```
 
-### Extract genomic data (dna seq) for non-zero bins
+### 3.1 Extract genomic data (dna seq) for non-zero bins
 Need to run on KATANA ([```ExtractDNAseq_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractDNAseq_KATANA.sh)) with following command (excerpt from the bash script):
 ```sh
 Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
@@ -65,7 +65,7 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
 	HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed \
 	HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed
 ```
-## Extract Labels (binary signals) for non-zero bins
+### 3.2 Extract Labels (binary signals) for non-zero bins
 - Extract labels for non-zero bins from each data files (HumanFC, EpiMap and ENCODE_TFs)
 ```sh
 # its checking binInfo of both files (chr, start and end coordinates of bins)
@@ -107,7 +107,7 @@ fwrite(output,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.bed", sep="\t", row
 fwrite(output_full,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels.bed", sep="\t", row.names=F, quote=F)
 ```
 
-### Results
+### 3.3 Results
 Final set of data (before entering DL pipeline) stats are as follows:
 
 |Type|Filename|Location|nBins|nLabels|
@@ -116,19 +116,19 @@ Final set of data (before entering DL pipeline) stats are as follows:
 |Binary Labels|HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
 |Data + Labels|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
 
-## (TF-specific genomic bins) based pipeline
+## 4. (TF-specific genomic bins) based pipeline
 - Genomic Bins (sized = 200bp) with at least TF signal (binary 1) found among ENCODE TF genes
 
 |Name|nBins|nPeak coordinates (filtered)|
 |---|---|---|
 |ENCODE TFs|2,441,723|725,276|
 
-### Get genomic bins with non-Zero TF signals
+### 4.1 Get genomic bins with non-Zero TF signals
 ```sh
 # for saving non-zero binInfo
 awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.tf.overlaps.dropped.filtered.fixed.sorted.bed > ENCODE_nonZero.binInfo.bed
 ```
-### Extract genomic data (dna seq) for non-zero bins
+### 4.2 Extract genomic data (dna seq) for non-zero bins
 Need to run on KATANA ([```ExtractDNAseq_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractDNAseq_KATANA.sh)) with following command (excerpt from the bash script):
 ```sh
 Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
@@ -139,4 +139,15 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
 ```
 Note, the input file (args[4]) is the 'ENCODE_nonZero.binInfo.bed', and only those bins (non-zero TFs) were considered for all other datasets. Hence the output file name 'HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed'.
 
+### 3.2 Extract Labels (binary signals) for non-zero bins
+- Extract labels for non-zero bins from each data files (HumanFC, EpiMap and ENCODE_TFs)
+```sh
+# its checking binInfo of both files (chr, start and end coordinates of bins)
+awk -F "\t" 'FILENAME=="ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' ENCODE_nonZero.binInfo.bed mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_tf_specific_labels.bed
+
+awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > EpiMap_nonzero_labels.bed
+
+awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed"{A[$1$2$3]=$1$2$3} FILENAME=="final.dat.tf.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed final.dat.tf.overlaps.dropped.fixed.filtered.sorted.bed > ENCODE_TFs_nonzero_labels.bed
+
+```
 
