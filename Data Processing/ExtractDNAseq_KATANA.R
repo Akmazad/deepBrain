@@ -17,6 +17,10 @@ hg <- BSgenome.Hsapiens.UCSC.hg19
 
 # read non-zero bins
 nonZerobins <- fread(inputFile, sep="\t", header=T)
+if(prod(colnames(nonZerobins) == c("chr", "start", "end", "binID")) == 0){
+	colnames(nonZerobins) <- c("chr", "start", "end", "binID")
+}
+
 seq <- getSeq(hg,nonZerobins$chr,start=nonZerobins$start-flankingLength,end=nonZerobins$end+flankingLength)
 seq <- as.character(as.data.frame(seq)[[1]])
 nonZerobins.seq <- cbind(nonZerobins,seq)
