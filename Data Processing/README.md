@@ -127,6 +127,9 @@ Final set of data (before entering DL pipeline) stats are as follows:
 ```sh
 # for saving non-zero binInfo
 awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.tf.overlaps.dropped.fixed.filtered.sorted.bed > ENCODE_nonZero.binInfo.bed
+
+# for adding the column headers
+echo -e "chr\tstart\t end\tid\n$(cat ENCODE_nonZero.binInfo.bed)" > ENCODE_nonZero.binInfo.bed
 ```
 ### 4.2 Extract genomic data (dna seq) for non-zero bins
 Need to run on KATANA ([```ExtractDNAseq_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractDNAseq_KATANA.sh)) with following command (excerpt from the bash script):
