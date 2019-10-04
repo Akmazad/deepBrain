@@ -141,7 +141,7 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
 ```
 Note, the input file (args[4]) is the 'ENCODE_nonZero.binInfo.bed', and only those bins (non-zero TFs) were considered for all other datasets. Hence the output file name 'HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed'.
 
-### 3.2 Extract Labels (binary signals) for tf-specific bins
+### 4.2 Extract Labels (binary signals) for tf-specific bins
 - Extract labels for tf-specific bins from each data files (HumanFC, EpiMap and ENCODE_TFs)
 ```sh
 # its checking binInfo of both files (chr, start and end coordinates of bins)
