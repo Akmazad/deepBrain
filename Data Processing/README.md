@@ -89,7 +89,8 @@ library(dplyr)
 # 3. ENCODE_TFs_nonzero_labels.bed
 # 4. HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed
 
-dna.dat <- fread("HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed", sep="\t", header=T) # ids seemed fine: "grep -o 'e+' HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed | wc -l" return 0
+dna.dat <- fread("HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed", sep="\t", header=T) # check ids: "grep -o 'e+' HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed | wc -l" should return 0
+dna.dat$id = paste0(dna.dat$chr, "_", dna.dat$start, "_", dna.dat$end)
 
 human <- fread("HumanFC_nonzero_labels.bed", sep="\t", header=T)
 human$id <- paste0(human$chr, "_", human$start, "_", human$end) # fix the 746 ids (scientific notation appread!!)
