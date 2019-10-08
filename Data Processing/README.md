@@ -60,7 +60,7 @@ fwrite(human.epi.tf,file="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed", sep=
 Need to run on KATANA ([```ExtractDNAseq_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractDNAseq_KATANA.sh)) with following command (excerpt from the bash script):
 ```sh
 Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
-	/srv/scratch/z3526914/DeepBrain/Data \
+	/srv/scratch/z3526914/DeepBrain/Data/ \
 	400 \
 	HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed \
 	HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed
@@ -135,7 +135,7 @@ echo -e "chr\tstart\tend\tid\n$(cat ENCODE_nonZero.binInfo.bed)" > ENCODE_nonZer
 Need to run on KATANA ([```ExtractDNAseq_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractDNAseq_KATANA.sh)) with following command (excerpt from the bash script):
 ```sh
 Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
-	/srv/scratch/z3526914/DeepBrain/Data \
+	/srv/scratch/z3526914/DeepBrain/Data/ \
 	400 \
 	ENCODE_nonZero.binInfo.bed \
 	HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed
@@ -156,7 +156,7 @@ awk -F "\t" 'FILENAME=="ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME==
 - Merge all labels. Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh)). DNA sequences (Data) will be also augmented. Command excerpt from the bash script:
 ```sh
 Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractLabels_KATANA.R \
-	/srv/scratch/z3526914/DeepBrain/Data \
+	/srv/scratch/z3526914/DeepBrain/Data/ \
 	HumanFC_tf_specific_labels.bed \
 	EpiMap_tf_specific_labels.bed \
 	ENCODE_TFs_tf_specific_labels.bed \
