@@ -38,7 +38,7 @@ awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; br
 ```r
 # for making Union of all non-zero binInfo
 # on KATANA (head node): 
-setwd('/srv/scratch/z3526914/DeepBrain/Data')
+setwd('/srv/scratch/z3526914/DeepBrain/Data/')
 library(dplyr)
 library(data.table)
 
@@ -79,7 +79,7 @@ awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed"{A[$1$2$
 - Merge all labels. Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh)). DNA sequences (Data) will be also augmented
 ```r
 rm(list = ls(all.names = TRUE))
-setwd('/srv/scratch/z3526914/DeepBrain/Data')
+setwd('/srv/scratch/z3526914/DeepBrain/Data/')
 library(data.table)
 library(dplyr)
 
