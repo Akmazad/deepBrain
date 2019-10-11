@@ -142,7 +142,7 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
 ```
 Note, the input file (args[4]) is the 'ENCODE_nonZero.binInfo.bed', and only those bins (non-zero TFs) were considered for all other datasets. Hence the output file name 'HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed'.
 
-### 4.2 Extract Labels (binary signals) for tf-specific bins
+### 4.3 Extract Labels (binary signals) for tf-specific bins
 - Extract labels for tf-specific bins from each data files (HumanFC, EpiMap and ENCODE_TFs)
 ```sh
 # its checking binInfo of both files (chr, start and end coordinates of bins)
@@ -163,4 +163,75 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractLabels_KATANA.R \
 	HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed \
 	HumanFC_ENCODE_EpiMap_tf_specific.bin.Labels.bed \
 	HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq_Labels.bed
+```
+## 5. (TF-specific genomic bins AND (nonZero HumanFC OR nonZero EpiMap)) based pipeline
+|Name|nBins|nPeak coordinates (filtered)|
+|---|---|---|
+|EpiMap|1,744,883|353,566|
+|HumanFC|490,233|118,347|
+|ENCODE TFs|2,441,723|725,276|
+|(HumanFC OR EpiMap) nonZero AND tf-specific|741,719|---|
+
+- Scripts used:
+```sh
+# for saving non-zero binInfo
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > EpiMap_nonZero.binInfo.bed
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_nonZero.binInfo.bed
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.tf.overlaps.dropped.fixed.filtered.sorted.bed > ENCODE_nonZero.binInfo.bed
+```
+```r
+# for making Union of all non-zero binInfo
+# on KATANA (head node): 
+setwd('/srv/scratch/z3526914/DeepBrain/Data/')
+library(dplyr)
+library(data.table)
+
+# binIDs got damaged somehow (ie. scientific notation appears) - don't know when and why, so need to reconstruct
+epi <- read.table("EpiMap_nonZero.binInfo.bed", sep='\t', header=F); epi <- cbind(epi[,-4],paste0(epi[,1],"_",epi[,2],"_",epi[,3]))
+human <- read.table("HumanFC_nonZero.binInfo.bed", sep='\t', header=F);  human <- cbind(human[,-4],paste0(human[,1],"_",human[,2],"_",human[,3]))
+tf <- read.table("ENCODE_nonZero.binInfo.bed", sep='\t', header=F); tf <- cbind(tf[,-4],paste0(tf[,1],"_",tf[,2],"_",tf[,3]))
+colnames(human)=colnames(epi)=colnames(tf) <- c("chr","start","end","id")
+
+# perform Union of records (bininfo); Ignore the warnings (auto-coercing of columns is helpful here)
+human.epi <- dplyr::union(human,epi)
+
+human.epi$chr = as.character(human.epi$chr)
+human.epi$start = as.character(human.epi$start)
+human.epi$end = as.character(human.epi$end)
+human.epi$id = as.character(human.epi$id)
+
+human.epi.tf <- dplyr::intersect(human.epi,tf)
+# nrow(human.epi.tf):
+# [1] 741,719
+fwrite(human.epi.tf,file="HumanFC_OR_EpiMap_AND_ENCODE_nonZero.binInfo.bed", sep="\t", row.names=F, quote=F)
+```
+### 5.1 Extract genomic data (dna seq) for non-zero bins
+Need to run on KATANA ([```ExtractDNAseq_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractDNAseq_KATANA.sh)) with following command (excerpt from the bash script):
+```sh
+Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
+	/srv/scratch/z3526914/DeepBrain/Data/ \
+	400 \
+	HumanFC_OR_EpiMap_AND_ENCODE_nonZero.binInfo.bed \
+	HumanFC_OR_EpiMap_AND_ENCODE_nonZero.bin.Seq.bed
+```
+### 5.2 Extract Labels (binary signals) for non-zero bins
+- Extract labels for bins-of-interest from each data files (HumanFC, EpiMap and ENCODE_TFs)
+```sh
+# its checking binInfo of both files (chr, start and end coordinates of bins)
+awk -F "\t" 'FILENAME=="HumanFC_OR_EpiMap_AND_ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_OR_EpiMap_AND_ENCODE_nonZero.binInfo.bed mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_tf_specific_v2_labels.bed
+
+awk -F "\t" 'FILENAME=="HumanFC_OR_EpiMap_AND_ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_OR_EpiMap_AND_ENCODE_nonZero.binInfo.bed mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > EpiMap_tf_specific_v2_labels.bed
+
+awk -F "\t" 'FILENAME=="HumanFC_OR_EpiMap_AND_ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="final.tf.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_OR_EpiMap_AND_ENCODE_nonZero.binInfo.bed final.tf.overlaps.dropped.fixed.filtered.sorted.bed > ENCODE_TFs_tf_specific_v2_labels.bed
+```
+- Merge all labels. Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh)). DNA sequences (Data) will be also augmented. Command excerpt from the bash script:
+```sh
+Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractLabels_KATANA.R \
+	/srv/scratch/z3526914/DeepBrain/Data/ \
+	HumanFC_tf_specific_v2_labels.bed \
+	EpiMap_tf_specific_v2_labels.bed \
+	ENCODE_TFs_tf_specific_v2_labels.bed \
+	HumanFC_OR_EpiMap_AND_ENCODE_nonZero.bin.Seq.bed \
+	HumanFC_OR_EpiMap_AND_ENCODE_tf_specific.bin.Labels.bed \
+	HumanFC_OR_EpiMap_AND_ENCODE_tf_specific.bin.Seq_Labels.bed
 ```
