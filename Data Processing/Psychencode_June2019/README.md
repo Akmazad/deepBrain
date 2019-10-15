@@ -8,7 +8,7 @@ In this data collection, we've gathered and preprocessed (using [```peak_process
 
 # Method
 ## Data Collection [Contributor: Jerry Offor]
-EpiMap and HumanFC studies were download from the PsychEncode Consortium using synapseClient(https://www.synapse.org). All samples from EpiMap came from NIMH Human Brain Collection core (HBCC).After dissection, they were shipped for sample preparation and CHIPseq to Ichan School of Medicince-Mt Sinai (ISMMS) while all samples from HumanFc study came from Mount Sinai NIH Brain Bank and Tissue Repository and then shipped for sample preparation and ATAC-Seq to Duke.
+EpiMap and HumanFC studies were download from the PsychEncode Consortium using synapseClient(https://www.synapse.org). All samples from EpiMap came from NIMH Human Brain Collection core (HBCC).After dissection, they were shipped for sample preparation and CHIPseq to Ichan School of Medicince-Mt Sinai (ISMMS). Samples from HumanFc study came from Mount Sinai NIH Brain Bank and Tissue Repository and then shipped for sample preparation and ATAC-Seq to Duke.
 
 ### EpiMap Data-ChiPseq
 BWA (VERSION 0.7.8) was used to align paired end FASTQ files to the human genome (HG19). Duplicates were mark into bamfiles using Picard (version 1.1.12) MarkDups. Filtering of improperly paired reads and multi-mapped reads was done with Samtools with defined parameters. The peaks (Narrow peaks) from Duplicate marked were call with Macs2.
