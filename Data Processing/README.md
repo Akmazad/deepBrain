@@ -180,7 +180,7 @@ awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; br
 awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }' final.tf.overlaps.dropped.fixed.filtered.sorted.bed > ENCODE_nonZero.binInfo.bed
 ```
 ```r
-# for making Union of all non-zero binInfo
+# for making bins-of-interest: [(HumanFC OR EpiMap) AND TFs] 
 # on KATANA (head node): 
 setwd('/srv/scratch/z3526914/DeepBrain/Data/')
 library(dplyr)
@@ -193,14 +193,14 @@ tf <- read.table("ENCODE_nonZero.binInfo.bed", sep='\t', header=F); tf <- cbind(
 colnames(human)=colnames(epi)=colnames(tf) <- c("chr","start","end","id")
 
 # perform Union of records (bininfo); Ignore the warnings (auto-coercing of columns is helpful here)
-human.epi <- dplyr::union(human,epi)
+human.epi <- dplyr::union(human,epi)		# HumanFC OR EpiMap
 
 human.epi$chr = as.character(human.epi$chr)
 human.epi$start = as.character(human.epi$start)
 human.epi$end = as.character(human.epi$end)
 human.epi$id = as.character(human.epi$id)
 
-human.epi.tf <- dplyr::intersect(human.epi,tf)
+human.epi.tf <- dplyr::intersect(human.epi,tf)	# [HumanFC OR EpiMap] AND TFs
 # nrow(human.epi.tf):
 # [1] 741,719
 fwrite(human.epi.tf,file="HumanFC_OR_EpiMap_AND_ENCODE_nonZero.binInfo.bed", sep="\t", row.names=F, quote=F)
