@@ -17,4 +17,4 @@ new_peaks <- new_peaks[which(rowSums2(new_peaks, na.rm = T) > 1),]
 binInfo <- as.data.frame(do.call(rbind,strsplit(rownames(new_peaks), "_")))
 final.dat <- cbind(binInfo, rownames(new_peaks), new_peaks)
 colnames(final.dat) <- c("chr","start","end", "id", colnames(new_peaks))
-fwrite(final.dat, paste0(filename, "_filtered.BED"), row.names = F, quote = F)
+fwrite(final.dat, paste0(filename, "_filtered.BED"), row.names = F, quote = F, sep="\t")
