@@ -6,6 +6,7 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 |---|---|---|
 |EpiMap (Chip-seq)|Sample peak Label extraction|[```ReadMe```](https://github.com/Akmazad/deepBrain/tree/master/Data%20Processing/Psychencode_June2019/README.md)|
 |HumanFC (ATAC-seq)|Sample peak Label extraction|[```ReadMe```](https://github.com/Akmazad/deepBrain/tree/master/Data%20Processing/Psychencode_June2019/README.md)|
+|CAGE|Sample peak Label extraction|[```ReadMe```](https://github.com/Akmazad/deepBrain/tree/master/Data%20Processing/Psychencode_June2019/README.md)|
 |ENCODE TFs (RNA-seq + ENCODE DCC)|TF label extraction|[```ReadMe```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/README.md)|
 
 
