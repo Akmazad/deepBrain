@@ -60,7 +60,7 @@ close(con)
 dat <- fread("mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.bed", sep="\t", header=F)
 dat <- dat %>% group_by(V4) %>% slice(which.max(V293)) %>% select(-c(V293))
 colnames(dat) <- header
-fwrite(dat, file="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.dat", sep="\t")
+fwrite(dat, file="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.bed", sep="\t")
 
 # for EpiMap
 # read the header (i.e. sample names)
@@ -70,31 +70,33 @@ close(con)
 dat <- fread("mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.bed", sep="\t", header=F)
 dat <- dat %>% group_by(V4) %>% slice(which.max(V155)) %>% select(-c(V155))
 colnames(dat) <- header
-fwrite(dat, file="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.dat", sep="\t")
+fwrite(dat, file="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.bed", sep="\t")
 
 # for CAGE
 # read the header (i.e. sample names)
-con <- file("Brain_CagePeaks_filtered.overlaps.bed","r")
+con <- file("Brain_CagePeaks_filtered.bed","r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
 close(con)
 dat <- fread("Brain_CagePeaks_filtered.overlaps.dropped.bed", sep="\t", header=F)
 dat <- dat %>% group_by(V4) %>% slice(which.max(V141)) %>% select(-c(V141))
 colnames(dat) <- header
-fwrite(dat, file="Brain_CagePeaks_filtered.overlaps.dropped.filtered.dat", sep="\t")
+fwrite(dat, file="Brain_CagePeaks_filtered.overlaps.dropped.filtered.bed", sep="\t")
 
 ```
 
 - Replace all the dots (comes from the [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)) when no matches are found.
 ```sh
-sed 's/\./0/g' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.dat > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.dat
-sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.dat > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.dat
+sed 's/\./0/g' mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.bed > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.bed
+sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.bed > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.bed
+sed 's/\./0/g' Brain_CagePeaks_filtered.overlaps.dropped.filtered.bed > Brain_CagePeaks_filtered.overlaps.dropped.filtered.fixed.filtered.bed
 ```
 
 ## Sorting bins
 This subsection sorts bins (they are in BED format) by chromosome then by start position (same as [```this subsection```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/README.md#28-sorting-bins)).
 ```sh
-sort -k 1,1 -k2,2n mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.dat > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.dat
-sort -k 1,1 -k2,2n mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.dat > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.dat
+sort -k 1,1 -k2,2n mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.bed > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed
+sort -k 1,1 -k2,2n mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.bed > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed
+sort -k 1,1 -k2,2n Brain_CagePeaks_filtered.overlaps.dropped.filtered.fixed.filtered.bed > Brain_CagePeaks_filtered.overlaps.dropped.filtered.fixed.filtered.sorted.bed
 ```
 ################## End of data-processing Pipeline ##############
 
