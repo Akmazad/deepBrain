@@ -46,6 +46,7 @@ intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b Brain_CagePeaks_filtered.BED
 ```sh
 cut -f1-4,10-298 mergedPeakHeightMatrix_HumanFC_filtered.overlaps.bed > mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.bed
 cut -f1-4,10-160 mergedPeakHeightMatrix_EpiMap_filtered.overlaps.bed > mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.bed
+cut -f1-4,10-146 Brain_CagePeaks_filtered.overlaps.bed > Brain_CagePeaks_filtered.overlaps.dropped.bed
 ```
 - For the same bin that overlaps with multiple peak vectors, we should chose the one with max overlap, i.e. the last column indicates overlap ammount after running [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)). This subsection follows similar steps in [```TF processing pipeline```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/README.md#27-filter-similar-overlapping-bins-with-the-max-overlap-size-last-column). But the codes are copied here though. NOTE: THIS SCRIPT FOR HumanFC EXHAUSTS RNA MACHINE'S MEMORY: HENCE, KATANA IS APPLIED ([```HumanFC_post_processing.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/Psychencode_June2019/HumanFC_post_processing.sh)).
 ```r
@@ -70,6 +71,17 @@ dat <- fread("mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.bed", sep=
 dat <- dat %>% group_by(V4) %>% slice(which.max(V155)) %>% select(-c(V155))
 colnames(dat) <- header
 fwrite(dat, file="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.filtered.dat", sep="\t")
+
+# for CAGE
+# read the header (i.e. sample names)
+con <- file("Brain_CagePeaks_filtered.overlaps.bed","r")
+header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
+close(con)
+dat <- fread("Brain_CagePeaks_filtered.overlaps.dropped.bed", sep="\t", header=F)
+dat <- dat %>% group_by(V4) %>% slice(which.max(V141)) %>% select(-c(V141))
+colnames(dat) <- header
+fwrite(dat, file="Brain_CagePeaks_filtered.overlaps.dropped.filtered.dat", sep="\t")
+
 ```
 
 - Replace all the dots (comes from the [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)) when no matches are found.
