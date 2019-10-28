@@ -5,6 +5,7 @@ In this data collection, we've gathered and preprocessed (using [```peak_process
 |---|---|---|
 |EpiMap|150|479,476|
 |HumanFC|288|197,263|
+|CAGE|-(Jerry to fill)-|-(Jerry to fill)-|
 
 # Method
 ## Data Collection [Contributor: Jerry Offor]
@@ -28,6 +29,7 @@ We dropped rows for which there are no more than 1 sample peaks found by using [
 |---|---|---|
 |EpiMap|150|353,566|
 |HumanFC|288|118,347|
+|CAGE|136|9,479|
 
 This filtered peak matrices can be augmented with TF features sets using [```Merge_binned_TF_profiles_with_other_features.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/Merge_binned_TF_profiles_with_other_features.sh) script on Raijin *hugemem* queue.
 
