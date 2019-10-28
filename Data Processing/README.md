@@ -18,7 +18,8 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 |---|---|---|---|---|---|
 |EpiMap|150|353,566|mergedPeakHeightMatrix_EpiMap_filtered.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|123,333,174 byte|
 |HumanFC|288|118,347|mergedPeakHeightMatrix_HumanFC_filtered.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|73,943,685 byte|
-|ENCODE TFs|128|725,276|final.tf.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|220,373,843 byte|
+|CAGE|136|9,479|Brain_CagePeaks_filtered.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|73,943,685 byte|
+|ENCODE TFs|128|725,276|final.tf.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,029,207 byte|
 
 ## 3. (Non-zero genomic bins) based pipeline
 - Genomic Bins (sized = 200bp) with at least one signal (binary 1) found among all samples
