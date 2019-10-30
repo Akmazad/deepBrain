@@ -140,9 +140,9 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
 	/srv/scratch/z3526914/DeepBrain/Data/ \
 	400 \
 	ENCODE_nonZero.binInfo.bed \
-	HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed
+	HumanFC_CAGE_ENCODE_EpiMap_tf_specific.bin.Seq.bed
 ```
-Note, the input file (args[4]) is the 'ENCODE_nonZero.binInfo.bed', and only those bins (non-zero TFs) were considered for all other datasets. Hence the output file name 'HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed'.
+Note, the input file (args[4]) is the 'ENCODE_nonZero.binInfo.bed', and only those bins (non-zero TFs) were considered for all other datasets. Hence the output file name 'HumanFC_CAGE_ENCODE_EpiMap_tf_specific.bin.Seq.bed'.
 
 ### 4.3 Extract Labels (binary signals) for tf-specific bins
 - Extract labels for tf-specific bins from each data files (HumanFC, EpiMap and ENCODE_TFs)
@@ -153,6 +153,8 @@ awk -F "\t" 'FILENAME=="ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME==
 awk -F "\t" 'FILENAME=="ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' ENCODE_nonZero.binInfo.bed mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > EpiMap_tf_specific_labels.bed
 
 awk -F "\t" 'FILENAME=="ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="final.tf.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' ENCODE_nonZero.binInfo.bed final.tf.overlaps.dropped.fixed.filtered.sorted.bed > ENCODE_TFs_tf_specific_labels.bed
+
+awk -F "\t" 'FILENAME=="ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="Brain_CagePeaks_filtered.overlaps.dropped.filtered.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' ENCODE_nonZero.binInfo.bed Brain_CagePeaks_filtered.overlaps.dropped.filtered.fixed.filtered.sorted.bed > CAGE_tf_specific_labels.bed
 
 ```
 - Merge all labels. Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh)). DNA sequences (Data) will be also augmented. Command excerpt from the bash script:
