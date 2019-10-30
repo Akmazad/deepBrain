@@ -13,10 +13,10 @@ module load R/3.5.3
 
 Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractLabels_KATANA.R \
 	/srv/scratch/z3526914/DeepBrain/Data/ \
-	HumanFC_tf_specific_v2_labels.bed \
-	EpiMap_tf_specific_v2_labels.bed \
+	HumanFC_tf_specific_labels.bed \
+	EpiMap_tf_specific_labels.bed \
 	CAGE_tf_specific_labels.bed \
-	ENCODE_TFs_tf_specific_v2_labels.bed \
-	HumanFC_OR_EpiMap_AND_ENCODE_nonZero.bin.Seq.bed \
-	HumanFC_OR_EpiMap_AND_ENCODE_tf_specific.bin.Labels.bed \
-	HumanFC_OR_EpiMap_AND_ENCODE_tf_specific.bin.Seq_Labels.bed
+	ENCODE_TFs_tf_specific_labels.bed \
+	HumanFC_CAGE_ENCODE_EpiMap_tf_specific.bin.Seq.bed \
+	HumanFC_CAGE_ENCODE_EpiMap_tf_specific.bin.Labels.bed \
+	HumanFC_CAGE_ENCODE_EpiMap_tf_specific.bin.Seq_Labels.bed
