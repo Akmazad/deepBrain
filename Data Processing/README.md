@@ -145,7 +145,7 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
 Note, the input file (args[4]) is the 'ENCODE_nonZero.binInfo.bed', and only those bins (non-zero TFs) were considered for all other datasets. Hence the output file name 'HumanFC_CAGE_ENCODE_EpiMap_tf_specific.bin.Seq.bed'.
 
 ### 4.3 Extract Labels (binary signals) for tf-specific bins
-- Extract labels for tf-specific bins from each data files (HumanFC, EpiMap and ENCODE_TFs)
+- Extract labels for tf-specific bins from each data files (HumanFC, EpiMap, CAGE and ENCODE_TFs)
 ```sh
 # its checking binInfo of both files (chr, start and end coordinates of bins)
 awk -F "\t" 'FILENAME=="ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' ENCODE_nonZero.binInfo.bed mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_tf_specific_labels.bed
@@ -163,6 +163,7 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractLabels_KATANA.R \
 	/srv/scratch/z3526914/DeepBrain/Data/ \
 	HumanFC_tf_specific_labels.bed \
 	EpiMap_tf_specific_labels.bed \
+	CAGE_tf_specific_labels.bed \
 	ENCODE_TFs_tf_specific_labels.bed \
 	HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed \
 	HumanFC_ENCODE_EpiMap_tf_specific.bin.Labels.bed \
