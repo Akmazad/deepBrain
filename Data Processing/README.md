@@ -165,9 +165,9 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractLabels_KATANA.R \
 	EpiMap_tf_specific_labels.bed \
 	CAGE_tf_specific_labels.bed \
 	ENCODE_TFs_tf_specific_labels.bed \
-	HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq.bed \
-	HumanFC_ENCODE_EpiMap_tf_specific.bin.Labels.bed \
-	HumanFC_ENCODE_EpiMap_tf_specific.bin.Seq_Labels.bed
+	HumanFC_CAGE_ENCODE_EpiMap_tf_specific.bin.Seq.bed \
+	HumanFC_CAGE_ENCODE_EpiMap_tf_specific.bin.Labels.bed \
+	HumanFC_CAGE_ENCODE_EpiMap_tf_specific.bin.Seq_Labels.bed
 ```
 ## 5. (TF-specific genomic bins AND (nonZero HumanFC OR nonZero EpiMap)) based pipeline
 |Name|nBins|nPeak coordinates (filtered)|
