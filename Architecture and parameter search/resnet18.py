@@ -412,34 +412,33 @@ def getTPRandTNR(predicted, target, args, logger):
     #tpr = torch.sum(torch.eq(T,P) * torch.eq(torch.ones(N, dtype=torch.float32),T)).item()/t_ones
     #tnr = torch.sum(torch.eq(T,P) * torch.eq(torch.zeros(N, dtype=torch.float32),T)).item()/t_zeros
     #return tpr, tnr
-    t_ones_H_bool = torch.eq(torch.ones(T.shape[0], 288, dtype=torch.float32),T[:,0:288])
-    t_zeros_H_bool = torch.eq(torch.zeros(T.shape[0], 288, dtype=torch.float32),T[:,0:288])
+    t_ones_H_bool = torch.eq(torch.ones(T.shape[0], 288, dtype=torch.float32), T[:, 0:288])
+    t_zeros_H_bool = torch.eq(torch.zeros(T.shape[0], 288, dtype=torch.float32), T[:, 0:288])
     t_ones_H = torch.sum(t_ones_H_bool).item()
     t_zeros_H = torch.sum(t_zeros_H_bool).item()
-    tpr_H = torch.sum(torch.eq(T[:,0:288],P[:,0:288]) * t_ones_H_bool).item()/t_ones_H
-    tnr_H = torch.sum(torch.eq(T[:,0:288],P[:,0:288]) * t_zeros_H_bool).item()/t_zeros_H
-    
-    t_ones_E_bool = torch.eq(torch.ones(T.shape[0], 150, dtype=torch.float32),T[:,288:438])
-    t_zeros_E_bool = torch.eq(torch.zeros(T.shape[0], 150, dtype=torch.float32),T[:,288:438])
+    tpr_H = torch.sum(torch.eq(T[:, 0:288], P[:, 0:288]) * t_ones_H_bool).item() / t_ones_H if t_ones_H != 0 else 0
+    tnr_H = torch.sum(torch.eq(T[:, 0:288], P[:, 0:288]) * t_zeros_H_bool).item() / t_zeros_H if t_zeros_H != 0 else 0
+
+    t_ones_E_bool = torch.eq(torch.ones(T.shape[0], 150, dtype=torch.float32), T[:, 288:438])
+    t_zeros_E_bool = torch.eq(torch.zeros(T.shape[0], 150, dtype=torch.float32), T[:, 288:438])
     t_ones_E = torch.sum(t_ones_E_bool).item()
     t_zeros_E = torch.sum(t_zeros_E_bool).item()
-    tpr_E = torch.sum(torch.eq(T[:,288:438],P[:,288:438]) * t_ones_E_bool).item()/t_ones_E
-    tnr_E = torch.sum(torch.eq(T[:,288:438],P[:,288:438]) * t_zeros_E_bool).item()/t_zeros_E
-  
-    t_ones_T_bool = torch.eq(torch.ones(T.shape[0], 128, dtype=torch.float32),T[:,438:])
-    t_zeros_T_bool = torch.eq(torch.zeros(T.shape[0], 128, dtype=torch.float32),T[:,438:])
+    tpr_E = torch.sum(torch.eq(T[:, 288:438], P[:, 288:438]) * t_ones_E_bool).item() / t_ones_E if t_ones_E != 0 else 0
+    tnr_E = torch.sum(torch.eq(T[:, 288:438], P[:, 288:438]) * t_zeros_E_bool).item() / t_zeros_E if t_zeros_E != 0 else 0
+
+    t_ones_T_bool = torch.eq(torch.ones(T.shape[0], 128, dtype=torch.float32), T[:, 438:])
+    t_zeros_T_bool = torch.eq(torch.zeros(T.shape[0], 128, dtype=torch.float32), T[:, 438:])
     t_ones_T = torch.sum(t_ones_T_bool).item()
     t_zeros_T = torch.sum(t_zeros_T_bool).item()
-    tpr_T = torch.sum(torch.eq(T[:,438:],P[:,438:]) * t_ones_T_bool).item()/t_ones_T
-    tnr_T = torch.sum(torch.eq(T[:,438:],P[:,438:]) * t_zeros_T_bool).item()/t_zeros_T
-    
-    t_ones_bool = torch.cat((t_ones_H_bool,t_ones_E_bool,t_ones_T_bool),1)
-    t_zeros_bool = torch.cat((t_zeros_H_bool,t_zeros_E_bool,t_zeros_T_bool),1)
+    tpr_T = torch.sum(torch.eq(T[:, 438:], P[:, 438:]) * t_ones_T_bool).item() / t_ones_T if t_ones_T != 0 else 0
+    tnr_T = torch.sum(torch.eq(T[:, 438:], P[:, 438:]) * t_zeros_T_bool).item() / t_zeros_T if t_zeros_T != 0 else 0
+
+    t_ones_bool = torch.cat((t_ones_H_bool, t_ones_E_bool, t_ones_T_bool), 1)
+    t_zeros_bool = torch.cat((t_zeros_H_bool, t_zeros_E_bool, t_zeros_T_bool), 1)
     t_ones = torch.sum(t_ones_bool).item()
     t_zeros = torch.sum(t_zeros_bool).item()
-    tpr_all = torch.sum(torch.eq(T,P) * t_ones_bool).item()/t_ones
-    tnr_all = torch.sum(torch.eq(T,P) * t_zeros_bool).item()/t_zeros
-
+    tpr_all = torch.sum(torch.eq(T, P) * t_ones_bool).item() / t_ones if t_ones != 0 else 0
+    tnr_all = torch.sum(torch.eq(T, P) * t_zeros_bool).item() / t_zeros if t_zeros != 0 else 0
 
     return [tpr_all, tnr_all, tpr_H, tnr_H, tpr_E, tnr_E, tpr_T, tnr_T]
 
