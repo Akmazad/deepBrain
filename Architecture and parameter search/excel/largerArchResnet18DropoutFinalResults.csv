@@ -1,0 +1,13 @@
+Training mean				
+	All	HumanFC	EpiMap	TFs
+	0.082466667	0	0.174813333	0.012041905
+Training max				
+	All	HumanFC	EpiMap	TFs
+	0.101	0	0.193	0.018
+				
+testing mean				
+	all	human	epi	tf
+	0.043192982	0	0.090631579	0.003859649
+testing max				
+	all	human	epi	tf
+	0.078	0	0.193	0.008
