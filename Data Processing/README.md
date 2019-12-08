@@ -29,7 +29,8 @@ Our pipeline considers only those chromosomal bins for DL training that has at l
 |EpiMap|1,744,883|353,566|
 |HumanFC|490,233|118,347|
 |ENCODE TFs|2,441,723|725,276|
-|union|3,528,533|---|
+|CAGE|9,840|9,479|
+|union (except CAGE)|3,528,533|---|
 - Scripts used:
 ```sh
 # for saving non-zero binInfo
