@@ -103,7 +103,7 @@ flankingLength = 400
 LabelFiles <- c("HumanFC_only_nonzero_labels.bed",
                "EpiMap_only_nonzero_labels.bed",
                "CAGE_only_nonzero_labels.bed",
-               "ENCODE_TFs__only_nonzero_labels.bed")
+               "ENCODE_TFs_only_nonzero_labels.bed")
 outCombined <- c("HumanFC_nonZero.bin.Seq_Labels.bed",
                  "EpiMap_nonZero.bin.Seq_Labels.bed",
                  "CAGE_nonZero.bin.Seq_Labels.bed",
