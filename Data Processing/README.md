@@ -89,6 +89,45 @@ awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed"{A[$1$2$
 awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed"{A[$1$2$3]=$1$2$3} FILENAME=="final.tf.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed final.tf.overlaps.dropped.fixed.filtered.sorted.bed > ENCODE_TFs_nonzero_labels.bed
 
 ```
+- get Sequences and Labels from individual data (for non_zero bins only) (ran on Katana Head node)
+```r
+setwd("/srv/scratch/z3526914/DeepBrain/Data")
+library(data.table)
+library(dplyr)
+
+library("BSgenome.Hsapiens.UCSC.hg19")
+hg <- BSgenome.Hsapiens.UCSC.hg19
+
+flankingLength = 400
+
+LabelFiles <- c("HumanFC_only_nonzero_labels.bed",
+               "EpiMap_only_nonzero_labels.bed",
+               "CAGE_only_nonzero_labels.bed",
+               "ENCODE_TFs__only_nonzero_labels.bed")
+outCombined <- c("HumanFC_nonZero.bin.Seq_Labels.bed",
+                 "EpiMap_nonZero.bin.Seq_Labels.bed",
+                 "CAGE_nonZero.bin.Seq_Labels.bed",
+                 "ENCODE_nonZero.bin.Seq_Labels.bed")
+
+for(i in 1:length(LabelFiles))
+{
+  binsOfInterest <- fread(LabelFiles[i], sep="\t", header=T)
+  binsOfInterest$id <- paste0(binsOfInterest$chr, "_", binsOfInterest$start, "_", binsOfInterest$end) # fix the ids (scientific notation appread!!)
+  
+  # flankingLength = 400
+  seq <- getSeq(hg, binsOfInterest$chr, start=binsOfInterest$start-flankingLength, end=binsOfInterest$end+flankingLength)
+  seq <- as.character(as.data.frame(seq)[[1]])
+  binsOfInterest.seq <- cbind(binsOfInterest[,c(1:4)],seq)
+  colnames(binsOfInterest.seq) <- c(colnames(binsOfInterest)[c(1:4)],"dna.seq")
+  dna.dat <- binsOfInterest.seq
+  rm(binsOfInterest.seq)
+  
+  # generate labels for the bins of interest
+  output_full <- cbind(dna.dat, binsOfInterest[,-c(1:4)])
+  colnames(output_full) <- c(colnames(dna.dat), colnames(binsOfInterest)[-c(1:4)])
+  fwrite(output_full,file=outCombined[i], sep="\t", row.names=F, quote=F)
+}
+```
 - Merge all labels. Need to run on KATANA ([```ExtractLabels_KATANA.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/ExtractLabels_KATANA.sh)). DNA sequences (Data) will be also augmented
 ```r
 rm(list = ls(all.names = TRUE))
