@@ -29,7 +29,7 @@ We dropped rows for which there are no more than 1 sample peaks found by using [
 |---|---|---|
 |EpiMap|150|353,566|
 |HumanFC|288|118,347|
-|CAGE|136|9,479|
+|CAGE|136|163,018|
 
 This filtered peak matrices can be augmented with TF features sets using [```Merge_binned_TF_profiles_with_other_features.sh```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/RNA-seq/Merge_binned_TF_profiles_with_other_features.sh) script on Raijin *hugemem* queue.
 
