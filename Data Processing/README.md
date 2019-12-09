@@ -165,10 +165,7 @@ Final set of data (before entering DL pipeline) stats are as follows:
 |Type|Filename|Location|nBins|nLabels|
 |---|---|---|---|---|
 |Genomic DNA|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|---|
-|Binary Labels|<ul><li>HumanFC_only_nonzero_labels.bed </li>
-<li>EpiMap_only_nonzero_labels.bed </li>
-<li>CAGE_only_nonzero_labels.bed </li>
-<li>ENCODE_TFs_only_nonzero_labels.bed </li> <li>HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.bed </li></ul>|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
+|Binary Labels|HumanFC_only_nonzero_labels.bed<br>EpiMap_only_nonzero_labels.bed<br>CAGE_only_nonzero_labels.bed<br>ENCODE_TFs_only_nonzero_labels.bed<br>HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
 |Data + Labels|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
 
 ## 4. (TF-specific genomic bins) based pipeline
