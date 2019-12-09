@@ -72,6 +72,15 @@ Rscript /srv/scratch/z3526914/DeepBrain/Scripts/ExtractDNAseq_KATANA.R \
 ### 3.2 Extract Labels (binary signals) for non-zero bins
 - Extract labels for non-zero bins from each data files (HumanFC, EpiMap and ENCODE_TFs)
 ```sh
+# extracting Labels for individual data
+awk -F "\t" 'FILENAME=="HumanFC_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_nonZero.binInfo.bed mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_only_nonzero_labels.bed
+
+awk -F "\t" 'FILENAME=="EpiMap_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' EpiMap_nonZero.binInfo.bed mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > EpiMap_only_nonzero_labels.bed
+
+awk -F "\t" 'FILENAME=="CAGE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="Brain_CagePeaks_filtered.overlaps.dropped.filtered.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' CAGE_nonZero.binInfo.bed mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > CAGE_only_nonzero_labels.bed
+
+awk -F "\t" 'FILENAME=="ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="final.tf.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' ENCODE_nonZero.binInfo.bed final.tf.overlaps.dropped.fixed.filtered.sorted.bed > ENCODE_TFs_only_nonzero_labels.bed
+
 # its checking binInfo of both files (chr, start and end coordinates of bins)
 awk -F "\t" 'FILENAME=="HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_nonzero_labels.bed
 
