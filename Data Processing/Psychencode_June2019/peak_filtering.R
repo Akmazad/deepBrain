@@ -7,7 +7,7 @@ filename <- "mergedPeakHeightMatrix_HumanFC"
 load(paste0(filename, ".rda"))
 val_th <- 0 # can be decided later
 new_peaks <- ifelse(peaks>val_th, 1, 0); rm(peaks)
-new_peaks <- ifelse(!is.na(new_peaks), 1, 0) # replacing NAs with 0
+new_peaks <- ifelse(!is.na(new_peaks), new_peaks, 0) # replacing NAs with 0
 new_peaks <- new_peaks[which(rowSums2(new_peaks, na.rm = T) > 1),]
 
 ## just checking if any bin has < 2 samples peaks
