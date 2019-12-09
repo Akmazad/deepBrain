@@ -77,7 +77,7 @@ awk -F "\t" 'FILENAME=="HumanFC_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=
 
 awk -F "\t" 'FILENAME=="EpiMap_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' EpiMap_nonZero.binInfo.bed mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > EpiMap_only_nonzero_labels.bed
 
-awk -F "\t" 'FILENAME=="CAGE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="Brain_CagePeaks_filtered.overlaps.dropped.filtered.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' CAGE_nonZero.binInfo.bed mergedPeakHeightMatrix_EpiMap_filtered.overlaps.dropped.fixed.filtered.sorted.bed > CAGE_only_nonzero_labels.bed
+awk -F "\t" 'FILENAME=="CAGE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="Brain_CagePeaks_filtered.overlaps.dropped.filtered.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' CAGE_nonZero.binInfo.bed Brain_CagePeaks_filtered.overlaps.dropped.filtered.fixed.filtered.sorted.bed > CAGE_only_nonzero_labels.bed
 
 awk -F "\t" 'FILENAME=="ENCODE_nonZero.binInfo.bed"{A[$1$2$3]=$1$2$3} FILENAME=="final.tf.overlaps.dropped.fixed.filtered.sorted.bed"{if(A[$1$2$3]==$1$2$3){print}}' ENCODE_nonZero.binInfo.bed final.tf.overlaps.dropped.fixed.filtered.sorted.bed > ENCODE_TFs_only_nonzero_labels.bed
 
