@@ -165,7 +165,7 @@ Final set of data (before entering DL pipeline) stats are as follows:
 |Type|Filename|Location|nBins|nLabels|
 |---|---|---|---|---|
 |Genomic DNA|HumanFC_ENCODE_EpiMap_nonZero.bin.Seq.bed|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|---|
-|Binary Labels| <ul><li>HumanFC_only_nonzero_labels.bed </li>
+|Binary Labels|<ul><li>HumanFC_only_nonzero_labels.bed </li>
 <li>EpiMap_only_nonzero_labels.bed </li>
 <li>CAGE_only_nonzero_labels.bed </li>
 <li>ENCODE_TFs_only_nonzero_labels.bed </li> <li>HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.bed </li></ul>|/Volumes/Data1/PROJECTS/DeepLearning/Test|3,528,533|566|
