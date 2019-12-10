@@ -112,6 +112,9 @@ outCombined <- c("HumanFC_nonZero.bin.Seq_Labels.bed",
 for(i in 1:length(LabelFiles))
 {
   binsOfInterest <- fread(LabelFiles[i], sep="\t", header=T)
+  # if(prod(colnames(binsOfInterest) == c("chr", "start", "end", "id")) == 0){
+  #   colnames(binsOfInterest) <- c("chr", "start", "end", "id")
+  # }
   binsOfInterest$id <- paste0(binsOfInterest$chr, "_", binsOfInterest$start, "_", binsOfInterest$end) # fix the ids (scientific notation appread!!)
   
   # flankingLength = 400
