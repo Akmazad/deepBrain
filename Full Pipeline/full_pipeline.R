@@ -15,6 +15,9 @@ dataDir = paste0("/Volumes/Data1/PROJECTS/DeepLearning/Test/",binSize,"_",flanki
 # dataDir = paste0("/srv/scratch/z3526914/DeepBrain/Data/",binSize,"_",flanking,"/")
 
 dir.create(dataDir)
+# set a fixed number of bins for this bin_flanking test:
+# Rationale: for smaller bin/flanking size, the number of bins will be huge
+#            for which downstream data processing may suffer resource issue
 howManyBins = 1000000
 # chrSizeFileName = "/srv/scratch/z3526914/DeepBrain/Data/hg19.chrom.sizes.txt"
 chrSizeFileName = "/Volumes/Data1/PROJECTS/DeepLearning/Test/hg19.chrom.sizes.txt"
