@@ -1,7 +1,7 @@
 # Input:  binsize, flankingLength, howManyBins (default: 1M)
 #         mergedPeaks (mergedPeakHeightMatrix_HumanFC_filtered.bed, 
 #         mergedPeakHeightMatrix_EpiMap_filtered.bed, 
-#         final.dat.tf.overlaps.bed)
+#         final.tf.overlaps.bed)
 # Host: RNA machine/KATANA 
 #       RNA:    Data dir: /Volumes/Data1/PROJECTS/DeepLearning/Test
 #               Script dir: /Volumes/Data1/PROJECTS/DeepLearning/Test
