@@ -106,6 +106,10 @@ sort -k 1,1 -k2,2n Brain_CagePeaks_filtered.overlaps.dropped.filtered.fixed.filt
 
 
 1) Few commands used for intermmediate sanity checks:
+- print the first line of a file
+```sh
+head -n 1 filename
+```
 - count number of fields in ```\t``` deliminted file
 ```sh
 awk -F'\t' '{print NF; exit}' mergedPeakHeightMatrix_HumanFC_filtered.overlaps.bed
