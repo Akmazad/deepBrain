@@ -1,7 +1,8 @@
 # Input:  binsize, flankingLength, howManyBins (default: 1M)
 #         mergedPeaks (mergedPeakHeightMatrix_HumanFC_filtered.bed, 
 #         mergedPeakHeightMatrix_EpiMap_filtered.bed, 
-#         final.dat.tf.overlaps.bed)
+#         Brain_CagePeaks_filtered.bed,
+#         final.tf.overlaps.bed)
 # Host: RNA machine/KATANA 
 #       RNA:    Data dir: /Volumes/Data1/PROJECTS/DeepLearning/Test
 #               Script dir: /Volumes/Data1/PROJECTS/DeepLearning/Test
@@ -13,12 +14,13 @@ library(dplyr)
 library(data.table)
 source = "HumanFC"
 # ------------- Set Bin-flanking configuration
-binSize = 200
-flanking = 4*binSize     # can be arbitrarily given
+binSize = 400
+flanking = 2*binSize     # can be arbitrarily given
 dataDir = paste0("/Volumes/Data1/PROJECTS/DeepLearning/Test/", source, "/",binSize,"_",flanking,"/")
 # dataDir = paste0("/srv/scratch/z3526914/DeepBrain/Data/", source, "/",binSize,"_",flanking,"/")
+dir.create(dataDir, recursive=T)
 
-dir.create(dataDir)
+# ------------- Bin creation
 # set a fixed number of bins for this bin_flanking test:
 # Rationale: for smaller bin/flanking size, the number of bins will be huge
 #            for which downstream data processing may suffer resource issue
@@ -44,6 +46,8 @@ for (j in c(1:nrow(chr_size))){
 bins=as.data.frame(bins)
 colnames(bins)=c("chr", "start", "end")
 bins$id=paste(bins$chr, bins$start, bins$end, sep="_")
+# Note: no strand is mentioned, hence 1 less column in all the subsequent files
+
 binFile=paste0("hg19_bins_", b,"bp")
 fwrite(bins, file=paste0(dataDir,binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 message("Done",appendLF=T)
@@ -60,8 +64,10 @@ message("Done",appendLF=T)
 # 2. IntersectBED bins (-a) with mergedPeaks (-b) in shell and post-processing: three file outputs
 
 # ---------------------------------------------- HumanFC
+# --------------- IntersectBED with bins
 humanFC_inputFile = "mergedPeakHeightMatrix_HumanFC_filtered"
-humanFC_outputFile = paste0(humanFC_inputFile,".overlaps")
+# Note: "humanFC_inputFile" should exist within the "dataDir"
+humanFC_outputFile = paste0(humanFC_inputFile,"_randBins.overlaps")
 message("Intersect BED HumanFC:",appendLF=F)
 system2('intersectBed', 
         paste('-wao -f 0.05 -a', paste0(dataDir,bin_outputFile,".bed"), '-b', paste0(dataDir,humanFC_inputFile,".bed"), sep=' '), 
@@ -69,6 +75,7 @@ system2('intersectBed',
         wait=T)
 message("Done",appendLF=T)
 
+# --------------- Drop unwanted fields
 humanFC_inputFile = humanFC_outputFile
 humanFC_outputFile = paste0(humanFC_inputFile,".dropped")
 message("Drop columns in HumanFC:",appendLF=F)
@@ -78,6 +85,7 @@ system2('cut',
         wait=T)
 message("Done",appendLF=T)
 
+# --------------- Filter and aggregate (max) bins with same IDs
 message("For multiple overlap with the same bin, pick the max-overlapped one: in HumanFC:",appendLF=F)
 con <- file(paste0(dataDir,"mergedPeakHeightMatrix_HumanFC_filtered.bed"),"r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
@@ -90,6 +98,7 @@ colnames(dat) <- header
 fwrite(dat, file=paste0(dataDir,humanFC_outputFile,".bed"), sep="\t")
 message("Done",appendLF=T)
 
+# --------------- Replace dots with 0
 message("Replace dots with 0 (comes from intersectBed -wao): in HumanFC:",appendLF=F)
 humanFC_inputFile = humanFC_outputFile
 humanFC_outputFile = paste0(humanFC_inputFile,".fixed")
@@ -111,19 +120,22 @@ message("Done",appendLF=T)
 # non-Zero bins extraction in Shell (using awk): three file outputs
 message("Getting Non-zero genomic bins:",appendLF=F)
 # HumanFC
-inputFile = "mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.fixed.sorted"
-outputFile = "HumanFC_nonZero.binInfo"
+inputFile = "mergedPeakHeightMatrix_HumanFC_filtered_randBins.overlaps.dropped.filtered.fixed.sorted"
+outputFile = "HumanFC_randBins_nonZero.binInfo"
 system2('awk', 
         paste('-F \'\t\' \' {for(i=5; i<=NF; i++) if ($i == 1) {print $1"\t"$2"\t"$3"\t"$4; break;} }\'',paste0(dataDir,inputFile,".bed"), sep=' '), 
         stdout=paste0(dataDir,outputFile,".bed"), 
         wait=T)
+message("Done",appendLF=T)
+
 # Extract genomic bins and lables and combine in a single file: one File output
 library("BSgenome.Hsapiens.UCSC.hg19")
 hg <- BSgenome.Hsapiens.UCSC.hg19
 flankingLength <- flanking
-inputFile <- unionFileOutput
-DNAoutputFile <- "HumanFC_ENCODE_EpiMap_nonZero.bin.Seq"
-nonZerobins <- fread(paste0(dataDir,inputFile), sep="\t", header=T)
+inputFile <- outputFile
+DNAoutputFile <- "HumanFC_randBins_nonZero.bin.Seq"
+nonZerobins <- fread(paste0(dataDir,inputFile, ".bed"), sep="\t", header=F)
+colnames(nonZerobins) <- c("chr","start","end","id")
 seq <- getSeq(hg,nonZerobins$chr,start=nonZerobins$start-flankingLength,end=nonZerobins$end+flankingLength)
 # seq <- tryCatch({
 #   getSeq(hg,nonZerobins$chr,start=nonZerobins$start-flankingLength,end=nonZerobins$end+flankingLength)
@@ -138,9 +150,9 @@ fwrite(nonZerobins.seq, file=paste0(dataDir, DNAoutputFile,".bed"), sep="\t", ro
 
 message("Extract labels for non-zero bins from each data files (HumanFC, EpiMap and ENCODE_TFs):",appendLF=F)
 # HUMANFC
-inputFile1 = "HumanFC_ENCODE_EpiMap_nonZero.binInfo.Union.bed"
-inputFile2 = "mergedPeakHeightMatrix_HumanFC_filtered.overlaps.dropped.filtered.fixed.sorted.bed"
-HumanFC_nonzero_outputFile = "HumanFC_nonzero_labels"
+inputFile1 = "HumanFC_randBins_nonZero.binInfo.bed"
+inputFile2 = "mergedPeakHeightMatrix_HumanFC_filtered_randBins.overlaps.dropped.filtered.fixed.sorted.bed"
+HumanFC_nonzero_outputFile = "HumanFC_randBins_nonzero_labels"
 system2('awk', 
         paste0('-F \"\t\" \'FILENAME==\"',
                paste0(dataDir,inputFile1),
@@ -154,24 +166,17 @@ system2('awk',
 
 message("Done",appendLF=T)
 
-# HumanFC_nonzero_outputFile = "HumanFC_nonzero_labels"
-# EpiMap_nonzero_outputFile = "EpiMap_nonzero_labels"
-# TFs_nonzero_outputFile = "ENCODE_TFs_nonzero_labels"
+# HumanFC_nonzero_outputFile = "HumanFC_randBins_nonzero_labels"
+
 message("Print all the nonzero bins with sequence and labels:",appendLF=F)
-outputFile <- "HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels"
+outputFile <- "HumanFC_randBins_nonZero.bin.Seq_Labels"
 dna.dat <- fread(paste0(dataDir, DNAoutputFile, ".bed"), sep="\t", header=T)
 human <- fread(paste0(dataDir, HumanFC_nonzero_outputFile, ".bed"), sep="\t", header=T)
 human$id <- paste0(human$chr, "_", human$start, "_", human$end)
-epi <- fread(paste0(dataDir, EpiMap_nonzero_outputFile, ".bed"), sep="\t", header=T)
-epi$id <- paste0(epi$chr, "_", epi$start, "_", epi$end)
-tf <- fread(paste0(dataDir, TFs_nonzero_outputFile, ".bed"), sep="\t", header=T)
-tf$id <- paste0(tf$chr, "_", tf$start, "_", tf$end)
 
-output <- cbind(human, epi[which(epi$id %in% human$id),-c(1:4)], tf[which(tf$id %in% human$id),-c(1:4)])
-output_full <- cbind(dna.dat[which(dna.dat$id %in% human$id), ], human[,-c(1:4)], epi[which(epi$id %in% human$id),-c(1:4)], tf[which(tf$id %in% human$id),-c(1:4)])
-colnames(output) <- c(colnames(human), colnames(epi)[-c(1:4)], colnames(tf)[-c(1:4)])
-colnames(output_full) <- c(colnames(dna.dat), colnames(human)[-c(1:4)], colnames(epi)[-c(1:4)], colnames(tf)[-c(1:4)])
-fwrite(output,file="HumanFC_ENCODE_EpiMap_nonZero.bin.Labels.bed", sep="\t", row.names=F, quote=F)
+# output <- cbind(human, epi[which(epi$id %in% human$id),-c(1:4)], tf[which(tf$id %in% human$id),-c(1:4)])
+output_full <- cbind(dna.dat[which(dna.dat$id %in% human$id), ], human[,-c(1:4)])
+colnames(output_full) <- c(colnames(dna.dat), colnames(human)[-c(1:4)])
 fwrite(output_full,file=paste0(dataDir, outputFile, ".bed"), sep="\t", row.names=F, quote=F)
 
 message("Done",appendLF=T)
