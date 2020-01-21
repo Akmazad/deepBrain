@@ -128,11 +128,6 @@ system2('awk',
         wait=T)
 message("Done",appendLF=T)
 
-# awk doesn't print the header in above command, so have to put the column header 
-tempFile = fread(paste0(dataDir,outputFile,".bed"), sep="\t", header=F)
-colnames(tempFile) <- c("chr","start","end","id")
-fwrite(tempFile, file=paste0(dataDir,outputFile,".bed"), sep="\t", quote=F, row.names=F)
-
 # Extract genomic bins and lables and combine in a single file: one File output
 library("BSgenome.Hsapiens.UCSC.hg19")
 hg <- BSgenome.Hsapiens.UCSC.hg19
@@ -141,6 +136,7 @@ inputFile <- outputFile
 DNAoutputFile <- "HumanFC_randBins_nonZero.bin.Seq"
 nonZerobins <- fread(paste0(dataDir,inputFile, ".bed"), sep="\t", header=F)
 colnames(nonZerobins) <- c("chr","start","end","id")
+fwrite(nonZerobins, file=paste0(dataDir,inputFile, ".bed"), sep="\t", quote=F, row.names=F)
 seq <- getSeq(hg,nonZerobins$chr,start=nonZerobins$start-flankingLength,end=nonZerobins$end+flankingLength)
 # seq <- tryCatch({
 #   getSeq(hg,nonZerobins$chr,start=nonZerobins$start-flankingLength,end=nonZerobins$end+flankingLength)
