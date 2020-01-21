@@ -187,7 +187,7 @@ message("Done",appendLF=T)
 system2("python", 
         paste(paste0(dataDir,"split_and_Numpy_V2.py"), 
               "--datadir", dataDir,
-              "--datafilename HumanFC_ENCODE_EpiMap_nonZero.bin.Seq_Labels",
+              "--datafilename HumanFC_randBins_nonZero.bin.Seq_Labels",
               "--valid_chr_id 1", 
               sep = ' '), 
         wait=T)
