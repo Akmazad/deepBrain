@@ -1,6 +1,7 @@
 # Input:  binsize, flankingLength, howManyBins (default: 1M)
 #         mergedPeaks (mergedPeakHeightMatrix_HumanFC_filtered.bed, 
 #         mergedPeakHeightMatrix_EpiMap_filtered.bed, 
+#         Brain_CagePeaks_filtered.bed,
 #         final.tf.overlaps.bed)
 # Host: RNA machine/KATANA 
 #       RNA:    Data dir: /Volumes/Data1/PROJECTS/DeepLearning/Test
@@ -14,7 +15,7 @@ flanking = 4*binSize     # can be arbitrarily given
 dataDir = paste0("/Volumes/Data1/PROJECTS/DeepLearning/Test/",binSize,"_",flanking,"/")
 # dataDir = paste0("/srv/scratch/z3526914/DeepBrain/Data/",binSize,"_",flanking,"/")
 
-dir.create(dataDir)
+dir.create(dataDir, recursive=T)
 # set a fixed number of bins for this bin_flanking test:
 # Rationale: for smaller bin/flanking size, the number of bins will be huge
 #            for which downstream data processing may suffer resource issue
@@ -43,6 +44,8 @@ for (j in c(1:nrow(chr_size))){
 bins=as.data.frame(bins)
 colnames(bins)=c("chr", "start", "end")
 bins$id=paste(bins$chr, bins$start, bins$end, sep="_")
+# Note: no strand is mentioned, hence 1 less column in all the subsequent files
+
 binFile=paste0("hg19_bins_", b,"bp")
 fwrite(bins, file=paste0(dataDir,binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
 message("Done",appendLF=T)
@@ -60,6 +63,7 @@ message("Done",appendLF=T)
 
 # ---------------------------------------------- HumanFC
 humanFC_inputFile = "mergedPeakHeightMatrix_HumanFC_filtered"
+# Note: "humanFC_inputFile" should exist within the "dataDir", and others (Epimap, Cage, and TFs) are likewise
 humanFC_outputFile = paste0(humanFC_inputFile,".overlaps")
 message("Intersect BED HumanFC:",appendLF=F)
 system2('intersectBed', 
