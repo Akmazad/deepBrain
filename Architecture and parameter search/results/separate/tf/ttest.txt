@@ -1,0 +1,33 @@
+running T-Test between TF_EXP7.LOG and TFDEEPSEA.LOG
+
+
+
+
+\#\#\#\#\#\#
+t-value for LOSS = [-0.10848333]
+p-value for LOSS = [0.91400711]
+Thus, LOSS is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [3.8152263]
+p-value for TPR = [0.00034674]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [3.8152263]
+p-value for TPR = [0.00034674]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for CERTAINTY = [-0.52774463]
+p-value for CERTAINTY = [0.59979933]
+Thus, CERTAINTY is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for ROC = [4.81696063]
+p-value for ROC = [1.1841441e-05]
+Thus, ROC is statistically Significant

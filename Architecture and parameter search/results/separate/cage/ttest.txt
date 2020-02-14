@@ -1,0 +1,33 @@
+running T-Test between CAGE_EXP7.LOG and CAGEDEEPSEACOMP.LOG
+
+
+
+
+\#\#\#\#\#\#
+t-value for LOSS = [1.25869777]
+p-value for LOSS = [0.24362726]
+Thus, LOSS is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [1.16883573]
+p-value for TPR = [0.27611665]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [1.16883573]
+p-value for TPR = [0.27611665]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for CERTAINTY = [-3.70768603]
+p-value for CERTAINTY = [0.00597619]
+Thus, CERTAINTY is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for ROC = [0.72659901]
+p-value for ROC = [0.48818406]
+Thus, ROC is statistically Significant

@@ -1,0 +1,33 @@
+running T-Test between EPIMAP_EXP7.LOG and EPIMAPDEEPSEA.LOG
+
+
+
+
+\#\#\#\#\#\#
+t-value for LOSS = [1.83461711]
+p-value for LOSS = [0.07803056]
+Thus, LOSS is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [3.66311922]
+p-value for TPR = [0.00111827]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [3.66311922]
+p-value for TPR = [0.00111827]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for CERTAINTY = [-6.92217275]
+p-value for CERTAINTY = [2.38426793e-07]
+Thus, CERTAINTY is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for ROC = [0.44777094]
+p-value for ROC = [0.65802725]
+Thus, ROC is statistically INsignificant

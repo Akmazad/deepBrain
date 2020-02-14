@@ -1,0 +1,33 @@
+running T-Test between HUMANFC_EXP7.LOG and HUMANFCDEEPSEA.LOG
+
+
+
+
+\#\#\#\#\#\#
+t-value for LOSS = [1.39371933]
+p-value for LOSS = [0.20089854]
+Thus, LOSS is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [0.47111626]
+p-value for TPR = [0.65013725]
+Thus, TPR is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [0.47111626]
+p-value for TPR = [0.65013725]
+Thus, TPR is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for CERTAINTY = [-2.36960762]
+p-value for CERTAINTY = [0.04527414]
+Thus, CERTAINTY is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for ROC = [-0.23821011]
+p-value for ROC = [0.81770621]
+Thus, ROC is statistically INsignificant
