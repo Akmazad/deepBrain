@@ -1,0 +1,33 @@
+running T-Test between HUMANFC_EXPCHROME9.LOG and HUMANFCDEEPSEACHROME9.LOG
+
+
+
+
+\#\#\#\#\#\#
+t-value for LOSS = [2.28500451]
+p-value for LOSS = [0.08431996]
+Thus, LOSS is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [3.02367646]
+p-value for TPR = [0.03902203]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [3.02367646]
+p-value for TPR = [0.03902203]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for CERTAINTY = [-1.83635232]
+p-value for CERTAINTY = [0.14019034]
+Thus, CERTAINTY is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for ROC = [0.87609418]
+p-value for ROC = [0.43043927]
+Thus, ROC is statistically Significant

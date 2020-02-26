@@ -1,0 +1,33 @@
+running T-Test between EPIMAP_EXPCHROME9.LOG and EPIMAPDEEPSEACHROME09.LOG
+
+
+
+
+\#\#\#\#\#\#
+t-value for LOSS = [1.27036558]
+p-value for LOSS = [0.21929098]
+Thus, LOSS is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [4.0178028]
+p-value for TPR = [0.00073566]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [4.0178028]
+p-value for TPR = [0.00073566]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for CERTAINTY = [-4.21784544]
+p-value for CERTAINTY = [0.00046596]
+Thus, CERTAINTY is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for ROC = [1.06748525]
+p-value for ROC = [0.29912919]
+Thus, ROC is statistically Significant

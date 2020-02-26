@@ -1,0 +1,33 @@
+running T-Test between CAGE_EXPCHROMOSOME9.LOG and CAGEDEEPSEACOMPCHROME9.LOG
+
+
+
+
+\#\#\#\#\#\#
+t-value for LOSS = [1.262673]
+p-value for LOSS = [0.24714143]
+Thus, LOSS is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [1.00068962]
+p-value for TPR = [0.35030551]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [1.00068962]
+p-value for TPR = [0.35030551]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for CERTAINTY = [-1.74805795]
+p-value for CERTAINTY = [0.1239437]
+Thus, CERTAINTY is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for ROC = [-0.61025954]
+p-value for ROC = [0.56097135]
+Thus, ROC is statistically INsignificant

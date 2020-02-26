@@ -1,0 +1,33 @@
+running T-Test between TF_EXPCHROME9.LOG and TFDEEPSEACHROME9.LOG
+
+
+
+
+\#\#\#\#\#\#
+t-value for LOSS = [-1.00906636]
+p-value for LOSS = [0.32796028]
+Thus, LOSS is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [2.77437834]
+p-value for TPR = [0.01353772]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for TPR = [2.77437834]
+p-value for TPR = [0.01353772]
+Thus, TPR is statistically Significant
+
+
+\#\#\#\#\#\#
+t-value for CERTAINTY = [0.13556908]
+p-value for CERTAINTY = [0.89385291]
+Thus, CERTAINTY is statistically INsignificant
+
+
+\#\#\#\#\#\#
+t-value for ROC = [3.28663883]
+p-value for ROC = [0.0046483]
+Thus, ROC is statistically Significant
