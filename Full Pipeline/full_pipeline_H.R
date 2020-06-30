@@ -27,7 +27,7 @@ dir.create(dataDir, recursive=T)
 howManyBins = 1000000
 # chrSizeFileName = "/srv/scratch/z3526914/DeepBrain/Data/hg19.chrom.sizes.txt"
 chrSizeFileName = "/Volumes/Data1/PROJECTS/DeepLearning/Test/hg19.chrom.sizes.txt"
-chr_size=read.table(chrSizeFileName, sep="\t")
+chr_size = fread(chrSizeFileName, sep="\t") %>% as.data.frame()
 colnames(chr_size)=c("chr", "size")
 # remove chromosome patches and sort by chr number
 chr_size=chr_size[-grep("_", chr_size$chr, fixed=TRUE),]
