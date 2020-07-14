@@ -2,7 +2,7 @@
 #         mergedPeaks (mergedPeakHeightMatrix_HumanFC_filtered.bed, 
 #         mergedPeakHeightMatrix_EpiMap_filtered.bed, 
 #         Brain_CagePeaks_filtered.bed,
-#         final.tf.overlaps.bed)
+#         final.tf.bed)
 # Host: RNA machine/KATANA 
 #       RNA:    Data dir: /Volumes/Data1/PROJECTS/DeepLearning/Test
 #               Script dir: /Volumes/Data1/PROJECTS/DeepLearning/Test
