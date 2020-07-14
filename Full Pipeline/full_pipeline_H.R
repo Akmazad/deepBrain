@@ -16,52 +16,12 @@ source = "HumanFC"
 # ------------- Set Bin-flanking configuration
 binSize = 400
 flanking = 2*binSize     # can be arbitrarily given
-dataDir = paste0("/Volumes/Data1/PROJECTS/DeepLearning/Test/", source, "/",binSize,"_",flanking,"/")
-# dataDir = paste0("/srv/scratch/z3526914/DeepBrain/Data/", source, "/",binSize,"_",flanking,"/")
-dir.create(dataDir, recursive=T)
+baseDir = "/srv/scratch/z3526914/DeepBrain/Data/"
+dataDir = paste0(baseDir, source, "/",binSize,"_",flanking,"/")
+dir.create(dataDir, recursive=T) # create the directory if doesn't exists
 
-# ------------- Bin creation
-# set a fixed number of bins for this bin_flanking test:
-# Rationale: for smaller bin/flanking size, the number of bins will be huge
-#            for which downstream data processing may suffer resource issue
-howManyBins = 1000000
-# chrSizeFileName = "/srv/scratch/z3526914/DeepBrain/Data/hg19.chrom.sizes.txt"
-chrSizeFileName = "/Volumes/Data1/PROJECTS/DeepLearning/Test/hg19.chrom.sizes.txt"
-chr_size = fread(chrSizeFileName, sep="\t") %>% as.data.frame()
-colnames(chr_size)=c("chr", "size")
-# remove chromosome patches and sort by chr number
-chr_size=chr_size[-grep("_", chr_size$chr, fixed=TRUE),]
-chr_size=chr_size[match(paste0("chr", c(c(1:22), "M", "X", "Y")), chr_size$chr), ]
-
-# 1. generate binIDs with size given, and chose randomly 1M of them: one File output
-# generate bed file of bins of size b
-message("Generating bed files for each bins of size b: ",appendLF=F)
-b=binSize
-for (j in c(1:nrow(chr_size))){
-  start=seq(from=0, to=chr_size$size[j], by=b)+1
-  end=seq(from=b, to=chr_size$size[j], by=b)
-  chr_bins=cbind(as.character(chr_size$chr[j]),start[1:length(end)],end)
-  if (j==1) bins=chr_bins else bins=rbind(bins, chr_bins) 
-}
-bins=as.data.frame(bins)
-colnames(bins)=c("chr", "start", "end")
-bins$id=paste(bins$chr, bins$start, bins$end, sep="_")
-# Note: no strand is mentioned, hence 1 less column in all the subsequent files
-
-binFile=paste0("hg19_bins_", b,"bp")
-fwrite(bins, file=paste0(dataDir,binFile,".bed"), sep="\t", row.names=FALSE, col.names=FALSE, quote=FALSE)
-message("Done",appendLF=T)
-# select randomly a fixed number of bins
-bin_inputFile = binFile
-bin_outputFile = paste0(bin_inputFile,"_rand")
-
-message(paste("Select", howManyBins, "bins randomly "),appendLF=F)
-system2('shuf', 
-        paste('-n', howManyBins, paste0(dataDir,bin_inputFile,".bed"), '>',paste0(dataDir,bin_outputFile,".bed"), sep=' '), 
-        wait=T)
-message("Done",appendLF=T)
-
-# 2. IntersectBED bins (-a) with mergedPeaks (-b) in shell and post-processing: three file outputs
+# ------------- Read random Bins of given size
+bin_outputFile = paste0("hg19_bins_", binSize,"bp","_rand")
 
 # ---------------------------------------------- HumanFC
 # --------------- IntersectBED with bins
@@ -70,7 +30,7 @@ humanFC_inputFile = "mergedPeakHeightMatrix_HumanFC_filtered"
 humanFC_outputFile = paste0(humanFC_inputFile,"_randBins.overlaps")
 message("Intersect BED HumanFC:",appendLF=F)
 system2('intersectBed', 
-        paste('-wao -f 0.05 -a', paste0(dataDir,bin_outputFile,".bed"), '-b', paste0(dataDir,humanFC_inputFile,".bed"), sep=' '), 
+        paste('-wao -f 0.05 -a', paste0(baseDir,bin_outputFile,".bed"), '-b', paste0(baseDir,humanFC_inputFile,".bed"), sep=' '), 
         stdout=paste0(dataDir,humanFC_outputFile,".bed"), 
         wait=T)
 message("Done",appendLF=T)
@@ -87,7 +47,7 @@ message("Done",appendLF=T)
 
 # --------------- Filter and aggregate (max) bins with same IDs
 message("For multiple overlap with the same bin, pick the max-overlapped one: in HumanFC:",appendLF=F)
-con <- file(paste0(dataDir,"mergedPeakHeightMatrix_HumanFC_filtered.bed"),"r")
+con <- file(paste0(baseDir,"mergedPeakHeightMatrix_HumanFC_filtered.bed"),"r")
 header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
 close(con)
 humanFC_inputFile = humanFC_outputFile
@@ -108,6 +68,7 @@ system2('sed',
         wait=T)
 message("Done",appendLF=T)
 
+# --------------- Sort bins
 message("Sort bins: in HumanFC:",appendLF=F)
 humanFC_inputFile = humanFC_outputFile
 humanFC_outputFile = paste0(humanFC_inputFile,".sorted")
@@ -117,6 +78,7 @@ system2('sort',
         wait=T)
 message("Done",appendLF=T)
 
+# --------------- non-Zero bins extraction in Shell (using awk): three file outputs
 # non-Zero bins extraction in Shell (using awk): three file outputs
 message("Getting Non-zero genomic bins:",appendLF=F)
 # HumanFC
@@ -128,6 +90,7 @@ system2('awk',
         wait=T)
 message("Done",appendLF=T)
 
+# --------------- Extract genomic bins and lables and combine in a single file: one File output
 # Extract genomic bins and lables and combine in a single file: one File output
 library("BSgenome.Hsapiens.UCSC.hg19")
 hg <- BSgenome.Hsapiens.UCSC.hg19
@@ -149,6 +112,7 @@ nonZerobins.seq <- cbind(nonZerobins,seq)
 colnames(nonZerobins.seq) <- c(colnames(nonZerobins),"dna.seq")
 fwrite(nonZerobins.seq, file=paste0(dataDir, DNAoutputFile,".bed"), sep="\t", row.names=F, quote=F)
 
+# --------------- Extract labels for non-zero bins
 message("Extract labels for non-zero bins from each data files (HumanFC, EpiMap and ENCODE_TFs):",appendLF=F)
 # HUMANFC
 inputFile1 = "HumanFC_randBins_nonZero.binInfo.bed"
@@ -169,6 +133,7 @@ message("Done",appendLF=T)
 
 # HumanFC_nonzero_outputFile = "HumanFC_randBins_nonzero_labels"
 
+# --------------- Print all the nonzero bins with sequence and labels
 message("Print all the nonzero bins with sequence and labels:",appendLF=F)
 outputFile <- "HumanFC_randBins_nonZero.bin.Seq_Labels"
 dna.dat <- fread(paste0(dataDir, DNAoutputFile, ".bed"), sep="\t", header=T)
@@ -182,6 +147,7 @@ fwrite(output_full,file=paste0(dataDir, outputFile, ".bed"), sep="\t", row.names
 
 message("Done",appendLF=T)
 
+# --------------- split (train and test (default: 'chr'))
 # split (train and test (default: 'chr')) and numpy in Shell (python code): four File outputs
 # remember to explicitely add run permission to the python script (chmod +x split_and_Numpy_V2.py)
 system2("python", 
