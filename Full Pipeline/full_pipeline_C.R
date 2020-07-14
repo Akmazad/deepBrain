@@ -124,7 +124,7 @@ system2('awk',
                '\"{if(A[$1$2$3]==$1$2$3){print}}\' ',
                paste0(dataDir,inputFile1),' ',
                paste0(dataDir,inputFile2)), 
-        stdout=paste0(dataDir,EpiMap_nonzero_outputFile,".bed"), 
+        stdout=paste0(dataDir,CAGE_nonzero_outputFile,".bed"), 
         wait=T)
 message("Done",appendLF=T)
 
