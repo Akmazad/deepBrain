@@ -112,7 +112,7 @@ fwrite(nonZerobins.seq, file=paste0(dataDir, DNAoutputFile,".bed"), sep="\t", ro
 
 # --------------- Extract labels for non-zero bins
 message("Extract labels for non-zero bins from each data files (HumanFC, EpiMap and ENCODE_TFs):",appendLF=F)
-# HUMANFC
+# EpiMap
 inputFile1 = "EpiMap_randBins_nonZero.binInfo.bed"
 inputFile2 = "mergedPeakHeightMatrix_EpiMap_filtered_randBins.overlaps.dropped.filtered.fixed.sorted.bed"
 EpiMap_nonzero_outputFile = "EpiMap_randBins_nonzero_labels"
