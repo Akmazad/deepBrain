@@ -23,7 +23,7 @@ dir.create(dataDir, recursive=T) # create the directory if doesn't exists
 # ------------- Read random Bins of given size
 bin_outputFile = paste0("hg19_bins_", binSize,"bp","_rand")
 
-# ---------------------------------------------- EpiMap
+# ---------------------------------------------- CAGE
 # --------------- IntersectBED with bins
 CAGE_inputFile = "Brain_CagePeaks_filtered"
 # Note: "CAGE_inputFile" should exist within the "baseDir"
