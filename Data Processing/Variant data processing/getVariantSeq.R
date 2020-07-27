@@ -33,13 +33,37 @@ getVariabntSeq <- function(dat, flankingLength){
 # start
 flankingLength = 500
 library(data.table)
-# file-based processing: deepsea supple table 5 (noncoding GRASP eQTLs and negative variants sets)
+library(dplyr)
+
+dir = "/srv/scratch/z3526914/DeepBrain/Data/"
+# dir = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\"
+
+# True Positives (i.e. Functional SNPs - Brain-based)
+filename="brain_specific_eQTL"
+dat = fread(paste0(dir, filename, ".txt")) %>% as.data.frame()
+dat = dat[,c(19,11,20,21,6)]
+colnames(dat) <- c("Chr","Pos","Ref","Alt","Strand")
+# find unique snps
+dat = unique(dat)
+fwrite(dat, paste0(dir,"SNPS.BED"), header=F)   # this list has both coding and non-coding SNPs)
+message("Intersect BED to get non-coding based SNPs:",appendLF=F)
+system2('intersectBed', 
+        paste('-V -A ', paste0(dir,"SNPS.BED"), '-B', paste0(dir,"CODING.EXONS.BED"), sep=' '), 
+        stdout=paste0(dir,"NONCODING.SNPS.BED"), 
+        wait=T)
+message("Done",appendLF=T)
+
+dat$Lable = "1" # all TP
+fwrite(getVariabntSeq(dat, flankingLength), file = paste0(dir, filename, "_fastaseq.csv"), sep = ",")
+
+# True Negative (i.e. non-Functional SNPs - from deepSea supple table 5)
 filename="deepsea_supple_tabale5"
-dat = as.data.frame(fread(paste0(filename, ".csv"),header = T))
-dat[,8] = ifelse(dat[,8] == "eQTL",1,0)
+# anything other than "eQTL" is negative
+dat = as.data.frame(fread(paste0(filename, ".csv"),header = T)) %>% dplyr::filter(label != "eQTL")
+# dat[,8] = ifelse(dat[,8] == "eQTL",1,0)
 dat = dat[,c(2,3,4,5,8)]
 colnames(dat) <- c("Chr","Pos","Ref","Alt","Label")
 dat$Strand = "+"
 
 # invoke function for sequence retreival and save
-fwrite(getVariabntSeq(dat, flankingLength), file = paste0(filename, "_fastaseq_refOnly.csv"), sep = ",")
+fwrite(getVariabntSeq(dat, flankingLength), file = paste0(dir, filename, "_fastaseq_Negatives.csv"), sep = ",")
