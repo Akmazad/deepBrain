@@ -23,10 +23,10 @@ getVariabntSeq <- function(dat, flankingLength){
   # print(substring(fasta.seq.var, (flankingLength + 1),(flankingLength + 1)))
   # substring(fasta.seq,(flankingLength + 1),(flankingLength + 1))
 
-  # dat = cbind(fasta.seq.ref, fasta.seq.var, dat$Label)
-  # colnames(dat) <- c("refDNAseq", "varDNAseq", "Label")
-  dat = cbind(dat$Ref, dat$Alt, flankingLength, fasta.seq.ref, dat$Label)
-  colnames(dat) <- c("Ref","Alt", "Pos", "refDNAseq", "Label")
+  dat = cbind(fasta.seq.ref, fasta.seq.var, dat$Label)
+  colnames(dat) <- c("refDNAseq", "varDNAseq", "Label")
+  # dat = cbind(dat$Ref, dat$Alt, flankingLength, fasta.seq.ref, dat$Label)
+  # colnames(dat) <- c("Ref","Alt", "Pos", "refDNAseq", "Label")
   return(dat)
 }
 
