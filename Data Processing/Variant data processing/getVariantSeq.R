@@ -65,14 +65,15 @@ ncSNPs$Label = "1"
 fwrite(getVariabntSeq(ncSNPs, flankingLength), file = paste0(dir, filename, "_fastaseq_Positives.csv"), sep = ",")
 
 
-# # True Negative (i.e. non-Functional SNPs - from deepSea supple table 5)
-# filename="deepsea_supple_tabale5"
-# # anything other than "eQTL" is negative
-# dat = as.data.frame(fread(paste0(filename, ".csv"),header = T)) %>% dplyr::filter(label != "eQTL")
-# # dat[,8] = ifelse(dat[,8] == "eQTL",1,0)
-# dat = dat[,c(2,3,4,5,8)]
-# colnames(dat) <- c("Chr","Pos","Ref","Alt","Label")
-# dat$Strand = "+"
+# True Negative (i.e. non-Functional SNPs - from deepSea supple table 5)
+filename="deepsea_supple_tabale5"
+# anything other than "eQTL" is negative
+dat = as.data.frame(fread(paste0(filename, ".csv"),header = T)) %>% dplyr::filter(label != "eQTL")
+# dat[,8] = ifelse(dat[,8] == "eQTL",1,0)
+dat = dat[,c(2,3,4,5)]
+colnames(dat) <- c("Chr","Pos","Ref","Alt")
+dat$Label = "0"
+dat$Strand = "+"
 
-# # invoke function for sequence retreival and save
-# fwrite(getVariabntSeq(dat, flankingLength), file = paste0(dir, filename, "_fastaseq_Negatives.csv"), sep = ",")
+# invoke function for sequence retreival and save
+fwrite(getVariabntSeq(dat, flankingLength), file = paste0(dir, filename, "_fastaseq_Negatives.csv"), sep = ",")
