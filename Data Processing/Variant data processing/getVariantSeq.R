@@ -36,19 +36,42 @@ library(data.table)
 library(dplyr)
 
 dir = "/srv/scratch/z3526914/DeepBrain/Data/"
-allSNPFileName = "SNPS"
+
+# filename="brain_specific_eQTL"
+# allSNPFileName = "SNPS_DER_08a"
+# codingExonFileName = "CODING.EXONS"
+# ncSNPFileName = "NONCODING_08a.SNPS"
+
+# # True Positives (i.e. Functional SNPs - Brain-based)
+# dat = fread(paste0(dir, filename, ".txt")) %>% as.data.frame()
+# dat.sm = dat[,c(10,11,12,9,20,21,6)]     # "SNP_chr"   "SNP_start" "SNP_end"   "SNP_id"    "REF"       "ALT" "strand"
+# # find unique snps
+# dat.sm = dat.sm[!duplicated(dat.sm[,-c(5,6,7)]),]
+# fwrite(dat.sm, paste0(dir,allSNPFileName,".BED"), col.names=F, sep="\t")   # this list has both coding and non-coding SNPs)
+
+# message("Intersect BED to get non-coding based SNPs:",appendLF=F)
+# system2('intersectBed', 
+#         paste0('-v -a ', paste0(dir, allSNPFileName,".BED "), ' -b ', paste0(dir,codingExonFileName,".BED ")), 
+#         stdout=paste0(dir,ncSNPFileName,".BED"), 
+#         wait=T)
+# message("Done",appendLF=T)
+
+allSNPFileName = "SNPS_DER_08d"
 codingExonFileName = "CODING.EXONS"
-ncSNPFileName = "NONCODING.SNPS"
+ncSNPFileName = "NONCODING_08d.SNPS"
 
-# dir = "C:\\Users\\Azad\\OneDrive - UNSW\\Vafaee Lab\\Projects\\Deep Brain\\"
-
-# True Positives (i.e. Functional SNPs - Brain-based)
-filename="brain_specific_eQTL"
-dat = fread(paste0(dir, filename, ".txt")) %>% as.data.frame()
-dat.sm = dat[,c(10,11,12,9,20,21,6)]     # "SNP_chr"   "SNP_start" "SNP_end"   "SNP_id"    "REF"       "ALT" "strand"
+# True positives (the most stringent one: FDR<0.05 and a filter requiring genes to have an expression > 1 FPKM in at least 20% of the samples)
+filename="DER-08d_hg19_eQTL.FPKM1_20per"
+dat = fread(paste0("http://resource.psychencode.org/Datasets/Derived/QTLs/", 
+                   filename, ".txt")) %>% as.data.frame()
+dat.sm = dat[,c(9,10,11,8,5)]     # "SNP_chr"   "SNP_start" "SNP_end"   "SNP_id"    "strand"
 # find unique snps
-dat.sm = dat.sm[!duplicated(dat.sm[,-c(5,6,7)]),]
-fwrite(dat.sm, paste0(dir,allSNPFileName,".BED"), col.names=F, sep="\t")   # this list has both coding and non-coding SNPs)
+dat.sm = dat.sm[!duplicated(dat.sm[,-c(5)]),]
+# get snp allele info
+allele.info = fread("http://resource.psychencode.org/Datasets/Derived/QTLs/SNP_Information_Table_with_Alleles.txt") %>% as.data.frame()
+dat.sm.comb = dplyr::inner_join(dat.sm, allele.info, by=c("SNP_id" = "PEC_id"))
+dat.sm.comb = dat.sm.comb %>% dplyr::select(c("SNP_chr","SNP_start","SNP_end","SNP_id","REF","ALT", "strand"))
+fwrite(dat.sm.comb, paste0(dir,allSNPFileName,".BED"), col.names=F, sep="\t")   # this list has both coding and non-coding SNPs)
 
 message("Intersect BED to get non-coding based SNPs:",appendLF=F)
 system2('intersectBed', 
@@ -56,6 +79,9 @@ system2('intersectBed',
         stdout=paste0(dir,ncSNPFileName,".BED"), 
         wait=T)
 message("Done",appendLF=T)
+
+
+
 
 # read the non
 ncSNPs = fread(paste0(dir,ncSNPFileName,".BED")) %>% as.data.frame() %>% dplyr::select(c(1,2,5,6,7))
