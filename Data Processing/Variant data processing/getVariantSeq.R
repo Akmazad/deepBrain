@@ -62,11 +62,22 @@ ncSNPFileName = "NONCODING_08d.SNPS"
 
 # True positives (the most stringent one: FDR<0.05 and a filter requiring genes to have an expression > 1 FPKM in at least 20% of the samples)
 filename="DER-08d_hg19_eQTL.FPKM1_20per"
-dat = fread(paste0("http://resource.psychencode.org/Datasets/Derived/QTLs/", 
-                   filename, ".txt")) %>% as.data.frame()
-dat.sm = dat[,c(9,10,11,8,5)]     # "SNP_chr"   "SNP_start" "SNP_end"   "SNP_id"    "strand"
+dat = fread(paste0("http://resource.psychencode.org/Datasets/Derived/QTLs/", filename, ".txt")) %>% as.data.frame()
+
+dat.sm = dat[,c(9,10,11,8,5, 15)]     # "SNP_chr"   "SNP_start" "SNP_end"   "SNP_id"    "strand"  "FDR"
 # find unique snps
-dat.sm = dat.sm[!duplicated(dat.sm[,-c(5)]),]
+dat.sm = dat.sm[!duplicated(dat.sm[,-c(5,6)]),]
+
+# select top-most (10%) significant SNPs (based on ascending FDR-value)
+# n = as.integer(nrow(dat.sm)*0.1) # which is ~10% of all SNPS in the file
+# dat.sm = dat.sm[order(dat.sm$FDR),]
+# dat.sm = dat.sm[1:n,] 
+# allSNPFileName = paste0(allSNPFileName, "_top_10_perc")
+# ncSNPFileName = paste0(ncSNPFileName, "_top_10_perc")
+
+# dat.sm = dat[,c(9,10,11,8,5)]     # "SNP_chr"   "SNP_start" "SNP_end"   "SNP_id"    "strand"
+# # find unique snps
+# dat.sm = dat.sm[!duplicated(dat.sm[,-c(5)]),]
 # get snp allele info
 allele.info = fread("http://resource.psychencode.org/Datasets/Derived/QTLs/SNP_Information_Table_with_Alleles.txt") %>% as.data.frame()
 dat.sm.comb = dplyr::inner_join(dat.sm, allele.info, by=c("SNP_id" = "PEC_id"))
