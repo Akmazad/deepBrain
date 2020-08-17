@@ -84,6 +84,11 @@ dat.sm.comb = dplyr::inner_join(dat.sm, allele.info, by=c("SNP_id" = "PEC_id"))
 dat.sm.comb = dat.sm.comb %>% dplyr::select(c("SNP_chr","SNP_start","SNP_end","SNP_id","REF","ALT", "strand"))
 fwrite(dat.sm.comb, paste0(dir,allSNPFileName,".BED"), col.names=F, sep="\t")   # this list has both coding and non-coding SNPs)
 
+
+# for HGMD file
+# first run process_HGMD_file.R file (https://github.com/Akmazad/deepPsych/blob/master/Data%20Processing/Variant%20data%20processing/process_HGMD_file.R)
+# allSNPFileName = "HGMD_Search_Results_PromoterActivity_processed"
+
 message("Intersect BED to get non-coding based SNPs:",appendLF=F)
 system2('intersectBed', 
         paste0('-v -a ', paste0(dir, allSNPFileName,".BED "), ' -b ', paste0(dir,codingExonFileName,".BED ")), 
