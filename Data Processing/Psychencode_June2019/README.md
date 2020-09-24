@@ -7,6 +7,13 @@ In this data collection, we've gathered and preprocessed (using [```peak_process
 |HumanFC|288|197,263|
 |CAGE|-(Jerry to fill)-|-(Jerry to fill)-|
 
+# Single-Sample Data
+|Name|nSample (only Controls)|nPeaks (total)| nPeaks (>50% samples have non-zero peak-height) |
+|---|---|---|---|
+|HumanFC|137 (out of 288)|197,263|15,867|
+
+
+
 # Method
 ## Data Collection [Contributor: Jerry Offor]
 EpiMap and HumanFC studies were download from the PsychEncode Consortium using synapseClient(https://www.synapse.org). All samples from EpiMap came from NIMH Human Brain Collection core (HBCC).After dissection, they were shipped for sample preparation and CHIPseq to Ichan School of Medicince-Mt Sinai (ISMMS). Samples from HumanFc study came from Mount Sinai NIH Brain Bank and Tissue Repository and then shipped to Duke for preparation of samples and ATAC-Seq .
