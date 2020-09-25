@@ -17,3 +17,32 @@ intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b mergedPeakHeightMatrix_Human
 ```sh
 cut -f1-4,9-10 mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.bed > mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.bed
 ```
+
+- For the same bin that overlaps with multiple peak vectors, we should chose the one with max overlap, i.e. the last column indicates overlap ammount after running [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)).
+
+```r
+library(dplyr)
+library(data.table)
+# for HumanFC
+# read the header (i.e. sample names)
+con <- file("mergedPeakHeightMatrix_HumanFC_filtered_single_label.bed","r")
+header <- readLines(con,n=1) %>% strsplit("\t") %>% do.call(c,.)
+close(con)
+dat <- fread("mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.bed", sep="\t", header=F)
+dat <- dat %>% group_by(V4) %>% slice(which.max(V6)) %>% select(-c(V6))
+colnames(dat) <- header
+fwrite(dat, file="mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.filtered.bed", sep="\t")
+```
+
+- Replace all the dots (comes from the [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)) when no matches are found.
+```sh
+sed 's/\./0/g' mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.filtered.bed > mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.fixed.filtered.bed
+```
+
+## Sorting bins
+This subsection sorts bins (they are in BED format) by chromosome then by start position (same as [```this subsection```](https://github.com/Akmazad/deepBrain/blob/master/Data%20Processing/README.md#28-sorting-bins)).
+```sh
+sort -k 1,1 -k2,2n mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.fixed.filtered.bed > mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.fixed.filtered.sorted.bed
+```
+################## End of data-processing Pipeline ##############
+
