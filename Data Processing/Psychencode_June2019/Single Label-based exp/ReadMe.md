@@ -54,5 +54,31 @@ sort -k 1,1 -k2,2n mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps
 # for saving non-zero binInfo
 awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i != -1) {print $1"\t"$2"\t"$3"\t"$4"\t"$5; break;} }' mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_single_label_nonZero.binInfo.bed
 ```
+## fix the bins ending when it goes beyond the refWidth
+
+## Extract DNA sequences
+```r
+setwd("/srv/scratch/z3526914/DeepBrain/Data")
+library(data.table)
+library(dplyr)
+
+library("BSgenome.Hsapiens.UCSC.hg19")
+hg <- BSgenome.Hsapiens.UCSC.hg19
+
+flankingLength = 500
+bins <- fread("HumanFC_single_label.binInfo.bed", sep="\t", header=T)
+# fix any bin ending+flankingWidth is beyond the length of the chromosome
+chr.refWidth = fread("hg19.chrom.sizes.txt") %>% dplyr::rename(chr = V1, refWidth = V2)
+bins <- dplyr::left_join(bins, chr.refWidth, by = "chr")
+bins <- bins %>% dplyr::filter(end + flankingLength < refWidth)  %>% dplyr::select(-refWidth)
+
+seq <- getSeq(hg, bins$chr, start = bins$start - flankingLength, end = bins$end + flankingLength)
+seq <- as.character(as.data.frame(seq)[[1]])
+bins.seq <- cbind(bins,seq)
+colnames(bins.seq) <- c(colnames(bins),"dna.seq")
+fwrite(bins.seq, file="HumanFC_single_label.bin.Seq.bed", sep="\t", row.names=F, quote=F)
+```
+
 ################## End of data-processing Pipeline ##############
+
 
