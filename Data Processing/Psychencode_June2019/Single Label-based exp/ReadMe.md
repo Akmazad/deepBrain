@@ -23,6 +23,7 @@ cut -f1-4,9-10 mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.bed
 ```r
 library(dplyr)
 library(data.table)
+setwd("/srv/scratch/z3526914/DeepBrain/Data")
 # for HumanFC
 # read the header (i.e. sample names)
 con <- file("mergedPeakHeightMatrix_HumanFC_filtered_single_label.bed","r")
@@ -32,6 +33,7 @@ dat <- fread("mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.drop
 dat <- dat %>% group_by(V4) %>% slice(which.max(V6)) %>% select(-c(V6))
 colnames(dat) <- header
 fwrite(dat, file="mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.filtered.bed", sep="\t")
+
 ```
 
 - Replace all the dots (comes from the [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)) when no matches are found.
