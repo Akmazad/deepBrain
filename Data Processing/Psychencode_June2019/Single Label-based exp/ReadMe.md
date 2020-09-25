@@ -46,5 +46,13 @@ This subsection sorts bins (they are in BED format) by chromosome then by start 
 ```sh
 sort -k 1,1 -k2,2n mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.fixed.filtered.bed > mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.fixed.filtered.sorted.bed
 ```
+
+## 3. (Non-zero genomic bins) based pipeline
+- Genomic Bins (sized = 200bp) with at least one signal (binary 1) found among all samples
+- Scripts used:
+```sh
+# for saving non-zero binInfo
+awk -F '\t' ' {for(i=5; i<=NF; i++) if ($i != -1) {print $1"\t"$2"\t"$3"\t"$4"\t"$5; break;} }' mergedPeakHeightMatrix_HumanFC_filtered_single_label.overlaps.dropped.fixed.filtered.sorted.bed > HumanFC_single_label_nonZero.binInfo.bed
+```
 ################## End of data-processing Pipeline ##############
 
