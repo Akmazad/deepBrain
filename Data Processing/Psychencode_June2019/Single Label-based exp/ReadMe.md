@@ -9,7 +9,7 @@ We selected rows that have at least 50% samples have a signal "1" (defined as pe
 Next, we need to intersect each peaks with chromosomal bins of fixed-width. Following commands were used to get it done.
 
 ```sh
-intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b mergedPeakHeightMatrix_HumanFC_filtered_signle_label.BED > mergedPeakHeightMatrix_HumanFC_filtered_signle_label.overlaps.bed
+intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b mergedPeakHeightMatrix_HumanFC_filtered_signle_label.bed > mergedPeakHeightMatrix_HumanFC_filtered_signle_label.overlaps.bed
 ```
 
 ## Post-processing
