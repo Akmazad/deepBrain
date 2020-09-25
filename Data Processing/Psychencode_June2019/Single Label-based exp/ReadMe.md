@@ -12,3 +12,8 @@ Next, we need to intersect each peaks with chromosomal bins of fixed-width. Foll
 intersectBed -wao -f 0.05 -a hg19_bins_200bp.bed -b mergedPeakHeightMatrix_HumanFC_filtered_signle_label.BED > mergedPeakHeightMatrix_HumanFC_filtered_signle_label.overlaps.bed
 ```
 
+## Post-processing
+- We need to drop few information that aren't relevant (comes from peaks' binIDs after [```intersectBed -wao```](https://bedtools.readthedocs.io/en/latest/content/tools/intersect.html)).
+```sh
+cut -f1-4,9-10 mergedPeakHeightMatrix_HumanFC_filtered_signle_label.overlaps.bed > mergedPeakHeightMatrix_HumanFC_filtered_signle_label.overlaps.dropped.bed
+```
