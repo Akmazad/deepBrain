@@ -75,7 +75,7 @@ seq <- getSeq(hg, bins$chr, start = bins$start - flankingLength, end = bins$end 
 seq <- as.character(as.data.frame(seq)[[1]])
 bins.seq <- cbind(bins,seq)
 colnames(bins.seq) <- c(colnames(bins),"dna.seq")
-fwrite(bins.seq, file="HumanFC_single_label.bin.Seq_Labels.bed", sep="\t", row.names=F, quote=F)
+fwrite(bins.seq[,c(1,2,3,4,6,5)], file="HumanFC_single_label.bin.Seq_Labels.bed", sep="\t", row.names=F, quote=F)
 ```
 
 ################## End of data-processing Pipeline ##############
