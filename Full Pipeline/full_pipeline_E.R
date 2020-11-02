@@ -78,7 +78,7 @@ system2('sort',
         wait=T)
 message("Done",appendLF=T)
 
-# --------------- non-Zero bins extraction in Shell (using awk): three file outputs
+# --------------- non-Zero bins extraction in Shell (using awk): three file outputs [double-check with Fatemeh and Irina]
 message("Getting Non-zero genomic bins:",appendLF=F)
 # EpiMap
 inputFile = "mergedPeakHeightMatrix_EpiMap_filtered_randBins.overlaps.dropped.filtered.fixed.sorted"
